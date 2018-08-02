@@ -9,10 +9,25 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.tron.common.application.ApplicationFactory;
+import org.tron.core.Constant;
+import org.tron.core.config.DefaultConfig;
+import org.tron.core.config.args.Args;
+import org.tron.core.services.RpcApiService;
+import org.tron.core.services.WitnessService;
+import org.tron.core.services.http.FullNodeHttpApiService;
 
+@Slf4j
 public class MainApplication extends Application {
 
+    public static Args cfgArgs;
+
     public static void main(String[] args) {
+        Args.setParam(args, Constant.TESTNET_CONF);
+        cfgArgs = Args.getInstance();
+        cfgArgs.setWitness(true);
         launch(args);
     }
 
@@ -26,6 +41,7 @@ public class MainApplication extends Application {
                 ioExc.printStackTrace();
             }
         }).start();
+        new Thread(MainApplication::startFullNode).start();
 
         Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
         primaryStage.setTitle("Tron Studio");
@@ -39,4 +55,42 @@ public class MainApplication extends Application {
 
         primaryStage.show();
     }
+
+    private static void startFullNode () {
+        logger.info("Full node running.");
+        if (cfgArgs.isHelp()) {
+            logger.info("Here is the help message.");
+            return;
+        }
+
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        beanFactory.setAllowCircularReferences(false);
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(beanFactory);
+        context.register(DefaultConfig.class);
+        context.refresh();
+        org.tron.common.application.Application appT = ApplicationFactory.create(context);
+        shutdown(appT);
+        //appT.init(cfgArgs);
+
+        RpcApiService rpcApiService = context.getBean(RpcApiService.class);
+        appT.addService(rpcApiService);
+        if (cfgArgs.isWitness()) {
+            appT.addService(new WitnessService(appT, context));
+        }
+        //http
+        FullNodeHttpApiService httpApiService = context.getBean(FullNodeHttpApiService.class);
+        appT.addService(httpApiService);
+
+        appT.initServices(cfgArgs);
+        appT.startServices();
+        appT.startup();
+
+        rpcApiService.blockUntilShutdown();
+    }
+
+
+  public static void shutdown(final org.tron.common.application.Application app) {
+      logger.info("********register application shutdown hook********");
+      Runtime.getRuntime().addShutdownHook(new Thread(app::shutdown));
+  }
 }
