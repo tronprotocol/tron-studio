@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TreeView?>
+<?import com.jfoenix.controls.JFXButton?>
+<VBox spacing="10" prefWidth="200" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.tron.studio.ui.LeftCodeListController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <HBox>
+        <JFXButton styleClass="custom-jfx-button-raised" text="New Contract"></JFXButton>
+    </HBox>
+    <TreeView fx:id="codeList" VBox.vgrow="ALWAYS"/>
+</VBox>

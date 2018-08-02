@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.fxmisc.richtext.CodeArea?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="Infinity" maxWidth="Infinity" prefHeight="450"
+            prefWidth="800" xmlns="http://javafx.com/javafx/8.0.121"
+            fx:controller="org.tron.studio.MainController">
+    <children>
+        <HBox spacing="10" fx:id="rootPanel"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
+              AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
+            <children>
+                <fx:include source="ui/left_code_list.fxml"/>
+                <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                        <tabs>
+                            <Tab text="VoteContract">
+                                <content>
+                                    <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
+                                              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <stylesheets>
+                                            <URL value="@/css/mainTextView.css"/>
+                                            <URL value="@/css/caret.css"/>
+                                            <URL value="@/css/linecount.css"/>
+                                            <URL value="@/css/codeAreaStyles.css"/>
+                                        </stylesheets>
+                                    </CodeArea>
+                                </content>
+                            </Tab>
+                        </tabs>
+                    </TabPane>
+                </VBox>
+
+                <VBox prefWidth="400">
+                    <TabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE">
+                        <tabs>
+                            <Tab text="Compile">
+                                <content>
+                                    <fx:include source="ui/right_tab_compile.fxml"/>
+                                </content>
+                            </Tab>
+                            <Tab text="Run">
+                                <content>
+                                    <fx:include source="ui/right_tab_run.fxml"/>
+                                </content>
+                            </Tab>
+                            <Tab text="Debug">
+                                <content>
+                                    <fx:include source="ui/right_tab_debug.fxml"/>
+                                </content>
+                            </Tab>
+                        </tabs>
+                    </TabPane>
+                </VBox>
+            </children>
+        </HBox>
+
+    </children>
+</AnchorPane>
