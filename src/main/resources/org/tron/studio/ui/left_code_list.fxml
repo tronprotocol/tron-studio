@@ -14,7 +14,7 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
     <HBox>
-        <JFXButton styleClass="custom-jfx-button-raised" text="New Contract"></JFXButton>
+        <JFXButton styleClass="custom-jfx-button-raised" text="New Contract" onAction="#CreateContract"></JFXButton>
     </HBox>
     <TreeView fx:id="codeList" VBox.vgrow="ALWAYS"/>
 </VBox>
