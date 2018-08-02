@@ -300,5 +300,5 @@ def binaryRelease(taskName, jarName, mainClass) {
 }
 
 artifacts {
-            binaryRelease('buildKeystoreFactoryJar', 'KeystoreFactory', 'org.tron.program.KeystoreFactory'))
+//    archives(binaryRelease('buildTronStudio', 'TronStudio', 'org.tron.studio.TronStudio'))
 }
