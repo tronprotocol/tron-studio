@@ -5,15 +5,22 @@ import javafx.scene.control.*;
 import javafx.fxml.FXML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tron.studio.MainController;
 
 public class LeftCodeListController {
     static final Logger logger = LoggerFactory.getLogger(RightTabCompileController.class);
     @FXML private TabPane codeAreaTabPane;
     @FXML private Tab defualtTab;
+    private MainController parentController;
 
     @FXML
     public void initialize() {
         // Nothing
+    }
+
+    public void setParentController(MainController parentController) {
+        System.out.println("setParent");
+        this.parentController = parentController;
     }
 
     @FXML

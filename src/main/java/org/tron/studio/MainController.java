@@ -9,14 +9,20 @@ import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.HBox;
 import org.fxmisc.richtext.CodeArea;
+import org.tron.studio.ui.LeftCodeListController;
+import javafx.fxml.FXML;
 
 public class MainController implements Initializable {
     public CodeArea codeArea;
     public HBox rootPanel;
+    @FXML
+    private LeftCodeListController childController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         StringBuilder builder = new StringBuilder();
+        System.out.println("MainController");
+        childController.setParentController(this);
         try {
             Files.lines(Paths.get(getClass().getResource("/template/Ballot.sol").toURI())).forEach(line -> {
                 builder.append(line).append(System.getProperty("line.separator"));

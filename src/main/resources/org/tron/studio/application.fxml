@@ -7,7 +7,7 @@
 <?import javafx.geometry.Insets?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="Infinity" maxWidth="Infinity" prefHeight="450"
             prefWidth="800" xmlns="http://javafx.com/javafx/8.0.121"
-            fx:controller="org.tron.studio.ui.LeftCodeListController">
+            fx:controller="org.tron.studio.MainController">
     <children>
         <HBox spacing="10" fx:id="rootPanel"
               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
