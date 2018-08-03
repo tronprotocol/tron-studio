@@ -37,6 +37,7 @@ public class MainController implements Initializable {
             try {
                 Tab codeTab = FXMLLoader.load(getClass().getResource("ui/code_panel.fxml"));
                 codeTab.setText(newValue);
+                codeTab.setClosable(true);
                 codeAreaTabPane.getTabs().add(codeTab);
                 StringBuilder templateBuilder = new StringBuilder();
                 templateBuilder.append("pragma solidity ^0.4.0;").append("\n");
