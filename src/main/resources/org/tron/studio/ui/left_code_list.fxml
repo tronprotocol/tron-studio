@@ -8,13 +8,21 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.TreeView?>
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTreeTableView?>
+<?import com.jfoenix.controls.JFXTreeTableColumn?>
+<?import javafx.scene.layout.StackPane?>
 <VBox spacing="10" prefWidth="200" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.tron.studio.ui.LeftCodeListController">
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
     <HBox>
-        <JFXButton styleClass="custom-jfx-button-raised" text="New Contract" onAction="#CreateContract"></JFXButton>
+        <JFXButton styleClass="custom-jfx-button-raised" text="Create Contract" onAction="#createContract"/>
     </HBox>
-    <TreeView fx:id="codeList" VBox.vgrow="ALWAYS"/>
+    <JFXTreeTableView fx:id="fileNameTable">
+        <columns>
+            <JFXTreeTableColumn fx:id="fileNameColumn" text="FileName"/>
+        </columns>
+    </JFXTreeTableView>
+    <StackPane fx:id="dialogRoot"/>
 </VBox>

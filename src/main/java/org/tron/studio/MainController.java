@@ -15,14 +15,11 @@ import javafx.fxml.FXML;
 public class MainController implements Initializable {
     public CodeArea codeArea;
     public HBox rootPanel;
-    @FXML
-    private LeftCodeListController childController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         StringBuilder builder = new StringBuilder();
         System.out.println("MainController");
-        childController.setParentController(this);
         try {
 
             Files.lines(Paths.get(getClass().getResource("/template/Ballot.sol").getPath())).forEach(line -> {
