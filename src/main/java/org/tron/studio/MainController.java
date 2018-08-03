@@ -18,12 +18,11 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         StringBuilder builder = new StringBuilder();
         try {
-            Files.lines(Paths.get(getClass().getResource("/template/Ballot.sol").toURI())).forEach(line -> {
+
+            Files.lines(Paths.get(getClass().getResource("/template/Ballot.sol").getPath())).forEach(line -> {
                 builder.append(line).append(System.getProperty("line.separator"));
             });
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         codeArea.insertText(0, builder.toString());
