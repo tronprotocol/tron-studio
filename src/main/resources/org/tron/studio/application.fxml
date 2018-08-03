@@ -14,10 +14,10 @@
               AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
             <children>
                 <fx:include source="ui/left_code_list.fxml"/>
-                <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
                     <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
                         <tabs>
-                            <Tab text="VoteContract">
+                            <Tab fx:id="defualtTab" text="VoteContract">
                                 <content>
                                     <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
                                               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
