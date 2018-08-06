@@ -42,6 +42,7 @@ import org.tron.api.GrpcAPI.NodeList;
 import org.tron.api.GrpcAPI.NumberMessage;
 import org.tron.api.GrpcAPI.ProposalList;
 import org.tron.api.GrpcAPI.Return.response_code;
+import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.api.GrpcAPI.WitnessList;
 import org.tron.common.crypto.ECKey;
 import org.tron.common.crypto.Hash;
@@ -289,10 +290,33 @@ public class Wallet {
   public TransactionCapsule createTransactionCapsule(com.google.protobuf.Message message,
       ContractType contractType) throws ContractValidateException {
     TransactionCapsule trx = new TransactionCapsule(message, contractType);
-    List<Actuator> actList = ActuatorFactory.createActuator(trx, dbManager);
-    for (Actuator act : actList) {
-      act.validate();
+    if (contractType != ContractType.CreateSmartContract
+        && contractType != ContractType.TriggerSmartContract) {
+      List<Actuator> actList = ActuatorFactory.createActuator(trx, dbManager);
+      for (Actuator act : actList) {
+        act.validate();
+      }
     }
+
+    if (contractType == ContractType.CreateSmartContract) {
+      // insure one owner just have one contract
+      CreateSmartContract contract = ContractCapsule
+          .getSmartContractFromTransaction(trx.getInstance());
+      byte[] ownerAddress = contract.getOwnerAddress().toByteArray();
+      if (dbManager.getAccountContractIndexStore().get(ownerAddress) != null) {
+        throw new ContractValidateException(
+            "Trying to create second contract with one account: address: " + Wallet
+                .encode58Check(ownerAddress));
+      }
+
+//        // insure the new contract address haven't exist
+//        if (deposit.getAccount(contractAddress) != null) {
+//          logger.error("Trying to create a contract with existing contract address: " + Wallet
+//              .encode58Check(contractAddress));
+//          return;
+//        }
+    }
+
     try {
       BlockCapsule headBlock = null;
       List<BlockCapsule> blockList = dbManager.getBlockStore().getBlockByLatestNum(1);
@@ -734,7 +758,7 @@ public class Wallet {
   }
 
   public Transaction triggerContract(TriggerSmartContract triggerSmartContract,
-      TransactionCapsule trxCap) {
+      TransactionCapsule trxCap, TransactionExtention.Builder builder) {
 
     ContractStore contractStore = dbManager.getContractStore();
     byte[] contractAddress = triggerSmartContract.getContractAddress().toByteArray();
@@ -764,8 +788,10 @@ public class Wallet {
 
         ProgramResult result = runtime.getResult();
         TransactionResultCapsule ret = new TransactionResultCapsule();
-        ret.setConstantResult(result.getHReturn());
-        ret.setStatus(0, code.SUCCESS);
+
+        builder.addConstantResult(ByteString.copyFrom(result.getHReturn()));
+        //ret.setConstantResult(result.getHReturn());
+        ret.setStatus(0, code.SUCESS);
         trxCap.setResult(ret);
         return trxCap.getInstance();
       }

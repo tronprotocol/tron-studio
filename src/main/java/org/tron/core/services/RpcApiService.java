@@ -82,6 +82,7 @@ import org.tron.protos.Contract.ParticipateAssetIssueContract;
 import org.tron.protos.Contract.TransferAssetContract;
 import org.tron.protos.Contract.TransferContract;
 import org.tron.protos.Contract.UnfreezeAssetContract;
+import org.tron.protos.Contract.UpdateSettingContract;
 import org.tron.protos.Contract.VoteWitnessContract;
 import org.tron.protos.Contract.WitnessCreateContract;
 import org.tron.protos.Protocol;
@@ -587,15 +588,23 @@ public class RpcApiService implements Service {
       }
 
       if (contractType == ContractType.CreateSmartContract) {
-        // insure one owner just have one contract
+
         CreateSmartContract contract = ContractCapsule
             .getSmartContractFromTransaction(trx.getInstance());
-        byte[] ownerAddress = contract.getOwnerAddress().toByteArray();
-        if (dbManager.getAccountContractIndexStore().get(ownerAddress) != null) {
-          throw new ContractValidateException(
-              "Trying to create second contract with one account: address: " + Wallet
-                  .encode58Check(ownerAddress));
+        long percent = contract.getNewContract().getConsumeUserResourcePercent();
+        if (percent < 0 || percent > 100) {
+          throw new ContractValidateException("percent must be >= 0 and <= 100");
         }
+
+//        // insure one owner just have one contract
+//        CreateSmartContract contract = ContractCapsule
+//            .getSmartContractFromTransaction(trx.getInstance());
+//        byte[] ownerAddress = contract.getOwnerAddress().toByteArray();
+//        if (dbManager.getAccountContractIndexStore().get(ownerAddress) != null) {
+//          throw new ContractValidateException(
+//              "Trying to create second contract with one account: address: " + Wallet
+//                  .encode58Check(ownerAddress));
+//        }
 
 //        // insure the new contract address haven't exist
 //        if (deposit.getAccount(contractAddress) != null) {
@@ -806,6 +815,13 @@ public class RpcApiService implements Service {
     }
 
     @Override
+    public void updateSetting(UpdateSettingContract request,
+        StreamObserver<TransactionExtention> responseObserver) {
+      createTransactionExtention(request, ContractType.UpdateSettingContract,
+          responseObserver);
+    }
+
+    @Override
     public void createWitness(WitnessCreateContract request,
         StreamObserver<Transaction> responseObserver) {
       try {
@@ -1005,6 +1021,12 @@ public class RpcApiService implements Service {
     public void buyStorage(Contract.BuyStorageContract request,
         StreamObserver<TransactionExtention> responseObserver) {
       createTransactionExtention(request, ContractType.BuyStorageContract, responseObserver);
+    }
+
+    @Override
+    public void buyStorageBytes(Contract.BuyStorageBytesContract request,
+        StreamObserver<TransactionExtention> responseObserver) {
+      createTransactionExtention(request, ContractType.BuyStorageBytesContract, responseObserver);
     }
 
     @Override
@@ -1304,7 +1326,7 @@ public class RpcApiService implements Service {
       try {
         TransactionCapsule trxCap = createTransactionCapsule(request,
             ContractType.TriggerSmartContract);
-        trx = wallet.triggerContract(request, trxCap);
+        trx = wallet.triggerContract(request, trxCap, trxExtBuilder);
         trxExtBuilder.setTransaction(trx);
         trxExtBuilder.setTxid(trxCap.getTransactionId().getByteString());
         retBuilder.setResult(true).setCode(response_code.SUCCESS);

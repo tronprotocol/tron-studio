@@ -41,6 +41,7 @@ import org.tron.core.exception.ValidateSignatureException;
 import org.tron.protos.Contract;
 import org.tron.protos.Contract.AccountCreateContract;
 import org.tron.protos.Contract.AccountUpdateContract;
+import org.tron.protos.Contract.BuyStorageBytesContract;
 import org.tron.protos.Contract.BuyStorageContract;
 import org.tron.protos.Contract.CreateSmartContract;
 import org.tron.protos.Contract.FreezeBalanceContract;
@@ -56,6 +57,7 @@ import org.tron.protos.Contract.TriggerSmartContract;
 import org.tron.protos.Contract.UnfreezeAssetContract;
 import org.tron.protos.Contract.UnfreezeBalanceContract;
 import org.tron.protos.Contract.UpdateAssetContract;
+import org.tron.protos.Contract.UpdateSettingContract;
 import org.tron.protos.Contract.WithdrawBalanceContract;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.protos.Protocol.Transaction.Contract.ContractType;
@@ -321,8 +323,15 @@ public class TransactionCapsule implements ProtoCapsule<Transaction> {
         case BuyStorageContract:
           owner = contractParameter.unpack(BuyStorageContract.class).getOwnerAddress();
           break;
+        case BuyStorageBytesContract:
+          owner = contractParameter.unpack(BuyStorageBytesContract.class).getOwnerAddress();
+          break;
         case SellStorageContract:
           owner = contractParameter.unpack(SellStorageContract.class).getOwnerAddress();
+          break;
+        case UpdateSettingContract:
+          owner = contractParameter.unpack(UpdateSettingContract.class)
+              .getOwnerAddress();
           break;
         // todo add other contract
         default:

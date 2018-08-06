@@ -313,12 +313,16 @@ public class Runtime {
     byte[] contractAddress = Wallet.generateContractAddress(trx);
     byte[] ownerAddress = contract.getOwnerAddress().toByteArray();
 
-    // insure one owner just have one contract
-    if (this.deposit.getContractByNormalAccount(ownerAddress) != null) {
-      logger.error("Trying to create second contract with one account: address: " + Wallet
-          .encode58Check(ownerAddress));
-      return;
+    long percent = contract.getNewContract().getConsumeUserResourcePercent();
+    if (percent < 0 || percent > 100) {
+      throw new ContractExeException("percent must be >= 0 and <= 100");
     }
+    // insure one owner just have one contract
+//    if (this.deposit.getContractByNormalAccount(ownerAddress) != null) {
+//      logger.error("Trying to create second contract with one account: address: " + Wallet
+//          .encode58Check(ownerAddress));
+//      return;
+//    }
 
     // insure the new contract address haven't exist
     if (deposit.getAccount(contractAddress) != null) {
@@ -337,7 +341,8 @@ public class Runtime {
       AccountCapsule creator = this.deposit
           .getAccount(newSmartContract.getOriginAddress().toByteArray());
       long thisTxCPULimitInUs;
-      long maxCpuInUsByCreator = trx.getRawData().getMaxCpuUsage();
+      //todo remove maxCpuInUsBySender
+      long maxCpuInUsByCreator = 100000;
       long limitInDrop = trx.getRawData().getFeeLimit();
       long accountCPULimitInUs = getAccountCPULimitInUs(creator, limitInDrop,
           maxCpuInUsByCreator);
@@ -407,7 +412,8 @@ public class Runtime {
 
       // todo use default value for cpu max and storage max
       long thisTxCPULimitInUs;
-      long maxCpuInUsBySender = trx.getRawData().getMaxCpuUsage();
+      //todo remove maxCpuInUsBySender
+      long maxCpuInUsBySender = 100000;
       long limitInDrop = trx.getRawData().getFeeLimit();
       long accountCPULimitInUs = getAccountCPULimitInUs(creator, sender, contract,
           maxCpuInUsBySender, limitInDrop);
@@ -420,6 +426,9 @@ public class Runtime {
             Constant.CPU_LIMIT_IN_ONE_TX_OF_SMART_CONTRACT);
       }
 
+      if (isCallConstant(contractAddress)) {
+        thisTxCPULimitInUs = 100000;
+      }
       long vmStartInUs = System.nanoTime() / 1000;
       long vmShouldEndInUs = vmStartInUs + thisTxCPULimitInUs;
 
@@ -472,11 +481,7 @@ public class Runtime {
           // touchedAccounts.addAll(result.getTouchedAccounts());
           // check storage useage
           long usedStorageSize =
-              deposit.getBeforeRunStorageSize() - deposit.computeAfterRunStorageSize();
-          if (usedStorageSize > trx.getRawData().getMaxStorageUsage()) {
-            result.setException(Program.Exception.notEnoughStorage());
-            throw result.getException();
-          }
+              deposit.computeAfterRunStorageSize() - deposit.getBeforeRunStorageSize();
           spendUsage(usedStorageSize);
           if (executorType == ET_NORMAL_TYPE) {
             deposit.commit();
@@ -509,7 +514,7 @@ public class Runtime {
 //    ByteString originAddress = contract.getInstance().getOriginAddress();
 //    AccountCapsule origin = deposit.getAccount(originAddress.toByteArray());
     if (useedStorageSize <= 0) {
-      trace.setBill(cpuUsage, useedStorageSize);
+      trace.setBill(cpuUsage, 0);
       return;
     }
     byte[] callerAddressBytes = TransactionCapsule.getOwner(trx.getRawData().getContract(0));
@@ -520,7 +525,7 @@ public class Runtime {
     if (cpuFee > 0) {
       storageFee -= cpuFee;
     }
-    long tryBuyStorage = storageMarket.tryBuyStorage(caller, storageFee);
+    long tryBuyStorage = storageMarket.tryBuyStorage(storageFee);
     if (tryBuyStorage + caller.getStorageLeft() < useedStorageSize) {
       throw Program.Exception.notEnoughStorage();
     }
@@ -530,6 +535,16 @@ public class Runtime {
   private boolean isCallConstant() {
     if (TRX_CONTRACT_CALL_TYPE.equals(trxType)) {
       ABI abi = deposit.getContract(result.getContractAddress()).getInstance().getAbi();
+      if (Wallet.isConstant(abi, ContractCapsule.getTriggerContractFromTransaction(trx))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isCallConstant(byte[] address) {
+    if (TRX_CONTRACT_CALL_TYPE.equals(trxType)) {
+      ABI abi = deposit.getContract(address).getInstance().getAbi();
       if (Wallet.isConstant(abi, ContractCapsule.getTriggerContractFromTransaction(trx))) {
         return true;
       }

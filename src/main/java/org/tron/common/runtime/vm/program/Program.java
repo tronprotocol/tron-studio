@@ -67,6 +67,7 @@ import org.tron.common.utils.Sha256Hash;
 import org.tron.common.utils.Utils;
 import org.tron.core.capsule.AccountCapsule;
 import org.tron.core.capsule.BlockCapsule;
+import org.tron.core.config.args.Args;
 import org.tron.core.exception.ContractExeException;
 import org.tron.protos.Protocol;
 
@@ -471,6 +472,7 @@ public class Program {
 
     checkCPULimit("BEFORE CREATE");
 
+
     // [5] COOK THE INVOKE AND EXECUTE
     InternalTransaction internalTx = addInternalTx(getDroplimit(), senderAddress, null, endowment,
         programCode, "create");
@@ -496,6 +498,7 @@ public class Program {
     }
 
     checkCPULimit("AFTER CREATE");
+
     // 4. CREATE THE CONTRACT OUT OF RETURN
     byte[] code = result.getHReturn();
 
@@ -614,7 +617,7 @@ public class Program {
     InternalTransaction internalTx = addInternalTx(getDroplimit(), senderAddress, contextAddress,
         endowment, data, "call");
 
-    //checkCPULimit("BEFORE CALL");
+    checkCPULimit("BEFORE CALL");
 
     ProgramResult result = null;
     if (isNotEmpty(programCode)) {
@@ -656,15 +659,17 @@ public class Program {
 
       if (byTestingSuite()) {
         logger.info("Testing run, skipping storage diff listener");
-      } else if (Arrays.equals(transaction.getReceiveAddress(), internalTx.getReceiveAddress())) {
-        storageDiffListener.merge(program.getStorageDiff());
       }
+//      else if (Arrays.equals(transaction.getReceiveAddress(), internalTx.getReceiveAddress())) {
+//        storageDiffListener.merge(program.getStorageDiff());
+//      }
     } else {
       // 4. THE FLAG OF SUCCESS IS ONE PUSHED INTO THE STACK
       deposit.commit();
       stackPushOne();
     }
-    //checkCPULimit("AFTER CALL");
+
+    checkCPULimit("BEFORE CALL");
 
     // 3. APPLY RESULTS: result.getHReturn() into out_memory allocated
     if (result != null) {
@@ -703,9 +708,11 @@ public class Program {
 
   public void checkCPULimit(String opName) throws OutOfResourceException {
 
-    long vmNowInUs = System.nanoTime() / 1000;
-    if (vmNowInUs > getVmShouldEndInUs()) {
-      throw Exception.notEnoughCPU(opName);
+    if (!Args.getInstance().isDebug()) {
+      long vmNowInUs = System.nanoTime() / 1000;
+      if (vmNowInUs > getVmShouldEndInUs()) {
+        throw Exception.notEnoughCPU(opName);
+      }
     }
   }
 
@@ -863,7 +870,7 @@ public class Program {
   }
 
   public DataWord getDifficulty() {
-    return null; //invoke.getDifficulty().clone();
+    return new DataWord(0); //invoke.getDifficulty().clone();
   }
 
   public boolean isStaticCall() {
