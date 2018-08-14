@@ -35,7 +35,8 @@ public class CpuProcessor extends ResourceProcessor {
   }
 
   @Override
-  public void consume(TransactionCapsule trx, TransactionResultCapsule ret)
+  public void consume(TransactionCapsule trx, TransactionResultCapsule ret,
+      TransactionTrace trace)
       throws ContractValidateException, AccountResourceInsufficientException {
     List<Contract> contracts =
         trx.getInstance().getRawData().getContractList();
@@ -146,6 +147,7 @@ public class CpuProcessor extends ResourceProcessor {
     return (long) (cpuWeight * ((double) totalCpuLimit / totalCpuWeight));
   }
 
+  // todo: will change the name from us to gas
   public long getAccountLeftCpuInUsFromFreeze(AccountCapsule accountCapsule) {
 
     long now = dbManager.getWitnessController().getHeadSlot();

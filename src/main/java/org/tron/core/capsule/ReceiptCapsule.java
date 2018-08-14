@@ -39,16 +39,32 @@ public class ReceiptCapsule {
     receipt = receipt.toBuilder().setCpuUsage(usage).build();
   }
 
+  public void setCpuFee(long fee) {
+    receipt = receipt.toBuilder().setCpuFee(fee).build();
+  }
+
   public long getCpuUsage() {
     return receipt.getCpuUsage();
+  }
+
+  public long getCpuFee() {
+    return receipt.getCpuFee();
   }
 
   public void setNetUsage(long netUsage) {
     this.receipt = this.receipt.toBuilder().setNetUsage(netUsage).build();
   }
 
+  public void setNetFee(long netFee) {
+    this.receipt = this.receipt.toBuilder().setNetFee(netFee).build();
+  }
+
   public long getNetUsage() {
     return this.receipt.getNetUsage();
+  }
+
+  public long getNetFee() {
+    return this.receipt.getNetFee();
   }
 
   public void calculateCpuFee() {
@@ -59,8 +75,16 @@ public class ReceiptCapsule {
     this.receipt = this.receipt.toBuilder().setStorageDelta(delta).build();
   }
 
+  public void setStorageFee(long fee) {
+    this.receipt = this.receipt.toBuilder().setStorageFee(fee).build();
+  }
+
   public long getStorageDelta() {
     return receipt.getStorageDelta();
+  }
+
+  public long getStorageFee() {
+    return receipt.getStorageFee();
   }
 
   /**
@@ -68,9 +92,9 @@ public class ReceiptCapsule {
    */
   public void payCpuBill(
       Manager manager,
-      byte[] origin,
-      byte[] caller,
-      int percent,
+      AccountCapsule origin,
+      AccountCapsule caller,
+      long percent,
       CpuProcessor cpuProcessor,
       long now) {
     if (0 == receipt.getCpuUsage()) {
@@ -78,6 +102,7 @@ public class ReceiptCapsule {
     }
 
     long originUsage = receipt.getCpuUsage() * percent / 100;
+    originUsage = Math.min(originUsage, cpuProcessor.getAccountLeftCpuInUsFromFreeze(origin));
     long callerUsage = receipt.getCpuUsage() - originUsage;
 
     payCpuBill(manager, origin, originUsage, cpuProcessor, now);
@@ -86,19 +111,22 @@ public class ReceiptCapsule {
 
   private void payCpuBill(
       Manager manager,
-      byte[] account,
+      AccountCapsule account,
       long usage,
       CpuProcessor cpuProcessor,
       long now) {
-    AccountCapsule accountCapsule = manager.getAccountStore().get(account);
-
-    if (cpuProcessor.getAccountLeftCpuInUsFromFreeze(accountCapsule) >= usage) {
-      cpuProcessor.useCpu(accountCapsule, usage, now);
+    long accountCpuLeft = cpuProcessor.getAccountLeftCpuInUsFromFreeze(account);
+    if (accountCpuLeft >= usage) {
+      cpuProcessor.useCpu(account, usage, now);
     } else {
-      accountCapsule.setBalance(accountCapsule.getBalance() - usage * Constant.DROP_PER_CPU_US);
+      cpuProcessor.useCpu(account, accountCpuLeft, now);
+      long cpuFee = (usage - accountCpuLeft) * Constant.SUN_PER_GAS;
+      this.setCpuUsage(accountCpuLeft);
+      this.setCpuFee(cpuFee);
+      account.setBalance(account.getBalance() - cpuFee);
     }
 
-    manager.getAccountStore().put(accountCapsule.getAddress().toByteArray(), accountCapsule);
+    manager.getAccountStore().put(account.getAddress().toByteArray(), account);
   }
 
   /**
@@ -106,15 +134,16 @@ public class ReceiptCapsule {
    */
   public void payStorageBill(
       Manager manager,
-      byte[] origin,
-      byte[] caller,
-      int percent,
+      AccountCapsule origin,
+      AccountCapsule caller,
+      long percent,
       StorageMarket storageMarket) {
     if (0 == receipt.getStorageDelta()) {
       return;
     }
 
     long originDelta = receipt.getStorageDelta() * percent / 100;
+    originDelta = Math.min(originDelta, origin.getStorageLeft());
     long callerDelta = receipt.getStorageDelta() - originDelta;
 
     payStorageBill(manager, origin, originDelta, storageMarket);
@@ -123,20 +152,20 @@ public class ReceiptCapsule {
 
   private void payStorageBill(
       Manager manager,
-      byte[] account,
+      AccountCapsule account,
       long delta,
       StorageMarket storageMarket) {
-    AccountCapsule accountCapsule = manager.getAccountStore().get(account);
 
-    if (accountCapsule.getStorageLeft() >= delta) {
-      accountCapsule.setStorageUsage(accountCapsule.getStorageUsage() + delta);
+    if (account.getStorageLeft() >= delta) {
+      account.setStorageUsage(account.getStorageUsage() + delta);
     } else {
-      long needStorage = delta - accountCapsule.getStorageLeft();
-      storageMarket.buyStorage(accountCapsule, needStorage);
-      accountCapsule.setStorageUsage(accountCapsule.getStorageUsage() + needStorage);
+      long needStorage = delta - account.getStorageLeft();
+      this.setStorageFee(storageMarket.tryBuyStorageBytes(needStorage));
+      account = storageMarket.buyStorageBytes(account, needStorage);
+      account.setStorageUsage(account.getStorageUsage() + delta);
     }
 
-    manager.getAccountStore().put(accountCapsule.getAddress().toByteArray(), accountCapsule);
+    manager.getAccountStore().put(account.getAddress().toByteArray(), account);
   }
 
   public void buyStorage(long storage) {
