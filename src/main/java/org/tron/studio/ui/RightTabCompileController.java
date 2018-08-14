@@ -98,6 +98,7 @@ public class RightTabCompileController implements Initializable {
         //page = (AnchorPane)loader.load(getClass().getResource("application.fxml"));
 
         TextArea textArea = new TextArea();
+        textArea.setEditable(false);
         textArea.setWrapText(true);
         textArea.setPrefRowCount(40);
         textArea.setPrefColumnCount(50);
