@@ -20,7 +20,7 @@
         <JFXToggleButton fx:id="autoCompileToggleButton" onAction="#onClickAutoCompile" text="Auto Compile"/>
         <HBox spacing="10">
             <children>
-                <JFXComboBox fx:id="contractComboBox" HBox.hgrow="ALWAYS"/>
+                <JFXComboBox fx:id="contractComboBox" onAction="#onSelectContract" HBox.hgrow="ALWAYS"/>
                 <JFXButton styleClass="custom-jfx-button-raised" onAction="#onClickDetail" text="Detail"/>
             </children>
         </HBox>

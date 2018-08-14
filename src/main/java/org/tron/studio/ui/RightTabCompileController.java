@@ -6,7 +6,9 @@ import static org.tron.studio.solc.SolidityCompiler.Options.INTERFACE;
 import static org.tron.studio.solc.SolidityCompiler.Options.METADATA;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonObject;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXToggleButton;
 import java.io.File;
@@ -25,11 +27,27 @@ import org.tron.studio.ShareData;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.SolidityCompiler;
 
+import javafx.stage.Popup;
+import javafx.scene.control.Button;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.paint.Color;
+
 public class RightTabCompileController implements Initializable {
     static final Logger logger = LoggerFactory.getLogger(RightTabCompileController.class);
 
     public JFXComboBox contractComboBox;
     public JFXToggleButton autoCompileToggleButton;
+    private static AnchorPane page;
+
+    List<String> contractABI = new ArrayList<>();
+    List<String> contractNameList = new ArrayList<>();
+    List<String> contractBin = new ArrayList<>();
+
+    int currentContractIndex = -1;
 
     public RightTabCompileController() {
     }
@@ -51,8 +69,9 @@ public class RightTabCompileController implements Initializable {
         CompilationResult compilationResult = CompilationResult.parse(res.output);
         ShareData.setCompilationResult(contractName, compilationResult);
 
-        List<String> contractNameList = new ArrayList<>();
         compilationResult.getContracts().forEach(contractResult -> {
+            contractBin.add(contractResult.bin);
+            contractABI.add(contractResult.abi);
             JSONObject metaData = JSON.parseObject(contractResult.metadata);
             JSONObject compilationTarget = metaData.getJSONObject("settings").getJSONObject("compilationTarget");
             compilationTarget.forEach((sol, value) -> {
@@ -64,7 +83,6 @@ public class RightTabCompileController implements Initializable {
         ));
         contractComboBox.getSelectionModel().selectFirst();
 
-
         ShareData.currentContractName.set(contractName);
     }
 
@@ -72,7 +90,59 @@ public class RightTabCompileController implements Initializable {
         logger.debug("onClickAutoCompile {}", autoCompileToggleButton.isSelected());
     }
 
+    private  Popup createPopup() throws IOException {
+        //FXMLLoader loader = new FXMLLoader();
+        //loader.setLocation(Class.class
+        //        .getResource("application.fxml"));
+        //page = (AnchorPane) loader.load();
+        //page = (AnchorPane)loader.load(getClass().getResource("application.fxml"));
+
+        TextArea textArea = new TextArea();
+        textArea.setWrapText(true);
+        textArea.setPrefRowCount(40);
+        textArea.setPrefColumnCount(50);
+
+        textArea.setText(contractNameList.get(currentContractIndex));
+        textArea.appendText("\n");
+        textArea.appendText("abi");
+        textArea.appendText("\n");
+        textArea.appendText(contractABI.get(currentContractIndex));
+        textArea.appendText("\n");
+        textArea.appendText("bytecode");
+        textArea.appendText("\n");
+        textArea.appendText(contractBin.get(currentContractIndex));
+
+
+        final Popup popup = new Popup();
+
+        popup.setAutoHide(true);
+        //popup.setX(300);
+        //popup.setY(200);
+        popup.getContent().addAll(textArea);
+        //popup.getContent().addAll(new Circle(25, 25, 50, Color.AQUAMARINE));
+        return popup;
+    }
+
     public void onClickDetail(ActionEvent actionEvent) {
         logger.debug("onClickDetail {}", autoCompileToggleButton.isSelected());
+
+        if (currentContractIndex == -1) {
+            return;
+        }
+
+        Button btn = (Button)actionEvent.getSource();
+        Popup popup = new Popup();
+        try {
+            popup = createPopup();
+        } catch(IOException e)
+        {
+            logger.error("Load failed");
+        }
+
+        popup.show(btn.getScene().getWindow());
+    }
+
+    public void onSelectContract(ActionEvent actionEvent) {
+        currentContractIndex = contractComboBox.getSelectionModel().getSelectedIndex();
     }
 }
