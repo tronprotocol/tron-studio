@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -22,6 +23,10 @@ import org.tron.core.services.http.FullNodeHttpApiService;
 
 @Slf4j
 public class MainApplication extends Application {
+
+  public static MainApplication instance;
+  public Stage primaryStage;
+
 
   public static Args cfgArgs;
   public static org.tron.common.application.Application appT;
@@ -41,6 +46,9 @@ public class MainApplication extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
+    instance = this;
+    this.primaryStage = primaryStage;
+
     new Thread(() -> {
       try {
         SVGGlyphLoader.loadGlyphsFont(getClass().getResourceAsStream("/fonts/icomoon.svg"),
@@ -53,6 +61,7 @@ public class MainApplication extends Application {
 
     Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
     primaryStage.setTitle("Tron Studio");
+    primaryStage.initStyle(StageStyle.UNDECORATED);
 
     Scene scene = new Scene(root, 1024, 576);
     final ObservableList<String> stylesheets = scene.getStylesheets();

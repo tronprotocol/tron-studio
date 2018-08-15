@@ -8,9 +8,12 @@
             prefWidth="800" xmlns="http://javafx.com/javafx/8.0.121"
             fx:controller="org.tron.studio.MainController">
     <children>
+        <fx:include source="ui/top.fxml"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
+                    AnchorPane.topAnchor="0"/>
         <HBox spacing="10" fx:id="rootPanel"
               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
-              AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="50">
+              AnchorPane.topAnchor="80" AnchorPane.bottomAnchor="50">
             <children>
                 <fx:include source="ui/left_code_list.fxml"/>
                 <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
