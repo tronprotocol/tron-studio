@@ -23,18 +23,14 @@
         </columnConstraints>
         <Label text="Environment"     GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <Label text="Account"         GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <Label text="BandWidth Limit" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <Label text="CPU Limit"       GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <Label text="Storage Limit"   GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <Label text="Value"           GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Label text="Fee Limit"       GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Label text="Value"           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
 
-        <JFXComboBox  fx:id="environmentComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXComboBox  fx:id="accountComboBox"         HBox.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXTextField fx:id="bandWidthLimitTextField" HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXTextField fx:id="cpuLimitTextField"       HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXTextField fx:id="storageLimitTextField"   HBox.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXTextField fx:id="valueTextField"          HBox.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
-        <JFXComboBox  fx:id="unitComboBox"            HBox.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
+        <JFXComboBox  fx:id="environmentComboBox"  HBox.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXComboBox  fx:id="accountComboBox"      HBox.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXTextField fx:id="feeLimitTextField"    HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXTextField fx:id="valueTextField"       HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXComboBox  fx:id="unitComboBox"         HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
 
         <JFXRippler position="BACK" styleClass="icons-rippler1" GridPane.rowIndex="1" GridPane.columnIndex="3" GridPane.columnSpan="1">
             <StackPane style="-fx-padding: 2;">
@@ -55,8 +51,8 @@
             <JFXTextField promptText="constructure parameters" HBox.hgrow="ALWAYS"/>
         </HBox>
         <HBox spacing="10">
-            <JFXTextField promptText="Load contract from Address" HBox.hgrow="ALWAYS"/>
-            <JFXButton styleClass="custom-jfx-button-raised"    text="Load At Address" onAction="#onClickLoad" HBox.hgrow="ALWAYS"/>
+            <JFXTextField promptText="Load contract from address" HBox.hgrow="ALWAYS"/>
+            <JFXButton styleClass="custom-jfx-button-raised"    text="Load" onAction="#onClickLoad" HBox.hgrow="ALWAYS"/>
         </HBox>
     </VBox>
     <Region prefHeight="20"/>

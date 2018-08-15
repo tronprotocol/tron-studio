@@ -62,8 +62,6 @@ public class RightTabRunController implements Initializable {
             contractComboBox.getSelectionModel().selectFirst();
         });
     }
-    public void onClickRun(ActionEvent actionEvent) {
-    }
 
     public void onClickDeploy(ActionEvent actionEvent) {
     }
