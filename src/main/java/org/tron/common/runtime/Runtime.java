@@ -4,6 +4,8 @@ import static com.google.common.primitives.Longs.max;
 import static com.google.common.primitives.Longs.min;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.tron.common.runtime.utils.MUtil.transfer;
+import static org.tron.common.runtime.vm.VMUtils.saveProgramTraceFile;
+import static org.tron.common.runtime.vm.VMUtils.zipAndEncode;
 import static org.tron.common.runtime.vm.program.InternalTransaction.ExecutorType.ET_CONSTANT_TYPE;
 import static org.tron.common.runtime.vm.program.InternalTransaction.ExecutorType.ET_NORMAL_TYPE;
 import static org.tron.common.runtime.vm.program.InternalTransaction.ExecutorType.ET_PRE_TYPE;
@@ -21,6 +23,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.spongycastle.util.encoders.Hex;
 import org.tron.common.runtime.config.SystemProperties;
 import org.tron.common.runtime.vm.PrecompiledContracts;
 import org.tron.common.runtime.vm.VM;
@@ -39,7 +42,6 @@ import org.tron.core.Wallet;
 import org.tron.core.actuator.Actuator;
 import org.tron.core.actuator.ActuatorFactory;
 import org.tron.core.capsule.AccountCapsule;
-import org.tron.core.capsule.BytesCapsule;
 import org.tron.core.capsule.ContractCapsule;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.config.Parameter.ChainConstant;
@@ -59,16 +61,11 @@ import org.tron.protos.Protocol.SmartContract.ABI;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.protos.Protocol.Transaction.Contract.ContractType;
 
-
-/**
- * @author Guo Yonggang
- * @since 28.04.2018
- */
 @Slf4j(topic = "Runtime")
 public class Runtime {
 
 
-  SystemProperties config;
+  private SystemProperties config = SystemProperties.getInstance();
 
   private Transaction trx;
   private Block block = null;
@@ -464,7 +461,7 @@ public class Runtime {
 
     deposit.createContract(contractAddress, new ContractCapsule(newSmartContract));
     deposit.saveCode(contractAddress, ProgramPrecompile.getCode(code));
-    deposit.createContractByNormalAccountIndex(ownerAddress, new BytesCapsule(contractAddress));
+    // deposit.createContractByNormalAccountIndex(ownerAddress, new BytesCapsule(contractAddress));
 
     // transfer from callerAddress to contractAddress according to callValue
     byte[] callerAddress = contract.getOwnerAddress().toByteArray();
@@ -672,8 +669,22 @@ public class Runtime {
     return false;
   }
 
-  public RuntimeSummary finalization() {
-    return null;
+  public void finalization() {
+    if (config.vmTrace() && program != null && result != null) {
+      String trace = program.getTrace()
+          .result(result.getHReturn())
+          .error(result.getException())
+          .toString();
+
+
+      if (config.vmTraceCompressed()) {
+        trace = zipAndEncode(trace);
+      }
+
+      String txHash = Hex.toHexString(new InternalTransaction(trx).getHash());
+      saveProgramTraceFile(config,txHash, trace);
+    }
+
   }
 
   public ProgramResult getResult() {
