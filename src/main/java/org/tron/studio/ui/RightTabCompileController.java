@@ -7,9 +7,8 @@ import static org.tron.studio.solc.SolidityCompiler.Options.METADATA;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXToggleButton;
+import com.jfoenix.controls.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -22,8 +21,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.stage.Popup;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.ShareData;
@@ -98,40 +99,6 @@ public class RightTabCompileController implements Initializable {
         logger.debug("onClickAutoCompile {}", autoCompileToggleButton.isSelected());
     }
 
-    private  Popup createPopup() throws IOException {
-        //FXMLLoader loader = new FXMLLoader();
-        //loader.setLocation(Class.class
-        //        .getResource("application.fxml"));
-        //page = (AnchorPane) loader.load();
-        //page = (AnchorPane)loader.load(getClass().getResource("application.fxml"));
-
-        TextArea textArea = new TextArea();
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-        textArea.setPrefRowCount(40);
-        textArea.setPrefColumnCount(50);
-
-        textArea.setText(contractNameList.get(currentContractIndex));
-        textArea.appendText("\n");
-        textArea.appendText("abi");
-        textArea.appendText("\n");
-        textArea.appendText(contractABI.get(currentContractIndex));
-        textArea.appendText("\n");
-        textArea.appendText("bytecode");
-        textArea.appendText("\n");
-        textArea.appendText(contractBin.get(currentContractIndex));
-
-
-        final Popup popup = new Popup();
-
-        popup.setAutoHide(true);
-        //popup.setX(300);
-        //popup.setY(200);
-        popup.getContent().addAll(textArea);
-        //popup.getContent().addAll(new Circle(25, 25, 50, Color.AQUAMARINE));
-        return popup;
-    }
-
     public void onClickDetail(ActionEvent actionEvent) {
         logger.debug("onClickDetail {}", autoCompileToggleButton.isSelected());
 
@@ -140,15 +107,30 @@ public class RightTabCompileController implements Initializable {
         }
 
         Button btn = (Button)actionEvent.getSource();
-        Popup popup = new Popup();
-        try {
-            popup = createPopup();
-        } catch(IOException e)
-        {
-            logger.error("Load failed");
-        }
 
-        popup.show(btn.getScene().getWindow());
+        JFXAlert alert = new JFXAlert((Stage) btn.getScene().getWindow());
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.setOverlayClose(false);
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setHeading(new Label(contractNameList.get(currentContractIndex)));
+
+        String msg = "ABI\n";
+        msg += contractABI.get(currentContractIndex);
+        msg += "\nbytecode\n";
+        msg += contractBin.get(currentContractIndex);
+
+        TextArea textArea = new TextArea();
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setText(msg);
+
+        layout.setBody(textArea);
+        JFXButton closeButton = new JFXButton("ACCEPT");
+        closeButton.getStyleClass().add("dialog-accept");
+        closeButton.setOnAction(event -> alert.hideWithAnimation());
+        layout.setActions(closeButton);
+        alert.setContent(layout);
+        alert.show();
     }
 
     public void onSelectContract(ActionEvent actionEvent) {
