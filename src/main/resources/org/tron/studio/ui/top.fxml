@@ -8,7 +8,7 @@
             fx:id="titlePane" fx:controller="org.tron.studio.ui.TopController">
     <children>
         <JFXToolbar AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
-                    AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
+                    AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" >
             <leftItems>
                 <Label>Tron Studio</Label>
             </leftItems>

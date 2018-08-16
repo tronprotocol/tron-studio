@@ -20,6 +20,7 @@ import org.tron.core.config.args.Args;
 import org.tron.core.services.RpcApiService;
 import org.tron.core.services.WitnessService;
 import org.tron.core.services.http.FullNodeHttpApiService;
+import org.tron.studio.utils.ResizeHelper;
 
 @Slf4j
 public class MainApplication extends Application {
@@ -63,6 +64,7 @@ public class MainApplication extends Application {
     Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
     primaryStage.setTitle("Tron Studio");
     primaryStage.initStyle(StageStyle.UNDECORATED);
+    primaryStage.setResizable(true);
 
     Scene scene = new Scene(root, 1024, 576);
     final ObservableList<String> stylesheets = scene.getStylesheets();
@@ -70,7 +72,7 @@ public class MainApplication extends Application {
         getClass().getResource("/css/jfoenix-design.css").toExternalForm(),
         getClass().getResource("/css/jfoenix-main-demo.css").toExternalForm());
     primaryStage.setScene(scene);
-
+    ResizeHelper.addResizeListener(primaryStage);
     primaryStage.show();
   }
 

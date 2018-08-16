@@ -16,21 +16,21 @@
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-    <GridPane hgap="2" vgap="2">
+    <GridPane hgap="5" vgap="5">
         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" prefWidth="90.0"/>
             <ColumnConstraints hgrow="SOMETIMES" prefWidth="110.0"/>
-            <ColumnConstraints hgrow="SOMETIMES" prefWidth="100.0"/>
         </columnConstraints>
         <Label text="Environment"     GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <Label text="Account"         GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <Label text="Fee Limit"       GridPane.rowIndex="2" GridPane.columnIndex="0"/>
         <Label text="Value"           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
 
-        <JFXComboBox  fx:id="environmentComboBox"  HBox.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXComboBox  fx:id="accountComboBox"      HBox.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXTextField fx:id="feeLimitTextField"    HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXTextField fx:id="valueTextField"       HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
-        <JFXComboBox  fx:id="unitComboBox"         HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
+        <JFXComboBox  fx:id="environmentComboBox" HBox.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXComboBox  fx:id="accountComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXTextField fx:id="feeLimitTextField"   HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXTextField fx:id="valueTextField"      HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXComboBox  fx:id="unitComboBox"        HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
 
         <JFXRippler position="BACK" styleClass="icons-rippler1" GridPane.rowIndex="1" GridPane.columnIndex="3" GridPane.columnSpan="1">
             <StackPane style="-fx-padding: 2;">
