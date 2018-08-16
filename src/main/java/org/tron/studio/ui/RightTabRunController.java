@@ -22,6 +22,7 @@ public class RightTabRunController implements Initializable {
     public JFXComboBox environmentComboBox;
     public JFXComboBox unitComboBox;
     public JFXComboBox contractComboBox;
+    public JFXComboBox accountComboBox;
 
     public RightTabRunController() {
 
@@ -34,6 +35,9 @@ public class RightTabRunController implements Initializable {
                 "Main Net"
         ));
         environmentComboBox.getSelectionModel().selectFirst();
+
+        accountComboBox.setItems(FXCollections.observableArrayList(ShareData.testAccountAddress));
+        accountComboBox.getSelectionModel().selectFirst();
 
         unitComboBox.setItems(FXCollections.observableArrayList(
                 "TRX",

@@ -20,6 +20,21 @@ import org.tron.studio.solc.CompilationResult;
 
 public class ShareData {
 
+    public static final String[] testAccountAddress = {
+        "TVdyt1s88BdiCjKt6K2YuoSmpWScZYK1QF",
+        "TCNVmGtkfknHpKSZXepZDXRowHF7kosxcv",
+        "TAbzgkG8p3yF5aywKVgq9AaAu6hvF2JrVC",
+        "TMmmvwvkBPBv3Gkw9cGKbZ8PLznYkTu3ep",
+        "TBJHZu4Sm86aWHtt6VF6KQSzot8vKTuTKx"
+    };
+    public static final String[] testAccountPrivateKey = {
+        "e901ef62b241b6f1577fd6ea34ef8b1c4b3ddee1e3c051b9e63f5ff729ad47a1",
+        "3a54ba30e3ee41b602eca8fb3a3ca1f99f49a3d3ab5d8d646a2ccdd3ffd9c21d",
+        "af7c83e40cc67a355852b44051fc9e34452375ae569d5c18dd62e3859b9be229",
+        "8e3edc3c34c6355cd1b2f0f11a672cddca4468da933813e052e38c93a971798a",
+        "7b0b316f60cf3954f0c54c292001f6b59f4a80328a04feafef539f0824ba5078"
+    };
+
     public static Wallet wallet;
 
     private static Map<String, CompilationResult> compilationResultHashMap = new HashMap<>();
