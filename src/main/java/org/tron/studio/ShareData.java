@@ -17,17 +17,18 @@ import org.tron.core.Wallet;
 import org.tron.core.WalletSolidity;
 import org.tron.core.db.Manager;
 import org.tron.studio.solc.CompilationResult;
+import org.tron.studio.walletserver.WalletClient;
 
 public class ShareData {
 
-    public static final String[] testAccountAddress = {
+    private static final String[] testAccountAddress = {
         "TVdyt1s88BdiCjKt6K2YuoSmpWScZYK1QF",
         "TCNVmGtkfknHpKSZXepZDXRowHF7kosxcv",
         "TAbzgkG8p3yF5aywKVgq9AaAu6hvF2JrVC",
         "TMmmvwvkBPBv3Gkw9cGKbZ8PLznYkTu3ep",
         "TBJHZu4Sm86aWHtt6VF6KQSzot8vKTuTKx"
     };
-    public static final String[] testAccountPrivateKey = {
+    private static final String[] testAccountPrivateKey = {
         "e901ef62b241b6f1577fd6ea34ef8b1c4b3ddee1e3c051b9e63f5ff729ad47a1",
         "3a54ba30e3ee41b602eca8fb3a3ca1f99f49a3d3ab5d8d646a2ccdd3ffd9c21d",
         "af7c83e40cc67a355852b44051fc9e34452375ae569d5c18dd62e3859b9be229",
@@ -35,7 +36,8 @@ public class ShareData {
         "7b0b316f60cf3954f0c54c292001f6b59f4a80328a04feafef539f0824ba5078"
     };
 
-    public static Wallet wallet;
+    public static final HashMap<String, String> testAccount = new HashMap<>();
+    public static WalletClient wallet;
 
     private static Map<String, CompilationResult> compilationResultHashMap = new HashMap<>();
 
@@ -51,6 +53,14 @@ public class ShareData {
         FXCollections.observableArrayList());
 
     private ShareData() {
+
+    }
+    static {
+        testAccount.put(testAccountAddress[0], testAccountPrivateKey[0]);
+        testAccount.put(testAccountAddress[1], testAccountPrivateKey[1]);
+        testAccount.put(testAccountAddress[2], testAccountPrivateKey[2]);
+        testAccount.put(testAccountAddress[3], testAccountPrivateKey[3]);
+        testAccount.put(testAccountAddress[4], testAccountPrivateKey[4]);
     }
 
     public static CompilationResult getCompilationResult(String contractName) {

@@ -25,7 +25,7 @@ public class BottomController {
                 if (ShareData.wallet == null) {
                     return;
                 }
-                Platform.runLater(() -> nowBlockButton.setText("Now Block:" + Long.toString(ShareData.wallet.getNowBlock().getBlockHeader().getRawData().getNumber())));
+                Platform.runLater(() -> nowBlockButton.setText("Now Block:" + Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber())));
             } catch (Throwable t) {
                 logger.error("Error in getNowBlock {}" + t.getMessage(), t);
             }

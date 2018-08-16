@@ -99,7 +99,7 @@ public class MainApplication extends Application {
     if (cfgArgs.isWitness()) {
       appT.addService(new WitnessService(appT, context));
     }
-    ShareData.wallet = context.getBean(Wallet.class);
+
     //http
     FullNodeHttpApiService httpApiService = context.getBean(FullNodeHttpApiService.class);
     appT.addService(httpApiService);

@@ -14,8 +14,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
 import org.tron.studio.ShareData;
 import org.tron.studio.solc.CompilationResult;
+import org.tron.studio.walletserver.WalletClient;
 
 public class RightTabRunController implements Initializable {
 
@@ -23,13 +25,12 @@ public class RightTabRunController implements Initializable {
   public JFXComboBox environmentComboBox;
   public JFXComboBox unitComboBox;
   public JFXComboBox contractComboBox;
-  public JFXComboBox accountComboBox;
+  public JFXComboBox<String> accountComboBox;
   public JFXTextField feeLimitTextField;
   public JFXTextField valueTextField;
 
-  public RightTabRunController() {
-
-  }
+  private static String DEFAULT_FEE_LIMIT = "1000000";
+  private static String DEFAULT_VALUE = "0";
 
   public void initialize(URL location, ResourceBundle resources) {
     environmentComboBox.setItems(FXCollections.observableArrayList(
@@ -39,14 +40,23 @@ public class RightTabRunController implements Initializable {
     ));
     environmentComboBox.getSelectionModel().selectFirst();
 
-    accountComboBox.setItems(FXCollections.observableArrayList(ShareData.testAccountAddress));
+    accountComboBox.setItems(FXCollections.observableArrayList(ShareData.testAccount.keySet()));
+    accountComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+          String address = newValue;
+          String privateKey = ShareData.testAccount.get(address);
+          ShareData.wallet = new WalletClient(Hex.decode(privateKey));
+        }
+    );
     accountComboBox.getSelectionModel().selectFirst();
 
     unitComboBox.setItems(FXCollections.observableArrayList(
         "TRX",
-        "Sun"
+        "SUN"
     ));
     unitComboBox.getSelectionModel().selectFirst();
+
+    feeLimitTextField.setText(DEFAULT_FEE_LIMIT);
+    valueTextField.setText(DEFAULT_VALUE);
     reloadContract();
   }
 
@@ -72,6 +82,7 @@ public class RightTabRunController implements Initializable {
   }
 
   public void onClickDeploy(ActionEvent actionEvent) {
+//    ShareData.wallet.deployContract();
   }
 
   public void onClickLoad(ActionEvent actionEvent) {
