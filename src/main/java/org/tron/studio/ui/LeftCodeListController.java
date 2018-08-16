@@ -1,16 +1,11 @@
 package org.tron.studio.ui;
 
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialog.DialogTransition;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import java.util.Optional;
 import java.util.function.Function;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -19,13 +14,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tron.studio.MainController;
 import org.tron.studio.ShareData;
 
 public class LeftCodeListController {
@@ -41,7 +32,7 @@ public class LeftCodeListController {
     public void initialize() {
 
         //监听新建的合约列表，
-        ShareData.newContractName.addListener((observable, oldValue, newValue) -> {
+        ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
             fileNameData.add(new FileName(newValue));
         });
         setupCellValueFactory(fileNameColumn, FileName::fileNameProperty);
@@ -49,7 +40,7 @@ public class LeftCodeListController {
         fileNameTable.setRoot(new RecursiveTreeItem<>(fileNameData, RecursiveTreeObject::getChildren));
         fileNameTable.setShowRoot(false);
 
-        ShareData.newContractName.set("/template/Ballot.sol");
+        ShareData.newContractFileName.set("/template/Ballot.sol");
     }
 
     private String showDialog()  {
@@ -63,12 +54,12 @@ public class LeftCodeListController {
     }
 
     public void createContract(ActionEvent actionEvent) {
-        String contractName = showDialog();
-        if(contractName == null) {
+        String contractFileName = showDialog();
+        if(contractFileName == null) {
             return;
         }
-        ShareData.newContractName.set(contractName);
-        ShareData.allContractName.get().add(contractName);
+        ShareData.newContractFileName.set(contractFileName);
+        ShareData.allContractFileName.get().add(contractFileName);
     }
 
     private <T> void setupCellValueFactory(JFXTreeTableColumn<FileName, T> column, Function<FileName, ObservableValue<T>> mapper) {

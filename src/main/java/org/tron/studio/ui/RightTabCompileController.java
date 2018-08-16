@@ -54,18 +54,19 @@ public class RightTabCompileController implements Initializable {
     protected void onClickCompile() {
         logger.debug("onClickCompile");
         compileButton.setDisable(true);
+        ShareData.currentContractFileName.set(null);
 
-        String contractName = "/template/Ballot.sol";
+        String contractFileName = "/template/Ballot.sol";
         new Thread(() -> {
             try {
                 SolidityCompiler.Result res = SolidityCompiler.compile(
-                    new File(getClass().getResource(contractName).getPath()), true, ABI, BIN, INTERFACE,
+                    new File(getClass().getResource(contractFileName).getPath()), true, ABI, BIN, INTERFACE,
                     METADATA);
 
                 logger.debug("Compile Out: '" + res.output + "'");
                 logger.debug("Compile Err: '" + res.errors + "'");
                 CompilationResult compilationResult = CompilationResult.parse(res.output);
-                ShareData.setCompilationResult(contractName, compilationResult);
+                ShareData.setCompilationResult(contractFileName, compilationResult);
 
                 compilationResult.getContracts().forEach(contractResult -> {
                     contractBin.add(contractResult.bin);
@@ -86,7 +87,7 @@ public class RightTabCompileController implements Initializable {
             } finally {
                 Platform.runLater(() -> {
                   contractComboBox.getSelectionModel().selectFirst();
-                  ShareData.currentContractName.set(contractName);
+                  ShareData.currentContractFileName.set(contractFileName);
                   compileButton.setDisable(false);
                 });
             }

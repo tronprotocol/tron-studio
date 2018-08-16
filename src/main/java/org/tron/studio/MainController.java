@@ -30,7 +30,7 @@ public class MainController {
         }
         codeArea.insertText(0, builder.toString());
 
-        ShareData.newContractName.addListener((observable, oldValue, newValue) -> {
+        ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
             try {
                 Tab codeTab = FXMLLoader.load(getClass().getResource("ui/code_panel.fxml"));
                 codeTab.setText(newValue);

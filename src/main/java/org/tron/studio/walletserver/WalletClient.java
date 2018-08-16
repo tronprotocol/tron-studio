@@ -118,7 +118,7 @@ public class WalletClient {
     }
 
     System.out.println(
-        "txid = " + ByteArray.toHexString(Sha256Hash.hash(transaction.getRawData().toByteArray())));
+        "Signed txid = " + ByteArray.toHexString(Sha256Hash.hash(transaction.getRawData().toByteArray())));
     transaction = TransactionUtils.sign(transaction, ecKey);
     return transaction;
   }
@@ -140,7 +140,7 @@ public class WalletClient {
       return false;
     }
     System.out.println(
-        "Receive txid = " + ByteArray.toHexString(transactionExtention.getTxid().toByteArray()));
+        "Receive unsigned txid = " + ByteArray.toHexString(transactionExtention.getTxid().toByteArray()));
     transaction = signTransaction(transaction);
     return rpcCli.broadcastTransaction(transaction);
   }

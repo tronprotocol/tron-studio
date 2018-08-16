@@ -41,15 +41,19 @@ public class ShareData {
 
     private static Map<String, CompilationResult> compilationResultHashMap = new HashMap<>();
 
-    //当前正在编辑的合约
+    //当前合约文件中，被选中的合约（合约文件中可能包含多份合约）
     public static SimpleObjectProperty<String> currentContractName = new SimpleObjectProperty<>();
-    //新建的合约
-    public static SimpleObjectProperty<String> newContractName = new SimpleObjectProperty<>();
-    //所有被打开的合约列表
-    public static SimpleListProperty<String> activeContractName = new SimpleListProperty<>(
+
+
+    //当前正在编辑的合约文件
+    public static SimpleObjectProperty<String> currentContractFileName = new SimpleObjectProperty<>();
+    //新建的合约文件
+    public static SimpleObjectProperty<String> newContractFileName = new SimpleObjectProperty<>();
+    //所有被打开的合约文件列表
+    public static SimpleListProperty<String> activeContractFileNameList = new SimpleListProperty<>(
         FXCollections.observableArrayList());
-    //所有的合约列表
-    public static SimpleListProperty<String> allContractName = new SimpleListProperty<>(
+    //所有的合约文件列表
+    public static SimpleListProperty<String> allContractFileName = new SimpleListProperty<>(
         FXCollections.observableArrayList());
 
     private ShareData() {

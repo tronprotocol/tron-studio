@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,22 +16,28 @@ import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
+import org.tron.core.exception.CancelException;
+import org.tron.keystore.CipherException;
 import org.tron.studio.ShareData;
 import org.tron.studio.solc.CompilationResult;
+import org.tron.studio.solc.CompilationResult.ContractMetadata;
 import org.tron.studio.walletserver.WalletClient;
 
 public class RightTabRunController implements Initializable {
 
   static final Logger logger = LoggerFactory.getLogger(RightTabRunController.class);
-  public JFXComboBox environmentComboBox;
-  public JFXComboBox unitComboBox;
-  public JFXComboBox contractComboBox;
+  public JFXComboBox<String> environmentComboBox;
+  public JFXComboBox<String> contractComboBox;
   public JFXComboBox<String> accountComboBox;
   public JFXTextField feeLimitTextField;
   public JFXTextField valueTextField;
+  public JFXComboBox feeUnitComboBox;
+  public JFXComboBox valueUnitComboBox;
+  public JFXTextField userPayRatio;
 
   private static String DEFAULT_FEE_LIMIT = "1000000";
   private static String DEFAULT_VALUE = "0";
+  private static String DEFAULT_RATIO = "100";
 
   public void initialize(URL location, ResourceBundle resources) {
     environmentComboBox.setItems(FXCollections.observableArrayList(
@@ -49,31 +56,38 @@ public class RightTabRunController implements Initializable {
     );
     accountComboBox.getSelectionModel().selectFirst();
 
-    unitComboBox.setItems(FXCollections.observableArrayList(
+    feeUnitComboBox.setItems(FXCollections.observableArrayList(
         "TRX",
         "SUN"
     ));
-    unitComboBox.getSelectionModel().selectFirst();
+    feeUnitComboBox.getSelectionModel().selectFirst();
+
+    valueUnitComboBox.setItems(FXCollections.observableArrayList(
+        "TRX",
+        "SUN"
+    ));
+    valueUnitComboBox.getSelectionModel().selectFirst();
 
     feeLimitTextField.setText(DEFAULT_FEE_LIMIT);
     valueTextField.setText(DEFAULT_VALUE);
+    userPayRatio.setText(DEFAULT_RATIO);
     reloadContract();
   }
 
   private void reloadContract() {
-    ShareData.currentContractName.addListener((observable, oldValue, newValue) -> {
-      CompilationResult compilationResult = ShareData.getCompilationResult(newValue);
+    ShareData.currentContractFileName.addListener((observable, oldValue, newValue) -> {
       List<String> contractNameList = new ArrayList<>();
-      compilationResult.getContracts().forEach(contractResult -> {
-        JSONObject metaData = JSON.parseObject(contractResult.metadata);
-        JSONObject compilationTarget = metaData.getJSONObject("settings")
-            .getJSONObject("compilationTarget");
-        compilationTarget.forEach((sol, value) -> {
-          contractNameList.add((String) value);
+      if (newValue != null) {
+        CompilationResult compilationResult = ShareData.getCompilationResult(newValue);
+        compilationResult.getContracts().forEach(contractResult -> {
+          JSONObject metaData = JSON.parseObject(contractResult.metadata);
+          JSONObject compilationTarget = metaData.getJSONObject("settings")
+              .getJSONObject("compilationTarget");
+          compilationTarget.forEach((sol, value) -> {
+            contractNameList.add((String) value);
+          });
         });
-
-
-      });
+      }
       contractComboBox.setItems(FXCollections.observableArrayList(
           contractNameList
       ));
@@ -82,7 +96,27 @@ public class RightTabRunController implements Initializable {
   }
 
   public void onClickDeploy(ActionEvent actionEvent) {
-//    ShareData.wallet.deployContract();
+    CompilationResult result = ShareData
+        .getCompilationResult(ShareData.currentContractFileName.get());
+    if (result == null) {
+      logger.error("No CompilationResult found");
+      return;
+    }
+    String currentContractName = contractComboBox.valueProperty().get();
+
+    ContractMetadata currentContract = result.getContract(currentContractName);
+
+    try {
+      ShareData.wallet.deployContract(currentContractName, currentContract.abi, currentContract.bin,
+          Long.parseLong(feeLimitTextField.getText()), Long.parseLong(valueTextField.getText()),
+          Long.parseLong(userPayRatio.getText()), null);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (CipherException e) {
+      e.printStackTrace();
+    } catch (CancelException e) {
+      e.printStackTrace();
+    }
   }
 
   public void onClickLoad(ActionEvent actionEvent) {
