@@ -1,6 +1,7 @@
 package org.tron.studio.ui;
 
 import javafx.event.ActionEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import org.tron.studio.MainApplication;
 
@@ -28,12 +29,12 @@ public class TopController {
         });
     }
 
-    public void onClickMin(ActionEvent actionEvent) {
+    public void onClickMin(MouseEvent mouseEvent) {
     }
 
-    public void onClickMax(ActionEvent actionEvent) {
+    public void onClickMax(MouseEvent mouseEvent) {
     }
 
-    public void onClickClose(ActionEvent actionEvent) {
+    public void onClickClose(MouseEvent mouseEvent) {
     }
 }
