@@ -3,7 +3,7 @@
     -fx-background-color: #ffffff;
     -fx-font-size: 13px;
     -fx-font-weight: Bold;
-    -fx-font-family: Consolas;
+    -fx-font-family: Monaco;
 }
 
 .styled-text-area .text {
