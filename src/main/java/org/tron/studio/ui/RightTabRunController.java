@@ -1,7 +1,10 @@
 package org.tron.studio.ui;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.google.gson.JsonObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -14,10 +17,16 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
+import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.core.exception.CancelException;
 import org.tron.keystore.CipherException;
 import org.tron.studio.ShareData;
@@ -110,8 +119,9 @@ public class RightTabRunController implements Initializable {
 
     ContractMetadata currentContract = result.getContract(currentContractName);
 
+    boolean deployContractResult = false;
     try {
-      ShareData.wallet.deployContract(currentContractName, currentContract.abi, currentContract.bin,
+      deployContractResult = ShareData.wallet.deployContract(currentContractName, currentContract.abi, currentContract.bin,
           Long.parseLong(feeLimitTextField.getText()), Long.parseLong(valueTextField.getText()),
           Long.parseLong(userPayRatio.getText()), null);
     } catch (IOException | CipherException | CancelException e) {
@@ -119,8 +129,38 @@ public class RightTabRunController implements Initializable {
       return;
     }
 
-    deployedContractList.getItems().add(new JFXButton("asd"));
+    if (!deployContractResult) {
+      logger.error("Failed to deployContract, please check tron.log");
+      return;
+    }
+
+    TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
+    if (transactionExtention == null) {
+      logger.error("Unable to get last TransactionExtention, please check tron.log");
+      return;
+    }
+
+    String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
+    deployedContractList.getItems().add(getContractRunPanel(transactionId, currentContract.abi));
   }
+
+  private Pane getContractRunPanel(String transactionId, String abi) {
+    VBox vbox = new VBox();
+    Label transactionLabel = new Label("0x" + transactionId.substring(0, 3) + "..." + transactionId.substring(transactionId.length() - 3, transactionId.length()));
+    vbox.getChildren().add(transactionLabel);
+    List<String> abiJson = JSONArray.parseArray(abi, String.class);
+    for (String entry : abiJson) {
+      JSONObject entryJson = JSONObject.parseObject(entry);
+      if(StringUtils.equalsIgnoreCase("function",entryJson.getString("type"))) {
+        HBox item = new HBox();
+        item.getChildren().add(new JFXButton(entryJson.getString("name")));
+        item.getChildren().add(new JFXTextField());
+        vbox.getChildren().add(item);
+      }
+    }
+    return vbox;
+  }
+
 
   public void onClickLoad(ActionEvent actionEvent) {
   }

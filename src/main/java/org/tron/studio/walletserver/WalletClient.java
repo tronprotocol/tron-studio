@@ -76,6 +76,7 @@ public class WalletClient {
   private ECKey ecKey = null;
   private static byte addressPreFixByte = CommonConstant.ADD_PRE_FIX_BYTE_TESTNET;
   private static int rpcVersion = 0;
+  private static TransactionExtention lastTransactionExtention = null;
 
   private static GrpcClient rpcCli = init();
 
@@ -1210,6 +1211,7 @@ public class WalletClient {
     texBuilder.setResult(transactionExtention.getResult());
     texBuilder.setTxid(transactionExtention.getTxid());
     transactionExtention = texBuilder.build();
+    lastTransactionExtention = transactionExtention;
 
     byte[] contractAddress = generateContractAddress(transactionExtention.getTransaction());
     System.out.println(
@@ -1268,5 +1270,9 @@ public class WalletClient {
 
   public static SmartContract getContract(byte[] address) {
     return rpcCli.getContract(address);
+  }
+
+  public static TransactionExtention getLastTransactionExtention() {
+    return lastTransactionExtention;
   }
 }
