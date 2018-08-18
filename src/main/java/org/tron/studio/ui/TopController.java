@@ -1,17 +1,22 @@
 package org.tron.studio.ui;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialog.DialogTransition;
+import com.jfoenix.controls.JFXDialogLayout;
+import com.sun.javafx.util.Utils;
+import java.io.IOException;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import org.tron.studio.MainApplication;
-
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import com.sun.javafx.util.Utils;
-import javafx.stage.Stage;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
-import javafx.geometry.Rectangle2D;
+import javafx.stage.Stage;
+import javax.annotation.PostConstruct;
+import org.tron.studio.MainApplication;
 
 public class TopController {
     public Pane titlePane;
@@ -64,5 +69,53 @@ public class TopController {
 
     public void onClickClose(MouseEvent mouseEvent) {
         Platform.exit();
+    }
+
+    public void onClickSettings(MouseEvent mouseEvent) {
+        JFXDialog dialog = new JFXDialog();
+        dialog.setTransitionType(DialogTransition.CENTER);
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setPrefWidth(800);
+        layout.setHeading(new Label("Settings"));
+        TextArea textArea = new TextArea();
+        layout.setBody(textArea);
+        dialog.setContent(layout);
+        JFXButton closeButton = new JFXButton("OK");
+        closeButton.getStyleClass().add("dialog-accept");
+        closeButton.setOnAction(event -> dialog.close());
+        layout.setActions(closeButton);
+        dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
+    }
+
+    public void onClickAccount(MouseEvent mouseEvent) {
+        JFXDialog dialog = new JFXDialog();
+        dialog.setTransitionType(DialogTransition.CENTER);
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setPrefWidth(800);
+        layout.setHeading(new Label("Account"));
+        TextArea textArea = new TextArea();
+        layout.setBody(textArea);
+        dialog.setContent(layout);
+        JFXButton closeButton = new JFXButton("OK");
+        closeButton.getStyleClass().add("dialog-accept");
+        closeButton.setOnAction(event -> dialog.close());
+        layout.setActions(closeButton);
+        dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
+    }
+
+    public void onClickBlockChain(MouseEvent mouseEvent) {
+        JFXDialog dialog = new JFXDialog();
+        dialog.setTransitionType(DialogTransition.CENTER);
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setPrefWidth(800);
+        layout.setHeading(new Label("BlackChain Status"));
+        TextArea textArea = new TextArea();
+        layout.setBody(textArea);
+        dialog.setContent(layout);
+        JFXButton closeButton = new JFXButton("OK");
+        closeButton.getStyleClass().add("dialog-accept");
+        closeButton.setOnAction(event -> dialog.close());
+        layout.setActions(closeButton);
+        dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
     }
 }

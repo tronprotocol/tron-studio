@@ -13,26 +13,44 @@
                     AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" >
             <leftItems>
                 <Label>Tron Studio</Label>
+
+                <HBox spacing="10">
+                    <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickAccount">
+                        <StackPane style="-fx-padding: 10;">
+                            <MaterialDesignIconView glyphSize="20" glyphName="ACCOUNT_MULTIPLE" styleClass="icon-top2"/>
+                        </StackPane>
+                    </JFXRippler>
+                    <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickBlockChain">
+                        <StackPane style="-fx-padding: 10;">
+                            <MaterialDesignIconView glyphSize="20" glyphName="LINK" styleClass="icon-top2"/>
+                        </StackPane>
+                    </JFXRippler>
+                    <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickSettings">
+                        <StackPane style="-fx-padding: 10;">
+                            <MaterialDesignIconView glyphSize="20" glyphName="SETTINGS" styleClass="icon-top2"/>
+                        </StackPane>
+                    </JFXRippler>
+                </HBox>
             </leftItems>
+
         </JFXToolbar>
 
-        <HBox AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
-              AnchorPane.topAnchor="5"
-              spacing="10">
+        <HBox AnchorPane.rightAnchor="0" AnchorPane.topAnchor="5"
+          spacing="10">
             <Region HBox.hgrow="ALWAYS"/>
-            <JFXRippler position="FRONT" styleClass="icons-rippler1">
-                <StackPane style="-fx-padding: 3;">
-                    <MaterialDesignIconView glyphName="WINDOW_MINIMIZE" styleClass="icon-top" onMouseClicked="#onClickMin"/>
+            <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickMin">
+                <StackPane style="-fx-padding: 5;">
+                    <MaterialDesignIconView glyphName="WINDOW_MINIMIZE" styleClass="icon-top"/>
                 </StackPane>
             </JFXRippler>
-            <JFXRippler position="FRONT" styleClass="icons-rippler1">
-                <StackPane style="-fx-padding: 3;">
-                    <MaterialDesignIconView glyphName="WINDOW_MAXIMIZE" styleClass="icon-top" onMouseClicked="#onClickMax"/>
+            <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickMax">
+                <StackPane style="-fx-padding: 5;">
+                    <MaterialDesignIconView glyphName="WINDOW_MAXIMIZE" styleClass="icon-top"/>
                 </StackPane>
             </JFXRippler>
-            <JFXRippler position="FRONT" styleClass="icons-rippler1">
-                <StackPane style="-fx-padding: 3;">
-                    <MaterialDesignIconView glyphName="WINDOW_CLOSE" styleClass="icon-top" onMouseClicked="#onClickClose"/>
+            <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickClose">
+                <StackPane style="-fx-padding: 5;">
+                    <MaterialDesignIconView glyphName="WINDOW_CLOSE" styleClass="icon-top"/>
                 </StackPane>
             </JFXRippler>
             <Region prefWidth="2"/>

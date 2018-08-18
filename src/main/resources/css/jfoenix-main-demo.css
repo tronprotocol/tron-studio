@@ -110,12 +110,17 @@
 }
 
 .icon-top {
+    -fx-fill: black;
+    -fx-cursor: hand;
+}
+
+.icon-top2 {
     -fx-fill: white;
     -fx-cursor: hand;
 }
 
 .icons-rippler {
-    -jfx-rippler-fill: #FE774D;
+    -jfx-rippler-fill: white;
     -jfx-mask-type: CIRCLE;
 }
 
