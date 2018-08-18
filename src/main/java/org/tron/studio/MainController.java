@@ -6,6 +6,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import lombok.extern.slf4j.Slf4j;
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+import org.tron.studio.ui.SolidityHighlight;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -28,25 +30,32 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        codeArea.insertText(0, builder.toString());
+
+        new SolidityHighlight(codeArea).highlight();
+        codeArea.replaceText(0, 0, builder.toString());
+        codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
             try {
                 Tab codeTab = FXMLLoader.load(getClass().getResource("ui/code_panel.fxml"));
                 codeTab.setText(newValue);
                 codeTab.setClosable(true);
+
                 codeAreaTabPane.getTabs().add(codeTab);
                 StringBuilder templateBuilder = new StringBuilder();
                 templateBuilder.append("pragma solidity ^0.4.0;").append("\n");
                 templateBuilder.append("contract ").append(newValue).append(" {").append("\n");
                 templateBuilder.append("}").append("\n");
                 CodeArea codeArea = (CodeArea) codeTab.getContent();
-                codeArea.insertText(0, templateBuilder.toString());
+
+                new SolidityHighlight(codeArea).highlight();
+                codeArea.replaceText(0, 0, templateBuilder.toString());
+                codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+
                 codeAreaTabPane.getSelectionModel().select(codeTab);
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }
         });
     }
-
 }

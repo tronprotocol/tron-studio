@@ -152,7 +152,7 @@ dependencies {
     // end http
 
     compile 'com.jfoenix:jfoenix:8.0.5'
-    compile 'org.fxmisc.richtext:richtextfx:0.6.10'
+    compile 'org.fxmisc.richtext:richtextfx:0.7-M2'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
 }
 

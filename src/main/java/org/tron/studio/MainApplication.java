@@ -1,7 +1,6 @@
 package org.tron.studio;
 
 import com.jfoenix.svg.SVGGlyphLoader;
-import java.io.IOException;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -14,13 +13,14 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.tron.common.application.ApplicationFactory;
 import org.tron.core.Constant;
-import org.tron.core.Wallet;
 import org.tron.core.config.DefaultConfig;
 import org.tron.core.config.args.Args;
 import org.tron.core.services.RpcApiService;
 import org.tron.core.services.WitnessService;
 import org.tron.core.services.http.FullNodeHttpApiService;
 import org.tron.studio.utils.ResizeHelper;
+
+import java.io.IOException;
 
 @Slf4j
 public class MainApplication extends Application {
@@ -70,7 +70,8 @@ public class MainApplication extends Application {
     final ObservableList<String> stylesheets = scene.getStylesheets();
     stylesheets.addAll(getClass().getResource("/css/jfoenix-fonts.css").toExternalForm(),
         getClass().getResource("/css/jfoenix-design.css").toExternalForm(),
-        getClass().getResource("/css/jfoenix-main-demo.css").toExternalForm());
+        getClass().getResource("/css/jfoenix-main-demo.css").toExternalForm(),
+            getClass().getResource("/css/keywords.css").toExternalForm());
     primaryStage.setScene(scene);
     ResizeHelper.addResizeListener(primaryStage);
     primaryStage.show();
