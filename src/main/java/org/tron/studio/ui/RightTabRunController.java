@@ -2,7 +2,9 @@ package org.tron.studio.ui;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import java.io.IOException;
 import java.net.URL;
@@ -34,6 +36,7 @@ public class RightTabRunController implements Initializable {
   public JFXComboBox feeUnitComboBox;
   public JFXComboBox valueUnitComboBox;
   public JFXTextField userPayRatio;
+  public JFXListView deployedContractList;
 
   private static String DEFAULT_FEE_LIMIT = "1000000";
   private static String DEFAULT_VALUE = "0";
@@ -71,6 +74,7 @@ public class RightTabRunController implements Initializable {
     feeLimitTextField.setText(DEFAULT_FEE_LIMIT);
     valueTextField.setText(DEFAULT_VALUE);
     userPayRatio.setText(DEFAULT_RATIO);
+
     reloadContract();
   }
 
@@ -110,13 +114,12 @@ public class RightTabRunController implements Initializable {
       ShareData.wallet.deployContract(currentContractName, currentContract.abi, currentContract.bin,
           Long.parseLong(feeLimitTextField.getText()), Long.parseLong(valueTextField.getText()),
           Long.parseLong(userPayRatio.getText()), null);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (CipherException e) {
-      e.printStackTrace();
-    } catch (CancelException e) {
-      e.printStackTrace();
+    } catch (IOException | CipherException | CancelException e) {
+      logger.error("Failed to deployContract{} {}", e.getMessage(), e);
+      return;
     }
+
+    deployedContractList.getItems().add(new JFXButton("asd"));
   }
 
   public void onClickLoad(ActionEvent actionEvent) {

@@ -35,7 +35,7 @@ public class RightTabCompileController implements Initializable {
     static final Logger logger = LoggerFactory.getLogger(RightTabCompileController.class);
 
     public JFXComboBox contractComboBox;
-    public JFXToggleButton autoCompileToggleButton;
+    public JFXCheckBox autoCompileCheckBox;
     public JFXButton compileButton;
 
     List<String> contractABI = new ArrayList<>();
@@ -96,11 +96,11 @@ public class RightTabCompileController implements Initializable {
     }
 
     public void onClickAutoCompile(ActionEvent actionEvent) throws IOException {
-        logger.debug("onClickAutoCompile {}", autoCompileToggleButton.isSelected());
+        logger.debug("onClickAutoCompile {}", autoCompileCheckBox.isSelected());
     }
 
     public void onClickDetail(ActionEvent actionEvent) {
-        logger.debug("onClickDetail {}", autoCompileToggleButton.isSelected());
+        logger.debug("onClickDetail {}", autoCompileCheckBox.isSelected());
 
         if (currentContractIndex == -1) {
             return;

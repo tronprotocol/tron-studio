@@ -6,13 +6,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import com.jfoenix.controls.JFXCheckBox?>
 <VBox spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.tron.studio.ui.RightTabCompileController">
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
     <JFXButton fx:id="compileButton" styleClass="custom-jfx-button-raised" onAction="#onClickCompile" text="Compile"/>
-    <JFXToggleButton fx:id="autoCompileToggleButton" onAction="#onClickAutoCompile" text="Auto Compile"/>
+    <JFXCheckBox fx:id="autoCompileCheckBox" onAction="#onClickAutoCompile" text="Auto Compile"/>
     <HBox spacing="10">
         <children>
             <JFXComboBox fx:id="contractComboBox" onAction="#onSelectContract" HBox.hgrow="ALWAYS"/>

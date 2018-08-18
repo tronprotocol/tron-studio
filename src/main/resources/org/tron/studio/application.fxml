@@ -42,7 +42,7 @@
                         </TabPane>
                     </VBox>
 
-                    <VBox prefWidth="400">
+                    <VBox prefWidth="400" AnchorPane.bottomAnchor="0">
                         <TabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE">
                             <tabs>
                                 <Tab text="Compile">
