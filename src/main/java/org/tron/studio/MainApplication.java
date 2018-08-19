@@ -4,11 +4,9 @@ import com.jfoenix.svg.SVGGlyphLoader;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -19,7 +17,6 @@ import org.tron.core.config.args.Args;
 import org.tron.core.services.RpcApiService;
 import org.tron.core.services.WitnessService;
 import org.tron.core.services.http.FullNodeHttpApiService;
-import org.tron.studio.utils.ResizeHelper;
 
 import java.io.IOException;
 
@@ -64,8 +61,6 @@ public class MainApplication extends Application {
 
     Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
     primaryStage.setTitle("Tron Studio");
-    primaryStage.initStyle(StageStyle.UNDECORATED);
-    primaryStage.setResizable(true);
 
     Scene scene = new Scene(root, 1024, 576);
     final ObservableList<String> stylesheets = scene.getStylesheets();
@@ -74,7 +69,6 @@ public class MainApplication extends Application {
         getClass().getResource("/css/jfoenix-main-demo.css").toExternalForm(),
             getClass().getResource("/css/keywords.css").toExternalForm());
     primaryStage.setScene(scene);
-    ResizeHelper.addResizeListener(primaryStage);
     primaryStage.show();
   }
 

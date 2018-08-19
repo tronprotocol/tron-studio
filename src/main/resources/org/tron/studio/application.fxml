@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import org.fxmisc.richtext.CodeArea?>
-<?import java.net.URL?>
-<?import com.jfoenix.controls.JFXDialog?>
-<?import com.jfoenix.controls.JFXDialogLayout?>
-<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXListView?>
+<?import java.net.URL?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.fxmisc.richtext.CodeArea?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="Infinity" maxWidth="Infinity" prefHeight="450"
     prefWidth="800" xmlns="http://javafx.com/javafx/8.0.121"
     fx:controller="org.tron.studio.MainController">
@@ -16,7 +19,7 @@
             <fx:include source="ui/top.fxml"
                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
                         AnchorPane.topAnchor="0"/>
-            <SplitPane orientation="HORIZONTAL"
+            <SplitPane dividerPositions="0.15, 0.75"
                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
                   AnchorPane.topAnchor="80" AnchorPane.bottomAnchor="50">
                     <fx:include source="ui/left_code_list.fxml"/>
