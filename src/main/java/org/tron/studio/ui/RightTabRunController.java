@@ -3,6 +3,8 @@ package org.tron.studio.ui;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -14,11 +16,17 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -142,25 +150,63 @@ public class RightTabRunController implements Initializable {
     }
 
     String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
-    deployedContractList.getItems().add(getContractRunPanel(transactionId, currentContract.abi));
+    deployedContractList.getItems().add(getContractRunPanel(currentContractName, transactionId, currentContract.abi));
   }
 
-  private Pane getContractRunPanel(String transactionId, String abi) {
-    VBox vbox = new VBox();
-    Label transactionLabel = new Label("0x" + transactionId.substring(0, 3) + "..." + transactionId
-        .substring(transactionId.length() - 3, transactionId.length()));
-    vbox.getChildren().add(transactionLabel);
+  private JFXListView getContractRunPanel(String contractName, String transactionId, String abi) {
+    JFXListView listView = new JFXListView();
+
+    HBox title = new HBox();
+    Label transactionLabel = new Label(contractName + "0x" + transactionId.substring(0, 5) + "..." + transactionId
+        .substring(transactionId.length() - 5, transactionId.length()));
+    title.getChildren().add(transactionLabel);
+    listView.setGroupnode(title);
+
     List<String> abiJson = JSONArray.parseArray(abi, String.class);
+    GridPane gridPane = new GridPane();
+    gridPane.setHgap(5);
+    gridPane.setVgap(5);
+    ColumnConstraints columnConstraints = new ColumnConstraints();
+    columnConstraints.setHgrow(Priority.ALWAYS);
+    gridPane.getColumnConstraints().add(columnConstraints);
+    gridPane.getColumnConstraints().add(columnConstraints);
+    int index = 0;
     for (String entry : abiJson) {
       JSONObject entryJson = JSONObject.parseObject(entry);
       if (StringUtils.equalsIgnoreCase("function", entryJson.getString("type"))) {
-        HBox item = new HBox();
-        item.getChildren().add(new JFXButton(entryJson.getString("name")));
-        item.getChildren().add(new JFXTextField());
-        vbox.getChildren().add(item);
+        JFXButton functionButton = new JFXButton(entryJson.getString("name"));
+        functionButton.getStyleClass().add("custom-jfx-button-raised-fix-width");
+
+        JFXTextField parameterText = new JFXTextField();
+        gridPane.add(functionButton, 0, index);
+        gridPane.add(parameterText, 1, index);
+
+        JSONArray inputsJsonArray = entryJson.getJSONArray("inputs");
+        StringBuilder parameterPromot = new StringBuilder();
+        if(inputsJsonArray != null) {
+          for (int j = 0; j < inputsJsonArray.size(); j++) {
+            JSONObject inputItem = inputsJsonArray.getJSONObject(j);
+            String inputName = inputItem.getString("name");
+            String type = inputItem.getString("type");
+            parameterPromot.append(type).append(" ").append(inputName);
+            if(j != inputsJsonArray.size()-1) {
+              parameterPromot.append(", ");
+            }
+          }
+        }
+        parameterText.setPromptText(parameterPromot.toString());
+
+        functionButton.setOnAction(new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent event) {
+            System.out.print("asd");
+          }
+        });
       }
+      index++;
     }
-    return vbox;
+    listView.getItems().add(gridPane);
+    return listView;
   }
 
 
