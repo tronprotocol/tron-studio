@@ -7,7 +7,10 @@ import com.jfoenix.controls.JFXDialogLayout;
 import com.sun.javafx.util.Utils;
 import java.io.IOException;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
@@ -117,5 +120,20 @@ public class TopController {
         closeButton.setOnAction(event -> dialog.close());
         layout.setActions(closeButton);
         dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
+    }
+
+
+    private void dumpLayoutInfo(Node n, int depth) {
+        for (int i = 0; i < depth; i++) System.out.print("  ");
+        System.out.println(n);
+        if (n instanceof Parent) {
+            for (Node c : ((Parent) n).getChildrenUnmodifiable()) {
+                dumpLayoutInfo(c, depth + 1);
+            }
+        }
+    }
+
+    public void dumpLayoutInfo(ActionEvent actionEvent) {
+        dumpLayoutInfo(MainApplication.instance.primaryStage.getScene().getRoot(), 0);
     }
 }

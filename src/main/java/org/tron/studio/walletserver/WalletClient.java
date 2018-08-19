@@ -77,6 +77,7 @@ public class WalletClient {
   private static byte addressPreFixByte = CommonConstant.ADD_PRE_FIX_BYTE_TESTNET;
   private static int rpcVersion = 0;
   private static TransactionExtention lastTransactionExtention = null;
+  private static Transaction lastTransaction = null;
 
   private static GrpcClient rpcCli = init();
 
@@ -126,6 +127,7 @@ public class WalletClient {
 
   private boolean processTransactionExtention(TransactionExtention transactionExtention)
       throws IOException, CipherException, CancelException {
+    lastTransactionExtention = transactionExtention;
     if (transactionExtention == null) {
       return false;
     }
@@ -143,6 +145,7 @@ public class WalletClient {
     System.out.println(
         "Receive unsigned txid = " + ByteArray.toHexString(transactionExtention.getTxid().toByteArray()));
     transaction = signTransaction(transaction);
+    lastTransaction = transaction;
     return rpcCli.broadcastTransaction(transaction);
   }
 
@@ -1211,7 +1214,6 @@ public class WalletClient {
     texBuilder.setResult(transactionExtention.getResult());
     texBuilder.setTxid(transactionExtention.getTxid());
     transactionExtention = texBuilder.build();
-    lastTransactionExtention = transactionExtention;
 
     byte[] contractAddress = generateContractAddress(transactionExtention.getTransaction());
     System.out.println(
@@ -1274,5 +1276,9 @@ public class WalletClient {
 
   public static TransactionExtention getLastTransactionExtention() {
     return lastTransactionExtention;
+  }
+
+  public static Transaction getLastTransaction() {
+    return lastTransaction;
   }
 }

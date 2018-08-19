@@ -69,6 +69,7 @@ public class RightTabCompileController implements Initializable {
                 CompilationResult compilationResult = CompilationResult.parse(res.output);
                 ShareData.setCompilationResult(contractFileName, compilationResult);
 
+                contractNameList.clear();
                 compilationResult.getContracts().forEach(contractResult -> {
                     contractBin.add(contractResult.bin);
                     contractABI.add(contractResult.abi);

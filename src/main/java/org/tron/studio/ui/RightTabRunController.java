@@ -134,8 +134,8 @@ public class RightTabRunController implements Initializable {
     }
 
     TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
-    if (transactionExtention == null) {
-      logger.error("Unable to get last TransactionExtention, please check tron.log");
+    if (!transactionExtention.getResult().getResult()) {
+      logger.error("Unable to get last TransactionExtention, {}", transactionExtention.getResult().getMessage().toStringUtf8());
       return;
     }
 

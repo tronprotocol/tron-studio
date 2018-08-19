@@ -1,6 +1,9 @@
 package org.tron.studio;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
@@ -58,4 +61,5 @@ public class MainController {
             }
         });
     }
+
 }

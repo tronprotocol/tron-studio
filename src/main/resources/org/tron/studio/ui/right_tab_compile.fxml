@@ -12,12 +12,12 @@
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-    <JFXButton fx:id="compileButton" styleClass="custom-jfx-button-raised" onAction="#onClickCompile" text="Compile"/>
-    <JFXCheckBox fx:id="autoCompileCheckBox" onAction="#onClickAutoCompile" text="Auto Compile"/>
     <HBox spacing="10">
-        <children>
-            <JFXComboBox fx:id="contractComboBox" onAction="#onSelectContract" HBox.hgrow="ALWAYS"/>
-            <JFXButton styleClass="custom-jfx-button-raised" onAction="#onClickDetail" text="Detail"/>
-        </children>
+        <JFXButton fx:id="compileButton" styleClass="custom-jfx-button-raised" onAction="#onClickCompile" text="Compile"/>
+        <JFXCheckBox fx:id="autoCompileCheckBox" onAction="#onClickAutoCompile" text="Auto Compile"/>
+    </HBox>
+    <HBox spacing="10">
+        <JFXComboBox fx:id="contractComboBox" onAction="#onSelectContract" HBox.hgrow="ALWAYS"/>
+        <JFXButton styleClass="custom-jfx-button-raised" onAction="#onClickDetail" text="Detail"/>
     </HBox>
 </VBox>
