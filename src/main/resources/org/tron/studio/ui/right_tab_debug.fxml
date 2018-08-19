@@ -9,6 +9,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import javafx.scene.layout.Region?>
+<?import com.jfoenix.controls.JFXListView?>
+
 <VBox spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.tron.studio.ui.RightTabDebugController">
     <padding>
@@ -58,5 +60,6 @@
             </JFXRippler>
             <Region HBox.hgrow="ALWAYS" />
         </HBox>
+        <JFXListView VBox.vgrow="ALWAYS" fx:id="debugList" styleClass="jfx-list-view" />
     </VBox>
 </VBox>
