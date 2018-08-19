@@ -160,6 +160,7 @@ public class RightTabRunController implements Initializable {
 
   private JFXListView getContractRunPanel(String contractName, String transactionId, String abi) {
     JFXListView listView = new JFXListView();
+    listView.getStyleClass().add("sublist");
 
     HBox title = new HBox();
     Label transactionLabel = new Label(contractName + "0x" + transactionId.substring(0, 5) + "..." + transactionId
@@ -171,10 +172,12 @@ public class RightTabRunController implements Initializable {
     GridPane gridPane = new GridPane();
     gridPane.setHgap(5);
     gridPane.setVgap(5);
-    ColumnConstraints columnConstraints = new ColumnConstraints();
-    columnConstraints.setHgrow(Priority.ALWAYS);
-    gridPane.getColumnConstraints().add(columnConstraints);
-    gridPane.getColumnConstraints().add(columnConstraints);
+    ColumnConstraints columnConstraints0 = new ColumnConstraints();
+    columnConstraints0.setHgrow(Priority.NEVER);
+    ColumnConstraints columnConstraints1 = new ColumnConstraints();
+    columnConstraints1.setHgrow(Priority.ALWAYS);
+    gridPane.getColumnConstraints().add(columnConstraints0);
+    gridPane.getColumnConstraints().add(columnConstraints1);
     int index = 0;
     for (String entry : abiJson) {
       JSONObject entryJson = JSONObject.parseObject(entry);

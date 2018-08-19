@@ -60,14 +60,17 @@
         <JFXButton    styleClass="custom-jfx-button-raised" text="Deploy" onAction="#onClickDeploy" GridPane.rowIndex="1" GridPane.columnIndex="1" />
         <JFXButton    styleClass="custom-jfx-button-raised" text="Load" onAction="#onClickLoad"     GridPane.rowIndex="2" GridPane.columnIndex="1" />
     </GridPane>
-    <HBox spacing="10">
-        <Label text="Deployed Contracts" />
-        <Region HBox.hgrow="ALWAYS"/>
-        <JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickClear">
-            <StackPane style="-fx-padding: 2;">
-                <MaterialDesignIconView glyphName="DELETE" styleClass="icon"/>
-            </StackPane>
-        </JFXRippler>
-    </HBox>
-    <JFXListView VBox.vgrow="ALWAYS" fx:id="deployedContractList" styleClass="jfx-list-view" />
+    <VBox spacing="10" styleClass="jfx-drawer-overlay-pane" VBox.vgrow="ALWAYS">
+        <HBox spacing="10">
+            <Label text="Deployed Contracts" />
+            <Region HBox.hgrow="ALWAYS"/>
+            <JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickClear">
+                <StackPane style="-fx-padding: 2;">
+                    <MaterialDesignIconView glyphName="DELETE" styleClass="icon"/>
+                </StackPane>
+            </JFXRippler>
+        </HBox>
+        <JFXListView VBox.vgrow="ALWAYS" fx:id="deployedContractList" styleClass="jfx-list-view" />
+    </VBox>
+
 </VBox>
