@@ -27,6 +27,7 @@ import org.spongycastle.util.encoders.Hex;
 import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.core.exception.CancelException;
 import org.tron.keystore.CipherException;
+import org.tron.protos.Protocol.Transaction;
 import org.tron.studio.ShareData;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.CompilationResult.ContractMetadata;
@@ -134,6 +135,7 @@ public class RightTabRunController implements Initializable {
     }
 
     TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
+    Transaction transaction = ShareData.wallet.getLastTransaction();
     if (!transactionExtention.getResult().getResult()) {
       logger.error("Unable to get last TransactionExtention, {}", transactionExtention.getResult().getMessage().toStringUtf8());
       return;

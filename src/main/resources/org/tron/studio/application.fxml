@@ -16,12 +16,11 @@
             <fx:include source="ui/top.fxml"
                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
                         AnchorPane.topAnchor="0"/>
-            <HBox spacing="10" fx:id="rootPanel"
+            <SplitPane orientation="HORIZONTAL"
                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
                   AnchorPane.topAnchor="80" AnchorPane.bottomAnchor="50">
-                <children>
                     <fx:include source="ui/left_code_list.fxml"/>
-                    <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                    <SplitPane prefWidth="400" AnchorPane.bottomAnchor="0" orientation="VERTICAL">
                         <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS"
                                  HBox.hgrow="ALWAYS">
                             <tabs>
@@ -41,32 +40,30 @@
                                 </Tab>
                             </tabs>
                         </TabPane>
-                        <JFXListView VBox.vgrow="ALWAYS" fx:id="debugInfoList" styleClass="jfx-debug-list-view" maxHeight="130" />
-                    </VBox>
-
-                    <VBox prefWidth="400" AnchorPane.bottomAnchor="0">
-                        <TabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE">
-                            <tabs>
-                                <Tab text="Compile">
-                                    <content>
-                                        <fx:include source="ui/right_tab_compile.fxml"/>
-                                    </content>
-                                </Tab>
-                                <Tab text="Run">
-                                    <content>
-                                        <fx:include source="ui/right_tab_run.fxml"/>
-                                    </content>
-                                </Tab>
-                                <Tab text="Debug">
-                                    <content>
-                                        <fx:include source="ui/right_tab_debug.fxml"/>
-                                    </content>
-                                </Tab>
-                            </tabs>
-                        </TabPane>
-                    </VBox>
-                </children>
-            </HBox>
+                        <ScrollPane>
+                            <JFXListView VBox.vgrow="ALWAYS" fx:id="debugInfoList" styleClass="jfx-debug-list-view" maxHeight="130" />
+                        </ScrollPane>
+                    </SplitPane>
+                    <TabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE">
+                        <tabs>
+                            <Tab text="Compile">
+                                <content>
+                                    <fx:include source="ui/right_tab_compile.fxml"/>
+                                </content>
+                            </Tab>
+                            <Tab text="Run">
+                                <content>
+                                    <fx:include source="ui/right_tab_run.fxml"/>
+                                </content>
+                            </Tab>
+                            <Tab text="Debug">
+                                <content>
+                                    <fx:include source="ui/right_tab_debug.fxml"/>
+                                </content>
+                            </Tab>
+                        </tabs>
+                    </TabPane>
+            </SplitPane>
             <fx:include source="ui/bottom.fxml"
                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
                         AnchorPane.bottomAnchor="0"/>

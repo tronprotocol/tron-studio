@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 @Slf4j
 public class MainController {
     public CodeArea codeArea;
-    public HBox rootPanel;
     public TabPane codeAreaTabPane;
 
     @PostConstruct
