@@ -19,9 +19,9 @@
             <fx:include source="ui/top.fxml"
                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
                         AnchorPane.topAnchor="0"/>
-            <SplitPane dividerPositions="0.15, 0.75"
+            <SplitPane dividerPositions="0.15, 0.7"
                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
-                  AnchorPane.topAnchor="80" AnchorPane.bottomAnchor="50">
+                  AnchorPane.topAnchor="64" AnchorPane.bottomAnchor="50">
                     <fx:include source="ui/left_code_list.fxml"/>
                     <SplitPane prefWidth="400" AnchorPane.bottomAnchor="0" orientation="VERTICAL">
                         <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS"

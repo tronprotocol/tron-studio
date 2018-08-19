@@ -343,6 +343,13 @@
     -fx-min-width: 75;
 }
 
+.custom-jfx-button-raised-fix-width {
+    -jfx-button-type: FLAT;
+    -fx-background-color: #5264AE;
+    -fx-text-fill: WHITE;
+    -fx-min-width: 100;
+}
+
 /*******************************************************************************
 *                                                                              *
 * JFX Check Box                                                                *
@@ -409,8 +416,8 @@
     -fx-font-weight: BOLD;
     -fx-prompt-text-fill: #808080;
     -fx-alignment: top-left;
-    -fx-max-width: 300.0;
-    -fx-pref-width: 300.0;
+    -fx-max-width: 800;
+    -fx-pref-width: 240.0;
     -jfx-focus-color: #4059A9;
     -jfx-unfocus-color: #4d4d4d;
 }
