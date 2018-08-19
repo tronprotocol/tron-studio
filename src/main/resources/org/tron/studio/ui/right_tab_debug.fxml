@@ -16,7 +16,7 @@
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-    <VBox spacing="10">
+    <VBox spacing="10" VBox.vgrow="ALWAYS">
         <HBox spacing="10">
             <JFXTextField promptText="Block number" fx:id="blockNumber"/>
             <JFXTextField promptText="Transaction Id" fx:id="transactionId"/>

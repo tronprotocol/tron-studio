@@ -150,7 +150,6 @@ public class RightTabRunController implements Initializable {
     }
 
     String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
-    deployedContractList.getItems().add(getContractRunPanel(currentContractName, transactionId, currentContract.abi));
 
     // Show debug info below codearea
     ShareData.deployRun.set("run");
