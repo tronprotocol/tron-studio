@@ -55,6 +55,7 @@ public class RightTabCompileController implements Initializable {
     protected void onClickCompile() {
         logger.debug("onClickCompile");
         compileButton.setDisable(true);
+        contractComboBox.requestFocus();
         ShareData.currentContractFileName.set(null);
 
         String contractFileName = "/template/Ballot.sol";
