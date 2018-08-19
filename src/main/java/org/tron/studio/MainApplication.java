@@ -62,7 +62,7 @@ public class MainApplication extends Application {
     Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
     primaryStage.setTitle("Tron Studio");
 
-    Scene scene = new Scene(root, 1024, 576);
+    Scene scene = new Scene(root, 1366, 768);
     final ObservableList<String> stylesheets = scene.getStylesheets();
     stylesheets.addAll(getClass().getResource("/css/jfoenix-fonts.css").toExternalForm(),
         getClass().getResource("/css/jfoenix-design.css").toExternalForm(),

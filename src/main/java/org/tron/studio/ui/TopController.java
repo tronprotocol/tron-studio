@@ -29,14 +29,8 @@ public class TopController {
     private double yInit;
     private Rectangle2D backupWindowBounds;
 
-    @PostConstruct
-    public void initialize() throws IOException {
-
-    }
-
     public void onClickSettings(MouseEvent mouseEvent) {
         JFXDialog dialog = new JFXDialog();
-        dialog.setTransitionType(DialogTransition.CENTER);
         JFXDialogLayout layout = new JFXDialogLayout();
         layout.setPrefWidth(800);
         layout.setHeading(new Label("Settings"));
@@ -52,7 +46,6 @@ public class TopController {
 
     public void onClickAccount(MouseEvent mouseEvent) {
         JFXDialog dialog = new JFXDialog();
-        dialog.setTransitionType(DialogTransition.CENTER);
         JFXDialogLayout layout = new JFXDialogLayout();
         layout.setPrefWidth(800);
         layout.setHeading(new Label("Account"));
@@ -68,7 +61,6 @@ public class TopController {
 
     public void onClickBlockChain(MouseEvent mouseEvent) {
         JFXDialog dialog = new JFXDialog();
-        dialog.setTransitionType(DialogTransition.CENTER);
         JFXDialogLayout layout = new JFXDialogLayout();
         layout.setPrefWidth(800);
         layout.setHeading(new Label("BlackChain Status"));
@@ -81,7 +73,6 @@ public class TopController {
         layout.setActions(closeButton);
         dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
     }
-
 
     private void dumpLayoutInfo(Node n, int depth) {
         for (int i = 0; i < depth; i++) System.out.print("  ");

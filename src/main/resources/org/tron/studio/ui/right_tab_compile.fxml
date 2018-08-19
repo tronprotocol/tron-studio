@@ -12,7 +12,7 @@
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-    <HBox spacing="10">
+    <HBox spacing="10" alignment="CENTER_LEFT">
         <JFXButton fx:id="compileButton" styleClass="custom-jfx-button-raised" onAction="#onClickCompile" text="Compile"/>
         <JFXCheckBox fx:id="autoCompileCheckBox" onAction="#onClickAutoCompile" text="Auto Compile"/>
     </HBox>
