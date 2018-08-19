@@ -3,8 +3,6 @@ package org.tron.studio.ui;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -18,16 +16,12 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +156,7 @@ public class RightTabRunController implements Initializable {
     listView.getStyleClass().add("sublist");
 
     HBox title = new HBox();
-    Label transactionLabel = new Label(contractName + "0x" + transactionId.substring(0, 5) + "..." + transactionId
+    Label transactionLabel = new Label(contractName + " 0x" + transactionId.substring(0, 5) + "..." + transactionId
         .substring(transactionId.length() - 5, transactionId.length()));
     title.getChildren().add(transactionLabel);
     listView.setGroupnode(title);
@@ -220,7 +214,9 @@ public class RightTabRunController implements Initializable {
   public void onClickLoad(ActionEvent actionEvent) {
   }
 
-  public void onClickClear(ActionEvent actionEvent) {
+  public void onClickClear(MouseEvent actionEvent) {
+    deployedContractList.getItems().clear();
+
   }
 
   public void onClickAddAddress(MouseEvent mouseEvent) {
