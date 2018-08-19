@@ -184,7 +184,7 @@ public class RightTabRunController implements Initializable {
 
         JSONArray inputsJsonArray = entryJson.getJSONArray("inputs");
         StringBuilder parameterPromot = new StringBuilder();
-        if(inputsJsonArray != null) {
+        if(inputsJsonArray != null && inputsJsonArray.size() > 0) {
           for (int j = 0; j < inputsJsonArray.size(); j++) {
             JSONObject inputItem = inputsJsonArray.getJSONObject(j);
             String inputName = inputItem.getString("name");
@@ -194,6 +194,8 @@ public class RightTabRunController implements Initializable {
               parameterPromot.append(", ");
             }
           }
+        } else {
+          parameterText.setVisible(false);
         }
         parameterText.setPromptText(parameterPromot.toString());
 
