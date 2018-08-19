@@ -56,6 +56,8 @@ public class ShareData {
     public static SimpleListProperty<String> allContractFileName = new SimpleListProperty<>(
         FXCollections.observableArrayList());
 
+    public static SimpleObjectProperty<String> deployRun = new SimpleObjectProperty<>();
+
     private ShareData() {
 
     }

@@ -1,9 +1,11 @@
 package org.tron.studio;
 
+import com.jfoenix.controls.JFXListView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
@@ -21,6 +23,7 @@ import java.nio.file.Paths;
 public class MainController {
     public CodeArea codeArea;
     public TabPane codeAreaTabPane;
+    public JFXListView<Object> debugInfoList;
 
     @PostConstruct
     public void initialize() throws IOException {
@@ -36,6 +39,13 @@ public class MainController {
         new SolidityHighlight(codeArea).highlight();
         codeArea.replaceText(0, 0, builder.toString());
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+
+        ShareData.deployRun.addListener((observable, oldValue, newValue) -> {
+            String currentContractName = ShareData.currentContractName.get();
+            String headMsg = String.format("creation of %s pending...", currentContractName);
+            System.out.println(debugContract());
+            debugInfoList.getItems().add(new Label(headMsg));
+        });
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
             try {
@@ -59,6 +69,13 @@ public class MainController {
                 logger.error(e.getMessage());
             }
         });
+    }
+
+    private String debugContract()
+    {
+        String address = ShareData.wallet.getClass().getName();
+        String msg = String.format("from: %s", address);
+        return msg;
     }
 
 }
