@@ -7,6 +7,7 @@
 <?import com.jfoenix.controls.JFXDialog?>
 <?import com.jfoenix.controls.JFXDialogLayout?>
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXListView?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="Infinity" maxWidth="Infinity" prefHeight="450"
     prefWidth="800" xmlns="http://javafx.com/javafx/8.0.121"
     fx:controller="org.tron.studio.MainController">
@@ -24,7 +25,7 @@
                         <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS"
                                  HBox.hgrow="ALWAYS">
                             <tabs>
-                                <Tab fx:id="defaultTab" text="VoteContract">
+                                <Tab fx:id="defaultTab" text="VoteContract" >
                                     <content>
                                         <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
                                                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
@@ -40,6 +41,7 @@
                                 </Tab>
                             </tabs>
                         </TabPane>
+                        <JFXListView VBox.vgrow="ALWAYS" fx:id="debugInfoList" styleClass="jfx-debug-list-view" maxHeight="130" />
                     </VBox>
 
                     <VBox prefWidth="400" AnchorPane.bottomAnchor="0">

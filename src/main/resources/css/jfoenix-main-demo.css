@@ -457,6 +457,15 @@
     -jfx-expanded: false;
 }
 
+.jfx-debug-list-view {
+    -fx-background-insets: 0.0;
+    -jfx-cell-horizontal-margin: 0.0;
+    -jfx-cell-vertical-margin: 5.0;
+    -jfx-vertical-gap: 10.0;
+    -jfx-expanded: false;
+    -fx-background-color:derive(black,90%);
+}
+
 .custom-jfx-list-view .jfx-list-cell:odd:selected > .jfx-rippler > StackPane,
 .custom-jfx-list-view .jfx-list-cell:even:selected > .jfx-rippler > StackPane {
     -fx-background-color: rgba(255, 0, 0, 0.2);
