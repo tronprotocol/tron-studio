@@ -3,8 +3,6 @@ package org.tron.studio.ui;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.google.gson.JsonObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -121,9 +119,10 @@ public class RightTabRunController implements Initializable {
 
     boolean deployContractResult = false;
     try {
-      deployContractResult = ShareData.wallet.deployContract(currentContractName, currentContract.abi, currentContract.bin,
-          Long.parseLong(feeLimitTextField.getText()), Long.parseLong(valueTextField.getText()),
-          Long.parseLong(userPayRatio.getText()), null);
+      deployContractResult = ShareData.wallet
+          .deployContract(currentContractName, currentContract.abi, currentContract.bin,
+              Long.parseLong(feeLimitTextField.getText()), Long.parseLong(valueTextField.getText()),
+              Long.parseLong(userPayRatio.getText()), null);
     } catch (IOException | CipherException | CancelException e) {
       logger.error("Failed to deployContract{} {}", e.getMessage(), e);
       return;
@@ -146,12 +145,13 @@ public class RightTabRunController implements Initializable {
 
   private Pane getContractRunPanel(String transactionId, String abi) {
     VBox vbox = new VBox();
-    Label transactionLabel = new Label("0x" + transactionId.substring(0, 3) + "..." + transactionId.substring(transactionId.length() - 3, transactionId.length()));
+    Label transactionLabel = new Label("0x" + transactionId.substring(0, 3) + "..." + transactionId
+        .substring(transactionId.length() - 3, transactionId.length()));
     vbox.getChildren().add(transactionLabel);
     List<String> abiJson = JSONArray.parseArray(abi, String.class);
     for (String entry : abiJson) {
       JSONObject entryJson = JSONObject.parseObject(entry);
-      if(StringUtils.equalsIgnoreCase("function",entryJson.getString("type"))) {
+      if (StringUtils.equalsIgnoreCase("function", entryJson.getString("type"))) {
         HBox item = new HBox();
         item.getChildren().add(new JFXButton(entryJson.getString("name")));
         item.getChildren().add(new JFXTextField());

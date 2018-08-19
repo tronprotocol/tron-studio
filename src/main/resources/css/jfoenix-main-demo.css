@@ -340,6 +340,7 @@
     -jfx-button-type: FLAT;
     -fx-background-color: #5264AE;
     -fx-text-fill: WHITE;
+    -fx-min-width: 75;
 }
 
 /*******************************************************************************

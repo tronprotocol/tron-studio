@@ -36,14 +36,14 @@
         <JFXComboBox  fx:id="valueUnitComboBox"   HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
         <JFXTextField fx:id="userPayRatio"        HBox.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
 
-        <JFXRippler position="BACK" styleClass="icons-rippler1" GridPane.rowIndex="1" GridPane.columnIndex="3" GridPane.columnSpan="1">
+        <JFXRippler position="BACK" styleClass="icons-rippler1" GridPane.rowIndex="1" GridPane.columnIndex="3" GridPane.columnSpan="1" onMouseClicked="#onClickCopyAddress">
             <StackPane style="-fx-padding: 2;">
-                <MaterialDesignIconView glyphName="CONTENT_COPY" styleClass="icon" onMouseClicked="#onClickCopyAddress"/>
+                <MaterialDesignIconView glyphName="CONTENT_COPY" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
-        <JFXRippler position="BACK" styleClass="icons-rippler1" GridPane.rowIndex="1" GridPane.columnIndex="4" GridPane.columnSpan="1">
+        <JFXRippler position="BACK" styleClass="icons-rippler1" GridPane.rowIndex="1" GridPane.columnIndex="4" GridPane.columnSpan="1" onMouseClicked="#onClickAddAddress">
             <StackPane style="-fx-padding: 2;">
-                <MaterialDesignIconView glyphName="PLUS_BOX" styleClass="icon" onMouseClicked="#onClickAddAddress"/>
+                <MaterialDesignIconView glyphName="PLUS_BOX" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
     </GridPane>
@@ -58,8 +58,8 @@
         <Label text="Deployed Contracts" />
         <Region HBox.hgrow="ALWAYS"/>
         <JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickClear">
-            <StackPane style="-fx-padding: 3;">
-                <MaterialDesignIconView glyphSize="10" glyphName="DELETE" styleClass="icon"/>
+            <StackPane style="-fx-padding: 2;">
+                <MaterialDesignIconView glyphName="DELETE" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
     </HBox>
