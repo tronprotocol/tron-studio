@@ -10,7 +10,9 @@ import com.jfoenix.controls.JFXTextField;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -26,6 +28,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
+import org.tron.abi.FunctionEncoder;
+import org.tron.abi.datatypes.Type;
+import org.tron.abi.datatypes.generated.AbiTypes;
 import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.core.exception.CancelException;
 import org.tron.keystore.CipherException;
@@ -47,6 +52,8 @@ public class RightTabRunController implements Initializable {
   public JFXComboBox valueUnitComboBox;
   public JFXTextField userPayRatio;
   public JFXListView deployedContractList;
+
+  public JFXTextField constructorParaTextField;
 
   private static String DEFAULT_FEE_LIMIT = "1000000";
   private static String DEFAULT_VALUE = "0";
@@ -121,9 +128,36 @@ public class RightTabRunController implements Initializable {
     ContractMetadata currentContract = result.getContract(currentContractName);
 
     boolean deployContractResult = false;
+    StringBuilder bin = new StringBuilder(currentContract.bin);
+
+    {
+      //Find out constructor, and encode constructor parameter, then append it to the end of bytecode
+      List<JSONObject> abiJson = JSONArray.parseArray(currentContract.abi, JSONObject.class);
+      Optional<JSONObject> constructorJSONObject = abiJson.stream()
+          .filter(entry -> StringUtils.equalsIgnoreCase("constructor", entry.getString("type")))
+          .findFirst();
+      if (constructorJSONObject.isPresent()) {
+        JSONObject constructorJSON = constructorJSONObject.get();
+        JSONArray inputsArray = constructorJSON.getJSONArray("inputs");
+        List<String> constructorParaValue = Arrays
+            .asList(constructorParaTextField.getText().split(","));
+        if (!inputsArray.isEmpty()) {
+          List<Type> constructorPara = new ArrayList<>();
+          for (int i = 0; i < inputsArray.size(); i++) {
+            JSONObject inputType = inputsArray.getJSONObject(i);
+            String value = i < constructorParaValue.size() ? constructorParaValue.get(i) : "0";
+            value = StringUtils.isNoneEmpty(value) ? value : "0";
+            Type tp = AbiTypes.getTypeWithValue(inputType.getString("type"), value);
+            constructorPara.add(tp);
+          }
+          String encodedConstructor = FunctionEncoder.encodeConstructor(constructorPara);
+          bin.append(encodedConstructor);
+        }
+      }
+    }
     try {
       deployContractResult = ShareData.wallet
-          .deployContract(currentContractName, currentContract.abi, currentContract.bin,
+          .deployContract(currentContractName, currentContract.abi, bin.toString(),
               Long.parseLong(feeLimitTextField.getText()), Long.parseLong(valueTextField.getText()),
               Long.parseLong(userPayRatio.getText()), null);
     } catch (IOException | CipherException | CancelException e) {
@@ -139,7 +173,8 @@ public class RightTabRunController implements Initializable {
     TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
     Transaction transaction = ShareData.wallet.getLastTransaction();
     if (!transactionExtention.getResult().getResult()) {
-      logger.error("Unable to get last TransactionExtention, {}", transactionExtention.getResult().getMessage().toStringUtf8());
+      logger.error("Unable to get last TransactionExtention, {}",
+          transactionExtention.getResult().getMessage().toStringUtf8());
       return;
     }
 
@@ -147,7 +182,8 @@ public class RightTabRunController implements Initializable {
 
     // Show debug info below codearea
     ShareData.deployRun.set("run");
-    deployedContractList.getItems().add(getContractRunPanel(currentContractName, transactionId, currentContract.abi));
+    deployedContractList.getItems()
+        .add(getContractRunPanel(currentContractName, transactionId, currentContract.abi));
 
   }
 
@@ -156,8 +192,9 @@ public class RightTabRunController implements Initializable {
     listView.getStyleClass().add("sublist");
 
     HBox title = new HBox();
-    Label transactionLabel = new Label(contractName + " 0x" + transactionId.substring(0, 5) + "..." + transactionId
-        .substring(transactionId.length() - 5, transactionId.length()));
+    Label transactionLabel = new Label(
+        contractName + " 0x" + transactionId.substring(0, 5) + "..." + transactionId
+            .substring(transactionId.length() - 5, transactionId.length()));
     title.getChildren().add(transactionLabel);
     listView.setGroupnode(title);
 
@@ -184,13 +221,13 @@ public class RightTabRunController implements Initializable {
 
         JSONArray inputsJsonArray = entryJson.getJSONArray("inputs");
         StringBuilder parameterPromot = new StringBuilder();
-        if(inputsJsonArray != null && inputsJsonArray.size() > 0) {
+        if (inputsJsonArray != null && inputsJsonArray.size() > 0) {
           for (int j = 0; j < inputsJsonArray.size(); j++) {
             JSONObject inputItem = inputsJsonArray.getJSONObject(j);
             String inputName = inputItem.getString("name");
             String type = inputItem.getString("type");
             parameterPromot.append(type).append(" ").append(inputName);
-            if(j != inputsJsonArray.size()-1) {
+            if (j != inputsJsonArray.size() - 1) {
               parameterPromot.append(", ");
             }
           }

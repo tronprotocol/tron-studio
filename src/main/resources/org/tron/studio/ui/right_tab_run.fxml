@@ -55,10 +55,10 @@
             <ColumnConstraints hgrow="SOMETIMES" />
         </columnConstraints>
         <JFXComboBox  fx:id="contractComboBox" GridPane.columnSpan="2" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <JFXTextField promptText="constructure parameters"    GridPane.rowIndex="1" GridPane.columnIndex="0" />
-        <JFXTextField promptText="Load contract from address" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+        <JFXTextField fx:id="constructorParaTextField" promptText="constructor parameters"    GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <!--<JFXTextField promptText="Load contract from address" GridPane.rowIndex="2" GridPane.columnIndex="0" />-->
         <JFXButton    styleClass="custom-jfx-button-raised" text="Deploy" onAction="#onClickDeploy" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-        <JFXButton    styleClass="custom-jfx-button-raised" text="Load" onAction="#onClickLoad"     GridPane.rowIndex="2" GridPane.columnIndex="1" />
+        <!--<JFXButton    styleClass="custom-jfx-button-raised" text="Load" onAction="#onClickLoad"     GridPane.rowIndex="2" GridPane.columnIndex="1" />-->
     </GridPane>
     <VBox spacing="10" styleClass="jfx-drawer-overlay-pane" VBox.vgrow="ALWAYS">
         <HBox spacing="10">

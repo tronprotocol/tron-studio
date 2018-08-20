@@ -127,13 +127,15 @@ contract DACCToken is StandardToken {
   string public name = "Decentralized Accessible Content Chain";
   string public symbol = "DACC";
   uint8 public decimals = 6;
+  uint256 public testValue;
 
   // internal variables
 
   // events
 
   // public functions
-  constructor() public {
+  constructor(uint256 test) public {
+    testValue = test;
     //init _totalSupply
     _totalSupply = 30 * (10 ** 9) * (10 ** uint256(decimals));
 
