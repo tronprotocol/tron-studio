@@ -19,17 +19,38 @@ import javafx.scene.layout.HBox;
 import com.jfoenix.controls.*;
 import javafx.scene.layout.StackPane;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+import org.tron.studio.ShareData;
 
 public class RightTabDebugController implements Initializable {
 
     public JFXListView debugList;
+    public boolean showedDebugList = false;
 
     public RightTabDebugController() {
 
     }
 
     public void initialize(URL location, ResourceBundle resources) {
+        ShareData.debugRun.addListener((observable, oldValue, newValue) -> {
+            if (showedDebugList)
+            {
+                return;
+            }
 
+            String[] nodes = {"Instructions", "Solidity Locals",
+                    "Solidity State", "Step detail", "Stack",
+                    "Storage completely loaded", "Memory", "Call Data", "Call Stack",
+                    "Return Value", "Full Storages Changes\n"};
+            String[] labels = {"test"};
+
+            for (String nodename: nodes
+            ) {
+                JFXListView<Object> subList = createList(labels, nodename);
+                debugList.getItems().add(subList);
+            }
+
+            showedDebugList = true;
+        });
     }
 
     public void onClickDebug(ActionEvent actionEvent) {
@@ -67,17 +88,7 @@ public class RightTabDebugController implements Initializable {
     }
 
     public void onClickPlay(MouseEvent mouseEvent) {
-        String[] nodes = {"Instructions", "Solidity Locals",
-                "Solidity State", "Step detail", "Stack",
-        "Storage completely loaded", "Memory", "Call Data", "Call Stack",
-        "Return Value", "Full Storages Changes\n"};
-        String[] labels = {"test"};
 
-        for (String nodename: nodes
-             ) {
-            JFXListView<Object> subList = createList(labels, nodename);
-            debugList.getItems().add(subList);
-        }
     }
 
     public void onClickStop(MouseEvent mouseEvent) {

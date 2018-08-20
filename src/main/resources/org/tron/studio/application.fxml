@@ -44,7 +44,8 @@
                             </tabs>
                         </TabPane>
                         <ScrollPane>
-                            <JFXListView VBox.vgrow="ALWAYS" fx:id="debugInfoList" styleClass="jfx-debug-list-view" maxHeight="130" />
+                            <JFXListView VBox.vgrow="ALWAYS" fx:id="debugInfoList" styleClass="jfx-list-view"
+                            minHeight="200" minWidth="600"/>
                         </ScrollPane>
                     </SplitPane>
                     <TabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE">

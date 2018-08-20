@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
+import org.tron.api.GrpcAPI;
 import org.tron.common.overlay.discover.node.NodeManager;
 import org.tron.core.Wallet;
 import org.tron.core.WalletSolidity;
@@ -57,6 +58,9 @@ public class ShareData {
         FXCollections.observableArrayList());
 
     public static SimpleObjectProperty<String> deployRun = new SimpleObjectProperty<>();
+    public static SimpleObjectProperty<String> debugRun = new SimpleObjectProperty<>();
+
+    public static GrpcAPI.TransactionExtention currentTransactionExtention;
 
     private ShareData() {
 
