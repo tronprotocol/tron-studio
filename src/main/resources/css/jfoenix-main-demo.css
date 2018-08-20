@@ -348,6 +348,9 @@
     -fx-background-color: #ddddff;
     -fx-text-fill: BLACK;
     -fx-min-width: 100;
+    -fx-max-width: 100;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
 }
 
 /*******************************************************************************
