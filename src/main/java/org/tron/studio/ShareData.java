@@ -59,6 +59,8 @@ public class ShareData {
 
     public static SimpleObjectProperty<String> deployRun = new SimpleObjectProperty<>();
     public static SimpleObjectProperty<String> debugRun = new SimpleObjectProperty<>();
+    public static SimpleObjectProperty<String> selectFile = new SimpleObjectProperty<>();
+    public static int currentFileIndex;
 
     public static GrpcAPI.TransactionExtention currentTransactionExtention;
 

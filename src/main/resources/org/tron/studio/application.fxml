@@ -24,7 +24,7 @@
                   AnchorPane.topAnchor="64" AnchorPane.bottomAnchor="50">
                     <fx:include source="ui/left_code_list.fxml"/>
                     <SplitPane prefWidth="400" AnchorPane.bottomAnchor="0" orientation="VERTICAL">
-                        <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS"
+                        <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="SELECTED_TAB" VBox.vgrow="ALWAYS"
                                  HBox.hgrow="ALWAYS">
                             <tabs>
                                 <Tab fx:id="defaultTab" text="VoteContract" >

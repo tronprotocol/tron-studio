@@ -5,6 +5,8 @@ import com.jfoenix.controls.JFXRippler;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -31,6 +33,7 @@ public class MainController {
     public TabPane codeAreaTabPane;
     public JFXListView<Object> debugInfoList;
 
+    public Tab defaultTab;
     public TabPane rightContentTabPane;
 
     @PostConstruct
@@ -44,14 +47,32 @@ public class MainController {
             e.printStackTrace();
         }
 
+        defaultTab.setOnCloseRequest(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+                int tabs_size = codeAreaTabPane.getTabs().size();
+                System.out.println(tabs_size);
+                if (tabs_size == 1)
+                {
+                    // Create blank file when closing last file
+                    ShareData.newContractFileName.set("/template/Ballot.sol");
+                }
+            }
+        });
+
         new SolidityHighlight(codeArea).highlight();
         codeArea.replaceText(0, 0, builder.toString());
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
+        SingleSelectionModel<Tab> selectionModel = codeAreaTabPane.getSelectionModel();
+
+        ShareData.selectFile.addListener((observable, oldValue, newValue) -> {
+            selectionModel.select(ShareData.currentFileIndex);
+        });
+
         ShareData.deployRun.addListener((observable, oldValue, newValue) -> {
             String currentContractName = ShareData.currentContractName.get();
             String headMsg = String.format("creation of %s pending...", currentContractName);
-            System.out.println(headMsg);
             debugInfoList.getItems().add(new Label(headMsg));
 
             String[] labels = {"labels"};
@@ -74,6 +95,19 @@ public class MainController {
                 Tab codeTab = FXMLLoader.load(getClass().getResource("ui/code_panel.fxml"));
                 codeTab.setText(newValue);
                 codeTab.setClosable(true);
+
+                codeTab.setOnCloseRequest(new EventHandler<Event>() {
+                    @Override
+                    public void handle(Event event) {
+                        int tabs_size = codeAreaTabPane.getTabs().size();
+                        System.out.println(tabs_size);
+                        if (tabs_size == 1)
+                        {
+                            // Create blank file when closing last file
+                            ShareData.newContractFileName.set("/template/Ballot.sol");
+                        }
+                    }
+                });
 
                 codeAreaTabPane.getTabs().add(codeTab);
                 StringBuilder templateBuilder = new StringBuilder();

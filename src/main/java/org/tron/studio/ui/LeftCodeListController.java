@@ -40,6 +40,13 @@ public class LeftCodeListController {
         fileNameTable.setRoot(new RecursiveTreeItem<>(fileNameData, RecursiveTreeObject::getChildren));
         fileNameTable.setShowRoot(false);
 
+        fileNameTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                ShareData.currentFileIndex = fileNameTable.getSelectionModel().getSelectedIndex();
+                ShareData.selectFile.set("run");
+            }
+        });
+
         ShareData.newContractFileName.set("/template/Ballot.sol");
     }
 
