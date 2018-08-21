@@ -43,7 +43,7 @@ public class LeftCodeListController {
         fileNameTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 ShareData.currentFileIndex = fileNameTable.getSelectionModel().getSelectedIndex();
-                ShareData.selectFile.set("run");
+                ShareData.selectFile.set(Integer.toString(ShareData.currentFileIndex));
             }
         });
 
