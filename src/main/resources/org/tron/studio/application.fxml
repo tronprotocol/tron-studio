@@ -43,10 +43,7 @@
                                 </Tab>
                             </tabs>
                         </TabPane>
-                        <ScrollPane>
-                            <JFXListView VBox.vgrow="ALWAYS" fx:id="transactionHistoryListView" styleClass="jfx-list-view"
-                            minHeight="200" minWidth="600"/>
-                        </ScrollPane>
+                        <fx:include VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" source="ui/transaction_history.fxml"/>
                     </SplitPane>
                     <TabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE">
                         <tabs>

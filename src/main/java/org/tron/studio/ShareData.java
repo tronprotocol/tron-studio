@@ -58,7 +58,7 @@ public class ShareData {
         FXCollections.observableArrayList());
 
     public static SimpleObjectProperty<String> addTransactionAction = new SimpleObjectProperty<>();
-    public static SimpleObjectProperty<String> debugRun = new SimpleObjectProperty<>();
+    public static SimpleObjectProperty<String> debugTransactionAction = new SimpleObjectProperty<>();
     public static SimpleObjectProperty<String> selectFile = new SimpleObjectProperty<>();
     public static int currentFileIndex;
 

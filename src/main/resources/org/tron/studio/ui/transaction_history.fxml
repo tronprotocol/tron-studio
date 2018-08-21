@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXListView?>
+<JFXListView xmlns:fx="http://javafx.com/fxml" styleClass="jfx-list-view"
+             fx:id="transactionHistoryListView"
+             fx:controller="org.tron.studio.ui.TransactionHistoryController"/>
