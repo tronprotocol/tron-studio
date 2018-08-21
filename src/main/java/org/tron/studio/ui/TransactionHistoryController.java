@@ -16,6 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.api.GrpcAPI;
+import org.tron.core.capsule.TransactionCapsule;
 import org.tron.protos.Protocol;
 import org.tron.studio.ShareData;
 
@@ -63,11 +64,16 @@ public class TransactionHistoryController {
         setupCellValueFactory(valueCol, TransactionDetail::valueProperty);
 
         GrpcAPI.TransactionExtention lastTransactionExtention = ShareData.wallet.getLastTransactionExtention();
+        Protocol.Transaction lastTransaction = ShareData.wallet.getLastTransaction();
+        String transactionId;
         if(lastTransactionExtention.getConstantResultCount() > 0) {
+            transactionId = Hex.toHexString(lastTransactionExtention.getTxid().toByteArray());
+        } else {
+            transactionId = Hex.toHexString(new TransactionCapsule(lastTransaction).getTransactionId().getBytes());
         }
 
         ObservableList<TransactionDetail> detailTableData = FXCollections.observableArrayList(
-                new TransactionDetail("transaction id", Hex.toHexString(lastTransactionExtention.getTxid().toByteArray()))
+                new TransactionDetail("transaction id", transactionId)
         );
         detailTable.setRoot(new RecursiveTreeItem<>(detailTableData, RecursiveTreeObject::getChildren));
         detailTable.setShowRoot(false);

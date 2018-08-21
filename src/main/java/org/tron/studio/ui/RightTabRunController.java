@@ -25,8 +25,11 @@ import org.tron.abi.FunctionEncoder;
 import org.tron.abi.datatypes.Type;
 import org.tron.abi.datatypes.generated.AbiTypes;
 import org.tron.api.GrpcAPI.TransactionExtention;
+import org.tron.core.Wallet;
+import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.exception.CancelException;
 import org.tron.keystore.CipherException;
+import org.tron.protos.Protocol;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.studio.ShareData;
 import org.tron.studio.solc.CompilationResult;
@@ -178,7 +181,7 @@ public class RightTabRunController implements Initializable {
         ShareData.currentContractName.set(currentContractName);
         ShareData.currentTransactionExtention = transactionExtention;
 
-        String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
+        String transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
 
         // Show debug info below codearea
         ShareData.addTransactionAction.set(transactionId);
@@ -236,10 +239,30 @@ public class RightTabRunController implements Initializable {
                 }
                 parameterText.setPromptText(parameterPromot.toString());
 
+                Optional<Protocol.TransactionInfo> tInfo = ShareData.wallet.getTransactionInfoById(transactionId);
                 functionButton.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        System.out.print("asd");
+                        Optional<Protocol.TransactionInfo> tInfo = ShareData.wallet.getTransactionInfoById(transactionId);
+                        byte[] contractAddressBytes = tInfo.get().getContractAddress().toByteArray();
+                        String contractAddress = Hex.toHexString(tInfo.get().getContractAddress().toByteArray());
+                        long callValue = Long.parseLong(valueTextField.getText());
+                        if(valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
+                            callValue *= 1_000_000;
+                        }
+                        byte[] data = null;
+                        long feeLimit = Long.parseLong(feeLimitTextField.getText());
+                        if(feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
+                            feeLimit *= 1_000_000;
+                        }
+                        try {
+                            ShareData.wallet.triggerContract(contractAddressBytes,callValue, data, feeLimit);
+                        } catch (IOException | CipherException | CancelException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            System.out.println(e);
+                        }
+                        System.out.print(tInfo);
                     }
                 });
             }
