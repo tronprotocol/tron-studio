@@ -4,23 +4,21 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXRippler;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import lombok.extern.slf4j.Slf4j;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.tron.core.db.api.pojo.Transaction;
 import org.tron.studio.ui.SolidityHighlight;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.collections.*;
-import javafx.scene.layout.Pane;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -31,7 +29,7 @@ import java.nio.file.Paths;
 public class MainController {
     public CodeArea codeArea;
     public TabPane codeAreaTabPane;
-    public JFXListView<Object> debugInfoList;
+    public JFXListView<Object> transactionHistoryListView;
 
     public Tab defaultTab;
     public TabPane rightContentTabPane;
@@ -52,8 +50,7 @@ public class MainController {
             public void handle(Event event) {
                 int tabs_size = codeAreaTabPane.getTabs().size();
                 System.out.println(tabs_size);
-                if (tabs_size == 1)
-                {
+                if (tabs_size == 1) {
                     // Create blank file when closing last file
                     ShareData.newContractFileName.set("/template/Ballot.sol");
                 }
@@ -70,24 +67,24 @@ public class MainController {
             selectionModel.select(ShareData.currentFileIndex);
         });
 
-        ShareData.deployRun.addListener((observable, oldValue, newValue) -> {
+        ShareData.addTransactionAction.addListener((observable, oldValue, newValue) -> {
             String currentContractName = ShareData.currentContractName.get();
-            String headMsg = String.format("creation of %s pending...", currentContractName);
-            debugInfoList.getItems().add(new Label(headMsg));
+            String transactionHeadMsg = String.format("creation of %s pending...", currentContractName);
+            transactionHistoryListView.getItems().add(new Label(transactionHeadMsg));
 
             String[] labels = {"labels"};
 
             JFXListView<Object> subList = createList(labels);
 
-            debugInfoList.getItems().add(subList);
+            transactionHistoryListView.getItems().add(subList);
 
             /**
-            int transationResCnt = ShareData.currentTransactionExtention.getConstantResultCount();
+             int transationResCnt = ShareData.currentTransactionExtention.getConstantResultCount();
 
-            if (transationResCnt == 0)
-            {
-                int signatureCount = ShareData.currentTransactionExtention.getTransaction().getSignatureCount();
-            } **/
+             if (transationResCnt == 0)
+             {
+             int signatureCount = ShareData.currentTransactionExtention.getTransaction().getSignatureCount();
+             } **/
         });
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
@@ -101,8 +98,7 @@ public class MainController {
                     public void handle(Event event) {
                         int tabs_size = codeAreaTabPane.getTabs().size();
                         System.out.println(tabs_size);
-                        if (tabs_size == 1)
-                        {
+                        if (tabs_size == 1) {
                             // Create blank file when closing last file
                             ShareData.newContractFileName.set("/template/Ballot.sol");
                         }
@@ -127,25 +123,25 @@ public class MainController {
         });
     }
 
-    private MyTableView<DebugDetail> createDetailTable() {
-        MyTableView<DebugDetail> table = new MyTableView<DebugDetail>();
+    private TransactionTableView<TransactionDetail> createDetailTable() {
+        TransactionTableView<TransactionDetail> table = new TransactionTableView<TransactionDetail>();
 
-        TableColumn fieldNameCol = new TableColumn("Field Name");
+        TableColumn<TransactionDetail, String> fieldNameCol = new TableColumn("Field Name");
         fieldNameCol.setMinWidth(50);
         fieldNameCol.setCellValueFactory(
-                new PropertyValueFactory<DebugDetail, String>("fieldName"));
+                new PropertyValueFactory<TransactionDetail, String>("fieldName"));
 
-        TableColumn valueCol = new TableColumn("Value");
+        TableColumn<TransactionDetail, String> valueCol = new TableColumn("Value");
         valueCol.setMinWidth(200);
         valueCol.setCellValueFactory(
-                new PropertyValueFactory<DebugDetail, String>("value"));
+                new PropertyValueFactory<TransactionDetail, String>("value"));
 
         // dummy data
-        final ObservableList<DebugDetail> data =
+        final ObservableList<TransactionDetail> data =
                 FXCollections.observableArrayList(
-                        new DebugDetail("status", "0x1 Transaction mined and execution succeed"),
-                        new DebugDetail("transaction hash", "0xdbc3c61781c3f61d09339b98a553a3d1ddf9a00e5888574c8cba1c7b00a81a62"),
-                        new DebugDetail("contract address", "0x692a70d2e424a56d2c6c27aa97d1a86395877b3a")
+                        new TransactionDetail("status", "0x1 Transaction mined and execution succeed"),
+                        new TransactionDetail("transaction hash", "0xdbc3c61781c3f61d09339b98a553a3d1ddf9a00e5888574c8cba1c7b00a81a62"),
+                        new TransactionDetail("contract address", "0x692a70d2e424a56d2c6c27aa97d1a86395877b3a")
                 );
 
         table.setItems(data);
@@ -155,8 +151,7 @@ public class MainController {
         return table;
     }
 
-    private JFXListView<Object> createList(String[] labels)
-    {
+    private JFXListView<Object> createList(String[] labels) {
         JFXListView<Object> subList = new JFXListView<>();
 
         // Create table to show details of transaction
@@ -201,19 +196,17 @@ public class MainController {
         return subList;
     }
 
-    private String debugContract()
-    {
+    private String debugContract() {
         String address = ShareData.wallet.getClass().getName();
         String msg = String.format("from: %s", address);
         return msg;
     }
 
-    public static class DebugDetail {
+    public static class TransactionDetail {
         private final SimpleStringProperty fieldName;
         private final SimpleStringProperty value;
 
-        private DebugDetail(String fieldName, String value)
-        {
+        private TransactionDetail(String fieldName, String value) {
             this.fieldName = new SimpleStringProperty(fieldName);
             this.value = new SimpleStringProperty(value);
         }
@@ -222,25 +215,22 @@ public class MainController {
             return fieldName.get();
         }
 
-        public void setFieldName(String fieldName)
-        {
+        public void setFieldName(String fieldName) {
             this.fieldName.set(fieldName);
         }
 
-        public String getValue()
-        {
+        public String getValue() {
             return value.get();
         }
 
-        public void setValue(String value)
-        {
+        public void setValue(String value) {
             this.value.set(value);
         }
     }
 
-    class MyTableView<T> extends TableView<T> {
+    class TransactionTableView<T> extends TableView<T> {
         @Override
-        public void resize(double width, double height){
+        public void resize(double width, double height) {
             super.resize(width, height);
             Pane header = (Pane) lookup("TableHeaderRow");
             header.setMinHeight(0);

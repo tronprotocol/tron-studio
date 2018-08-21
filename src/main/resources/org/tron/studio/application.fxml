@@ -44,7 +44,7 @@
                             </tabs>
                         </TabPane>
                         <ScrollPane>
-                            <JFXListView VBox.vgrow="ALWAYS" fx:id="debugInfoList" styleClass="jfx-list-view"
+                            <JFXListView VBox.vgrow="ALWAYS" fx:id="transactionHistoryListView" styleClass="jfx-list-view"
                             minHeight="200" minWidth="600"/>
                         </ScrollPane>
                     </SplitPane>
