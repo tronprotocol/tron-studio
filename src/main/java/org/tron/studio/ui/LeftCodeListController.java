@@ -36,7 +36,7 @@ public class LeftCodeListController {
             fileNameData.add(new FileName(newValue));
         });
         setupCellValueFactory(fileNameColumn, FileName::fileNameProperty);
-        fileNameData =  FXCollections.observableArrayList();
+        fileNameData = FXCollections.observableArrayList();
         fileNameTable.setRoot(new RecursiveTreeItem<>(fileNameData, RecursiveTreeObject::getChildren));
         fileNameTable.setShowRoot(false);
 

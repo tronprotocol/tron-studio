@@ -1,25 +1,28 @@
 package org.tron.studio.ui;
 
-import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXRippler;
+import com.jfoenix.controls.*;
+import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.TreeTableColumn;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import org.spongycastle.util.encoders.Hex;
+import org.tron.api.GrpcAPI;
+import org.tron.protos.Protocol;
 import org.tron.studio.ShareData;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.function.Function;
 
 public class TransactionHistoryController {
 
@@ -34,9 +37,7 @@ public class TransactionHistoryController {
             transactionHistoryListView.getItems().add(new Label(transactionHeadMsg));
 
             String[] labels = {"labels"};
-
-            JFXListView<Object> subList = createList(labels);
-
+            JFXListView<Object> subList = createSubList(labels);
             transactionHistoryListView.getItems().add(subList);
 
             /**
@@ -50,39 +51,32 @@ public class TransactionHistoryController {
     }
 
 
-    private TransactionTableView<TransactionDetail> createDetailTable() {
-        TransactionTableView<TransactionDetail> table = new TransactionTableView<TransactionDetail>();
+    private JFXTreeTableView<TransactionDetail> createDetailTable() {
 
-        TableColumn<TransactionDetail, String> fieldNameCol = new TableColumn("Field Name");
-        fieldNameCol.setMinWidth(50);
-        fieldNameCol.setCellValueFactory(
-                new PropertyValueFactory<TransactionDetail, String>("fieldName"));
+        JFXTreeTableView<TransactionDetail> detailTable = new JFXTreeTableView<>();
+        JFXTreeTableColumn<TransactionDetail, String> keyCol = new JFXTreeTableColumn<>("Item");
+        JFXTreeTableColumn<TransactionDetail, String> valueCol = new JFXTreeTableColumn<>("Value");
+        detailTable.getColumns().add(keyCol);
+        detailTable.getColumns().add(valueCol);
 
-        TableColumn<TransactionDetail, String> valueCol = new TableColumn("Value");
-        valueCol.setMinWidth(200);
-        valueCol.setCellValueFactory(
-                new PropertyValueFactory<TransactionDetail, String>("value"));
+        setupCellValueFactory(keyCol, TransactionDetail::keyProperty);
+        setupCellValueFactory(valueCol, TransactionDetail::valueProperty);
 
-        // dummy data
-        final ObservableList<TransactionDetail> data =
-                FXCollections.observableArrayList(
-                        new TransactionDetail("status", "0x1 Transaction mined and execution succeed"),
-                        new TransactionDetail("transaction hash", "0xdbc3c61781c3f61d09339b98a553a3d1ddf9a00e5888574c8cba1c7b00a81a62"),
-                        new TransactionDetail("contract address", "0x692a70d2e424a56d2c6c27aa97d1a86395877b3a")
-                );
+        GrpcAPI.TransactionExtention lastTransactionExtention = ShareData.wallet.getLastTransactionExtention();
+        if(lastTransactionExtention.getConstantResultCount() > 0) {
+        }
 
-        table.setItems(data);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        table.getColumns().addAll(fieldNameCol, valueCol);
+        ObservableList<TransactionDetail> detailTableData = FXCollections.observableArrayList(
+                new TransactionDetail("transaction id", Hex.toHexString(lastTransactionExtention.getTxid().toByteArray()))
+        );
+        detailTable.setRoot(new RecursiveTreeItem<>(detailTableData, RecursiveTreeObject::getChildren));
+        detailTable.setShowRoot(false);
 
-        return table;
+        return detailTable;
     }
 
-    private JFXListView<Object> createList(String[] labels) {
+    private JFXListView<Object> createSubList(String[] labels) {
         JFXListView<Object> subList = new JFXListView<>();
-
-        // Create table to show details of transaction
-
 
         //subList.getItems().add(new Label("details"));
         subList.getItems().add(createDetailTable());
@@ -121,42 +115,33 @@ public class TransactionHistoryController {
         return subList;
     }
 
-    public static class TransactionDetail {
-        private final SimpleStringProperty fieldName;
-        private final SimpleStringProperty value;
+    static final class TransactionDetail extends RecursiveTreeObject<TransactionDetail> {
 
-        private TransactionDetail(String fieldName, String value) {
-            this.fieldName = new SimpleStringProperty(fieldName);
-            this.value = new SimpleStringProperty(value);
+        final StringProperty keyProperty;
+        final StringProperty valueProperty;
+
+        TransactionDetail(String key, String val) {
+            this.keyProperty = new SimpleStringProperty(key);
+            this.valueProperty = new SimpleStringProperty(val);
         }
 
-        public String getFieldName() {
-            return fieldName.get();
+        StringProperty keyProperty() {
+            return keyProperty;
         }
 
-        public void setFieldName(String fieldName) {
-            this.fieldName.set(fieldName);
-        }
-
-        public String getValue() {
-            return value.get();
-        }
-
-        public void setValue(String value) {
-            this.value.set(value);
+        StringProperty valueProperty() {
+            return valueProperty;
         }
     }
 
-    class TransactionTableView<T> extends TableView<T> {
-        @Override
-        public void resize(double width, double height) {
-            super.resize(width, height);
-            Pane header = (Pane) lookup("TableHeaderRow");
-            header.setMinHeight(0);
-            header.setPrefHeight(0);
-            header.setMaxHeight(0);
-            header.setVisible(false);
-        }
+    private <T> void setupCellValueFactory(JFXTreeTableColumn<TransactionDetail, T> column, Function<TransactionDetail, ObservableValue<T>> mapper) {
+        column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TransactionDetail, T> param) -> {
+            if (column.validateValue(param)) {
+                return mapper.apply(param.getValue().getValue());
+            } else {
+                return column.getComputedValue(param);
+            }
+        });
     }
 
 }
