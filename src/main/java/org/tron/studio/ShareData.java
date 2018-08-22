@@ -57,12 +57,17 @@ public class ShareData {
     public static SimpleListProperty<String> allContractFileName = new SimpleListProperty<>(
         FXCollections.observableArrayList());
 
+    //所有的交易历史记录
+    //包括不上链的交易：TransactionExtension
+    //包括上链的交易：Transaction
+    //包括错误交易信息：ErrorInfo
+    public static HashMap<String, TransactionHistoryItem> transactionHistory = new HashMap<>();
     public static SimpleObjectProperty<String> addTransactionAction = new SimpleObjectProperty<>();
     public static SimpleObjectProperty<String> debugTransactionAction = new SimpleObjectProperty<>();
+
     public static SimpleObjectProperty<String> selectFile = new SimpleObjectProperty<>();
     public static int currentFileIndex;
 
-    public static GrpcAPI.TransactionExtention currentTransactionExtention;
 
     private ShareData() {
 

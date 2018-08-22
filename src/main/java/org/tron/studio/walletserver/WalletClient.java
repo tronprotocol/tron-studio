@@ -1237,6 +1237,7 @@ public class WalletClient {
     }
 
     Transaction transaction = transactionExtention.getTransaction();
+    lastTransaction = transaction;
     if (transaction.getRetCount() != 0 &&
         transactionExtention.getConstantResult(0) != null &&
         transactionExtention.getResult() != null) {

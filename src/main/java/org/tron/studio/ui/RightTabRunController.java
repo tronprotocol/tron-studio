@@ -26,12 +26,16 @@ import org.tron.abi.datatypes.Type;
 import org.tron.abi.datatypes.generated.AbiTypes;
 import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.core.Wallet;
+import org.tron.core.capsule.ContractCapsule;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.exception.CancelException;
+import org.tron.core.services.http.Util;
 import org.tron.keystore.CipherException;
+import org.tron.protos.Contract;
 import org.tron.protos.Protocol;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.studio.ShareData;
+import org.tron.studio.TransactionHistoryItem;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.CompilationResult.ContractMetadata;
 import org.tron.studio.walletserver.WalletClient;
@@ -166,38 +170,42 @@ public class RightTabRunController implements Initializable {
         }
 
         if (!deployContractResult) {
-            logger.error("Failed to deployContract, please check tron.log");
+            String uuid = UUID.randomUUID().toString();
+            addTransactionHistoryItem(uuid, new TransactionHistoryItem(TransactionHistoryItem.Type.ERROR,
+                    "Failed to deployContract. Please check tron.log"));
             return;
         }
 
         TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
-        Transaction transaction = ShareData.wallet.getLastTransaction();
+        String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
         if (!transactionExtention.getResult().getResult()) {
-            logger.error("Unable to get last TransactionExtention, {}",
-                    transactionExtention.getResult().getMessage().toStringUtf8());
+            addTransactionHistoryItem(transactionId, new TransactionHistoryItem(
+                    TransactionHistoryItem.Type.ERROR,
+                    String.format("Unable to get last TransactionExtention: %s",
+                            transactionExtention.getResult().getMessage().toStringUtf8())));
             return;
         }
 
+        Transaction transaction = ShareData.wallet.getLastTransaction();
+        transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
+        addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction));
+
         ShareData.currentContractName.set(currentContractName);
-        ShareData.currentTransactionExtention = transactionExtention;
 
-        String transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
-
-        // Show debug info below codearea
-        ShareData.addTransactionAction.set(transactionId);
+        byte[] ownerAddress = Wallet.decodeFromBase58Check(accountComboBox.getSelectionModel().getSelectedItem());
+        byte[] contractAddress = Util.generateContractAddress(transaction, ownerAddress);
         deployedContractList.getItems()
-                .add(getContractRunPanel(currentContractName, transactionId, currentContract.abi));
+                .add(getContractRunPanel(currentContractName, contractAddress, currentContract.abi));
 
     }
 
-    private JFXListView getContractRunPanel(String contractName, String transactionId, String abi) {
+    private JFXListView getContractRunPanel(String contractName, byte[] contractAddress, String abi) {
         JFXListView listView = new JFXListView();
         listView.getStyleClass().add("sublist");
 
         HBox title = new HBox();
-        Label transactionLabel = new Label(
-                contractName + " 0x" + transactionId.substring(0, 5) + "..." + transactionId
-                        .substring(transactionId.length() - 5, transactionId.length()));
+        String contractAddressString = Wallet.encode58Check(contractAddress);
+        Label transactionLabel = new Label(String.format("%s %s", contractName, contractAddressString));
         title.getChildren().add(transactionLabel);
         listView.setGroupnode(title);
 
@@ -238,33 +246,7 @@ public class RightTabRunController implements Initializable {
                     parameterText.setVisible(false);
                 }
                 parameterText.setPromptText(parameterPromot.toString());
-
-                Optional<Protocol.TransactionInfo> tInfo = ShareData.wallet.getTransactionInfoById(transactionId);
-                functionButton.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        Optional<Protocol.TransactionInfo> tInfo = ShareData.wallet.getTransactionInfoById(transactionId);
-                        byte[] contractAddressBytes = tInfo.get().getContractAddress().toByteArray();
-                        String contractAddress = Hex.toHexString(tInfo.get().getContractAddress().toByteArray());
-                        long callValue = Long.parseLong(valueTextField.getText());
-                        if(valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                            callValue *= 1_000_000;
-                        }
-                        byte[] data = null;
-                        long feeLimit = Long.parseLong(feeLimitTextField.getText());
-                        if(feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                            feeLimit *= 1_000_000;
-                        }
-                        try {
-                            ShareData.wallet.triggerContract(contractAddressBytes,callValue, data, feeLimit);
-                        } catch (IOException | CipherException | CancelException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            System.out.println(e);
-                        }
-                        System.out.print(tInfo);
-                    }
-                });
+                functionButton.setOnAction(new ClickTriggerAction(contractAddress));
             }
             index++;
         }
@@ -273,7 +255,9 @@ public class RightTabRunController implements Initializable {
     }
 
 
-    public void onClickLoad(ActionEvent actionEvent) {
+    private void addTransactionHistoryItem(String id, TransactionHistoryItem item) {
+        ShareData.transactionHistory.put(id, item);
+        ShareData.addTransactionAction.set(id);
     }
 
     public void onClickClear(MouseEvent actionEvent) {
@@ -286,5 +270,34 @@ public class RightTabRunController implements Initializable {
     }
 
     public void onClickCopyAddress(MouseEvent mouseEvent) {
+    }
+
+    class ClickTriggerAction implements EventHandler<ActionEvent> {
+
+        byte[] contractAddress;
+
+        public ClickTriggerAction(byte[] contractAddress) {
+            this.contractAddress = contractAddress;
+        }
+
+        @Override
+        public void handle(ActionEvent event) {
+            long callValue = Long.parseLong(valueTextField.getText());
+            if (valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
+                callValue *= 1_000_000;
+            }
+            byte[] data = null;
+            long feeLimit = Long.parseLong(feeLimitTextField.getText());
+            if (feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
+                feeLimit *= 1_000_000;
+            }
+            try {
+                ShareData.wallet.triggerContract(contractAddress, callValue, data, feeLimit);
+            } catch (IOException | CipherException | CancelException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
     }
 }
