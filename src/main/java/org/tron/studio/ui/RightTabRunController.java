@@ -57,7 +57,7 @@ public class RightTabRunController implements Initializable {
 
     public JFXTextField constructorParaTextField;
 
-    private static String DEFAULT_FEE_LIMIT = String.valueOf(10);
+    private static String DEFAULT_FEE_LIMIT = String.valueOf(100);
     private static String DEFAULT_VALUE = String.valueOf(0);
     private static String DEFAULT_RATIO = String.valueOf(100);
 

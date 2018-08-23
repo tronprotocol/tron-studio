@@ -1304,7 +1304,7 @@ public class Manager {
       BlockCapsule solidifiedBlock = getBlockByNum(latestSolidifiedBlockNum);
       forkController.update(solidifiedBlock);
     } catch (ItemNotFoundException | BadItemException e) {
-      logger.error("solidified block not found");
+      logger.warn("solidified block not found");
     }
   }
 
