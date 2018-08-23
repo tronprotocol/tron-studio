@@ -279,17 +279,21 @@ public class Runtime {
 
   private long getEnergyLimit(AccountCapsule account, long feeLimit, long callValue) {
 
+    long SUN_PER_ENERGY = deposit.getDbManager().getDynamicPropertiesStore().getEnergyFee() == 0
+        ? Constant.SUN_PER_ENERGY :
+        deposit.getDbManager().getDynamicPropertiesStore().getEnergyFee();
     // can change the calc way
     long leftEnergyFromFreeze = energyProcessor.getAccountLeftEnergyFromFreeze(account);
     callValue = max(callValue, 0);
     long energyFromBalance = Math
-        .floorDiv(max(account.getBalance() - callValue, 0), Constant.SUN_PER_ENERGY);
+        .floorDiv(max(account.getBalance() - callValue, 0), SUN_PER_ENERGY);
 
     long energyFromFeeLimit;
     long totalBalanceForEnergyFreeze = account.getAccountResource().getFrozenBalanceForEnergy()
         .getFrozenBalance();
     if (0 == totalBalanceForEnergyFreeze) {
-      energyFromFeeLimit = feeLimit / Constant.SUN_PER_ENERGY;
+      energyFromFeeLimit =
+          feeLimit / SUN_PER_ENERGY;
     } else {
       long totalEnergyFromFreeze = energyProcessor
           .calculateGlobalEnergyLimit(totalBalanceForEnergyFreeze);
@@ -304,7 +308,7 @@ public class Runtime {
       } else {
         energyFromFeeLimit = Math
             .addExact(leftEnergyFromFreeze,
-                (feeLimit - leftBalanceForEnergyFreeze) / Constant.SUN_PER_ENERGY);
+                (feeLimit - leftBalanceForEnergyFreeze) / SUN_PER_ENERGY);
       }
     }
 
@@ -355,12 +359,6 @@ public class Runtime {
     if (percent < 0 || percent > 100) {
       throw new ContractExeException("percent must be >= 0 and <= 100");
     }
-    // insure one owner just have one contract
-    // if (this.deposit.getContractByNormalAccount(ownerAddress) != null) {
-    //   logger.error("Trying to create second contract with one account: address: " + Wallet
-    //       .encode58Check(ownerAddress));
-    //   return;
-    // }
 
     // insure the new contract address haven't exist
     if (deposit.getAccount(contractAddress) != null) {
@@ -399,12 +397,13 @@ public class Runtime {
       byte[] ops = newSmartContract.getBytecode().toByteArray();
       InternalTransaction internalTransaction = new InternalTransaction(trx);
 
-      // todo: callvalue should pass into this function
       ProgramInvoke programInvoke = programInvokeFactory
           .createProgramInvoke(TRX_CONTRACT_CREATION_TYPE, executorType, trx,
               block, deposit, vmStartInUs, vmShouldEndInUs, energyLimit);
       this.vm = new VM(config);
       this.program = new Program(ops, programInvoke, internalTransaction, config);
+      Program.setRootTransactionId(new TransactionCapsule(trx).getTransactionId().getBytes());
+      Program.resetNonce();
     } catch (Exception e) {
       logger.error(e.getMessage());
       throw new ContractExeException(e.getMessage());
@@ -479,6 +478,8 @@ public class Runtime {
       this.vm = new VM(config);
       InternalTransaction internalTransaction = new InternalTransaction(trx);
       this.program = new Program(null, code, programInvoke, internalTransaction, config);
+      Program.setRootTransactionId(new TransactionCapsule(trx).getTransactionId().getBytes());
+      Program.resetNonce();
     }
 
     program.getResult().setContractAddress(contractAddress);
@@ -490,7 +491,7 @@ public class Runtime {
 
   }
 
-  public void go() throws OutOfSlotTimeException, ContractExeException {
+  public void go() throws OutOfSlotTimeException {
     if (!readyToExecute) {
       return;
     }
@@ -519,7 +520,6 @@ public class Runtime {
           if (result.getException() != null) {
             program.spendAllEnergy();
             runtimeError = result.getException().getMessage();
-            trace.setBill(result.getEnergyUsed());
             throw result.getException();
           } else {
             runtimeError = "REVERT opcode executed";
@@ -527,22 +527,21 @@ public class Runtime {
         } else {
           deposit.commit();
         }
-        trace.setBill(result.getEnergyUsed());
+
       } else {
         deposit.commit();
       }
     } catch (OutOfResourceException e) {
       logger.error(e.getMessage());
       throw new OutOfSlotTimeException(e.getMessage());
-    } catch (ArithmeticException e) {
+    } catch (Throwable e) {
+      result.setException(new RuntimeException("Unknown Throwable"));
       logger.error(e.getMessage());
-      throw new ContractExeException(e.getMessage());
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      if (StringUtils.isNoneEmpty(runtimeError)) {
+      if (StringUtils.isEmpty(runtimeError)) {
         runtimeError = e.getMessage();
       }
     }
+    trace.setBill(result.getEnergyUsed());
   }
 
   private long getEnergyFee(long callerEnergyUsage, long callerEnergyFrozen,
