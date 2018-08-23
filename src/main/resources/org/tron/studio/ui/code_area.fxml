@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import org.fxmisc.richtext.CodeArea?>
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<CodeArea xmlns:fx="http://javafx.com/fxml" fx:controller="org.tron.studio.ui.CodeAreaController"
+          fx:id="codeArea" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
+          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <stylesheets>
+        <URL value="@/css/mainTextView.css"/>
+        <URL value="@/css/caret.css"/>
+        <URL value="@/css/linecount.css"/>
+        <URL value="@/css/codeAreaStyles.css"/>
+    </stylesheets>
+</CodeArea>
+
