@@ -62,6 +62,9 @@ public class ShareData {
     public static SimpleObjectProperty<String> selectFile = new SimpleObjectProperty<>();
     public static int currentFileIndex;
 
+    public static String currentAccount;
+    public static String cuurentValue;
+
     public static GrpcAPI.TransactionExtention currentTransactionExtention;
 
     private ShareData() {

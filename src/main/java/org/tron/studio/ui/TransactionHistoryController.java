@@ -66,11 +66,17 @@ public class TransactionHistoryController {
         GrpcAPI.TransactionExtention lastTransactionExtention = ShareData.wallet.getLastTransactionExtention();
         Protocol.Transaction lastTransaction = ShareData.wallet.getLastTransaction();
         String transactionId;
+        int hashcode;
         if(lastTransactionExtention.getConstantResultCount() > 0) {
             transactionId = Hex.toHexString(lastTransactionExtention.getTxid().toByteArray());
+            hashcode = lastTransactionExtention.hashCode();
         } else {
             transactionId = Hex.toHexString(new TransactionCapsule(lastTransaction).getTransactionId().getBytes());
+            hashcode = lastTransaction.hashCode();
+
         }
+
+        System.out.println(hashcode);
 
         ObservableList<TransactionDetail> detailTableData = FXCollections.observableArrayList(
                 new TransactionDetail("transaction id", transactionId)
@@ -105,7 +111,14 @@ public class TransactionHistoryController {
 
         ((HBox) node).getChildren().add(ripper);
 
-        String debugInfo = "[vm] from: xxxx to:Ballot.xxxx \n value:0 data: xxxxx. logs:0 hash:xxxx";
+        String acountAddr = ShareData.currentAccount;
+        acountAddr = acountAddr.substring(0,5) + "..." + acountAddr.substring(acountAddr.length()-5);
+
+        String currentContract = ShareData.currentContractName.get();
+        String currentValue = ShareData.cuurentValue;
+
+        String debugInfo = "[vm] from: %s to: %s.(consructor)\n value:%s data: xxxxx. logs:0 hash:xxxx";
+        debugInfo = String.format(debugInfo, acountAddr, currentContract, currentValue);
         Label debugInfoLabel = new Label(debugInfo);
         ((HBox) node).getChildren().add(debugInfoLabel);
 

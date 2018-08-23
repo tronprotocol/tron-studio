@@ -180,6 +180,8 @@ public class RightTabRunController implements Initializable {
 
         ShareData.currentContractName.set(currentContractName);
         ShareData.currentTransactionExtention = transactionExtention;
+        ShareData.currentAccount = accountComboBox.valueProperty().get();
+        ShareData.cuurentValue = valueTextField.getText();
 
         String transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
 
