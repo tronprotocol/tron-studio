@@ -1228,6 +1228,7 @@ public class WalletClient {
     Contract.TriggerSmartContract triggerContract = triggerCallContract(owner, contractAddress,
         callValue, data);
     TransactionExtention transactionExtention = rpcCli.triggerContract(triggerContract);
+    lastTransactionExtention = transactionExtention;
     if (transactionExtention == null || !transactionExtention.getResult().getResult()) {
       System.out.println("RPC create call trx failed!");
       System.out.println("Code = " + transactionExtention.getResult().getCode());
@@ -1237,6 +1238,7 @@ public class WalletClient {
     }
 
     Transaction transaction = transactionExtention.getTransaction();
+    lastTransaction = transaction;
     if (transaction.getRetCount() != 0 &&
         transactionExtention.getConstantResult(0) != null &&
         transactionExtention.getResult() != null) {

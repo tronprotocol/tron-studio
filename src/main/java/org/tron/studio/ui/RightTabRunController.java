@@ -28,12 +28,14 @@ import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.exception.CancelException;
+import org.tron.core.services.http.Util;
 import org.tron.keystore.CipherException;
-import org.tron.protos.Protocol;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.studio.ShareData;
+import org.tron.studio.TransactionHistoryItem;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.CompilationResult.ContractMetadata;
+import org.tron.studio.utils.AbiUtil;
 import org.tron.studio.walletserver.WalletClient;
 
 import java.io.IOException;
@@ -55,9 +57,9 @@ public class RightTabRunController implements Initializable {
 
     public JFXTextField constructorParaTextField;
 
-    private static String DEFAULT_FEE_LIMIT = "1000000";
-    private static String DEFAULT_VALUE = "0";
-    private static String DEFAULT_RATIO = "100";
+    private static String DEFAULT_FEE_LIMIT = String.valueOf(10);
+    private static String DEFAULT_VALUE = String.valueOf(0);
+    private static String DEFAULT_RATIO = String.valueOf(100);
 
     public void initialize(URL location, ResourceBundle resources) {
         environmentComboBox.setItems(FXCollections.observableArrayList(
@@ -156,9 +158,17 @@ public class RightTabRunController implements Initializable {
             }
         }
         try {
+            long callValue = Long.parseLong(valueTextField.getText());
+            if (valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
+                callValue *= 1_000_000;
+            }
+            long feeLimit = Long.parseLong(feeLimitTextField.getText());
+            if (feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
+                feeLimit *= 1_000_000;
+            }
             deployContractResult = ShareData.wallet
                     .deployContract(currentContractName, currentContract.abi, bin.toString(),
-                            Long.parseLong(feeLimitTextField.getText()), Long.parseLong(valueTextField.getText()),
+                            feeLimit, callValue,
                             Long.parseLong(userPayRatio.getText()), null);
         } catch (IOException | CipherException | CancelException e) {
             logger.error("Failed to deployContract{} {}", e.getMessage(), e);
@@ -166,15 +176,19 @@ public class RightTabRunController implements Initializable {
         }
 
         if (!deployContractResult) {
-            logger.error("Failed to deployContract, please check tron.log");
+            String uuid = UUID.randomUUID().toString();
+            addTransactionHistoryItem(uuid, new TransactionHistoryItem(TransactionHistoryItem.Type.ERROR,
+                    "Failed to deployContract. Please check tron.log"));
             return;
         }
 
         TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
-        Transaction transaction = ShareData.wallet.getLastTransaction();
+        String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
         if (!transactionExtention.getResult().getResult()) {
-            logger.error("Unable to get last TransactionExtention, {}",
-                    transactionExtention.getResult().getMessage().toStringUtf8());
+            addTransactionHistoryItem(transactionId, new TransactionHistoryItem(
+                    TransactionHistoryItem.Type.ERROR,
+                    String.format("Unable to get last TransactionExtention: %s",
+                            transactionExtention.getResult().getMessage().toStringUtf8())));
             return;
         }
 
@@ -183,23 +197,26 @@ public class RightTabRunController implements Initializable {
         ShareData.currentAccount = accountComboBox.valueProperty().get();
         ShareData.cuurentValue = valueTextField.getText();
 
-        String transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
+        Transaction transaction = ShareData.wallet.getLastTransaction();
+        transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
+        addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction));
 
-        // Show debug info below codearea
-        ShareData.addTransactionAction.set(transactionId);
+        ShareData.currentContractName.set(currentContractName);
+
+        byte[] ownerAddress = Wallet.decodeFromBase58Check(accountComboBox.getSelectionModel().getSelectedItem());
+        byte[] contractAddress = Util.generateContractAddress(transaction, ownerAddress);
         deployedContractList.getItems()
-                .add(getContractRunPanel(currentContractName, transactionId, currentContract.abi));
+                .add(getContractRunPanel(currentContractName, contractAddress, currentContract.abi));
 
     }
 
-    private JFXListView getContractRunPanel(String contractName, String transactionId, String abi) {
+    private JFXListView getContractRunPanel(String contractName, byte[] contractAddress, String abi) {
         JFXListView listView = new JFXListView();
         listView.getStyleClass().add("sublist");
 
         HBox title = new HBox();
-        Label transactionLabel = new Label(
-                contractName + " 0x" + transactionId.substring(0, 5) + "..." + transactionId
-                        .substring(transactionId.length() - 5, transactionId.length()));
+        String contractAddressString = Wallet.encode58Check(contractAddress);
+        Label transactionLabel = new Label(String.format("%s %s", contractName, contractAddressString));
         title.getChildren().add(transactionLabel);
         listView.setGroupnode(title);
 
@@ -226,47 +243,27 @@ public class RightTabRunController implements Initializable {
 
                 JSONArray inputsJsonArray = entryJson.getJSONArray("inputs");
                 StringBuilder parameterPromot = new StringBuilder();
+
+                StringBuilder methodStr = new StringBuilder(entryJson.getString("name"));
+                methodStr.append("(");
                 if (inputsJsonArray != null && inputsJsonArray.size() > 0) {
                     for (int j = 0; j < inputsJsonArray.size(); j++) {
                         JSONObject inputItem = inputsJsonArray.getJSONObject(j);
                         String inputName = inputItem.getString("name");
                         String type = inputItem.getString("type");
                         parameterPromot.append(type).append(" ").append(inputName);
+                        methodStr.append(type);
                         if (j != inputsJsonArray.size() - 1) {
                             parameterPromot.append(", ");
+                            methodStr.append(",");
                         }
                     }
                 } else {
                     parameterText.setVisible(false);
                 }
+                methodStr.append(")");
                 parameterText.setPromptText(parameterPromot.toString());
-
-                Optional<Protocol.TransactionInfo> tInfo = ShareData.wallet.getTransactionInfoById(transactionId);
-                functionButton.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        Optional<Protocol.TransactionInfo> tInfo = ShareData.wallet.getTransactionInfoById(transactionId);
-                        byte[] contractAddressBytes = tInfo.get().getContractAddress().toByteArray();
-                        String contractAddress = Hex.toHexString(tInfo.get().getContractAddress().toByteArray());
-                        long callValue = Long.parseLong(valueTextField.getText());
-                        if(valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                            callValue *= 1_000_000;
-                        }
-                        byte[] data = null;
-                        long feeLimit = Long.parseLong(feeLimitTextField.getText());
-                        if(feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                            feeLimit *= 1_000_000;
-                        }
-                        try {
-                            ShareData.wallet.triggerContract(contractAddressBytes,callValue, data, feeLimit);
-                        } catch (IOException | CipherException | CancelException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            System.out.println(e);
-                        }
-                        System.out.print(tInfo);
-                    }
-                });
+                functionButton.setOnAction(new ClickTriggerAction(contractAddress, methodStr.toString(), parameterText));
             }
             index++;
         }
@@ -275,7 +272,9 @@ public class RightTabRunController implements Initializable {
     }
 
 
-    public void onClickLoad(ActionEvent actionEvent) {
+    private void addTransactionHistoryItem(String id, TransactionHistoryItem item) {
+        ShareData.transactionHistory.put(id, item);
+        ShareData.addTransactionAction.set(id);
     }
 
     public void onClickClear(MouseEvent actionEvent) {
@@ -288,5 +287,54 @@ public class RightTabRunController implements Initializable {
     }
 
     public void onClickCopyAddress(MouseEvent mouseEvent) {
+    }
+
+    class ClickTriggerAction implements EventHandler<ActionEvent> {
+
+        byte[] contractAddress;
+        String methodStr;
+        JFXTextField parameterText;
+
+        public ClickTriggerAction(byte[] contractAddress, String methodStr, JFXTextField parameterText) {
+            this.contractAddress = contractAddress;
+            this.methodStr = methodStr;
+            this.parameterText = parameterText;
+        }
+
+        @Override
+        public void handle(ActionEvent event) {
+            long callValue = Long.parseLong(valueTextField.getText());
+            if (valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
+                callValue *= 1_000_000;
+            }
+            long feeLimit = Long.parseLong(feeLimitTextField.getText());
+            if (feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
+                feeLimit *= 1_000_000;
+            }
+            try {
+                byte[] data = Hex.decode(AbiUtil.parseMethod(methodStr, parameterText.getText().trim(), false));
+                ShareData.wallet.triggerContract(contractAddress, callValue, data, feeLimit);
+                processResult();
+            } catch (IOException | CipherException | CancelException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+        private void processResult() {
+            TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
+            String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
+            if (!transactionExtention.getResult().getResult()) {
+                addTransactionHistoryItem(transactionId, new TransactionHistoryItem(
+                        TransactionHistoryItem.Type.ERROR,
+                        String.format("Unable to get last TransactionExtention: %s",
+                                transactionExtention.getResult().getMessage().toStringUtf8())));
+                return;
+            }
+
+            Transaction transaction = ShareData.wallet.getLastTransaction();
+            transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
+            addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction));
+        }
     }
 }
