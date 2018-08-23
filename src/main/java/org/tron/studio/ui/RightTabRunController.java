@@ -193,9 +193,8 @@ public class RightTabRunController implements Initializable {
         }
 
         ShareData.currentContractName.set(currentContractName);
-        ShareData.currentTransactionExtention = transactionExtention;
         ShareData.currentAccount = accountComboBox.valueProperty().get();
-        ShareData.cuurentValue = valueTextField.getText();
+        ShareData.currentValue = valueTextField.getText();
 
         Transaction transaction = ShareData.wallet.getLastTransaction();
         transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
@@ -314,14 +313,15 @@ public class RightTabRunController implements Initializable {
             try {
                 byte[] data = Hex.decode(AbiUtil.parseMethod(methodStr, parameterText.getText().trim(), false));
                 ShareData.wallet.triggerContract(contractAddress, callValue, data, feeLimit);
-                processResult();
+                processTriggerContractResult();
             } catch (IOException | CipherException | CancelException e) {
                 e.printStackTrace();
             } catch (Exception e) {
                 System.out.println(e);
             }
         }
-        private void processResult() {
+
+        private void processTriggerContractResult() {
             TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
             String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
             if (!transactionExtention.getResult().getResult()) {

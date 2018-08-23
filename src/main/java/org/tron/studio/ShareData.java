@@ -69,9 +69,7 @@ public class ShareData {
     public static int currentFileIndex;
 
     public static String currentAccount;
-    public static String cuurentValue;
-
-    public static GrpcAPI.TransactionExtention currentTransactionExtention;
+    public static String currentValue;
 
     private ShareData() {
 

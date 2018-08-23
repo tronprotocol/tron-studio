@@ -115,7 +115,7 @@ public class TransactionHistoryController {
         acountAddr = acountAddr.substring(0,5) + "..." + acountAddr.substring(acountAddr.length()-5);
 
         String currentContract = ShareData.currentContractName.get();
-        String currentValue = ShareData.cuurentValue;
+        String currentValue = ShareData.currentValue;
 
         String debugInfo = "[vm] from: %s to: %s.(consructor)\n value:%s data: xxxxx. logs:0 hash:xxxx";
         debugInfo = String.format(debugInfo, acountAddr, currentContract, currentValue);

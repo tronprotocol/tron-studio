@@ -37,6 +37,7 @@ public class RightTabCompileController implements Initializable {
     public JFXComboBox contractComboBox;
     public JFXCheckBox autoCompileCheckBox;
     public JFXButton compileButton;
+    public JFXListView compileResultInfoListView;
 
     List<String> contractABI = new ArrayList<>();
     List<String> contractNameList = new ArrayList<>();

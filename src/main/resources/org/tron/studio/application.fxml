@@ -27,7 +27,7 @@
                         <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="SELECTED_TAB" VBox.vgrow="ALWAYS"
                                  HBox.hgrow="ALWAYS">
                             <tabs>
-                                <Tab fx:id="defaultTab" text="VoteContract" >
+                                <Tab fx:id="defaultCodeAreaTab" text="VoteContract" >
                                     <content>
                                         <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
                                                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"

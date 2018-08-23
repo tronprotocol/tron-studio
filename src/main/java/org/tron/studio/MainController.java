@@ -21,7 +21,7 @@ public class MainController {
     public CodeArea codeArea;
     public TabPane codeAreaTabPane;
 
-    public Tab defaultTab;
+    public Tab defaultCodeAreaTab;
     public TabPane rightContentTabPane;
 
     @PostConstruct
@@ -35,7 +35,7 @@ public class MainController {
             e.printStackTrace();
         }
 
-        defaultTab.setOnCloseRequest(new EventHandler<Event>() {
+        defaultCodeAreaTab.setOnCloseRequest(new EventHandler<Event>() {
             @Override
             public void handle(Event event) {
                 int tabs_size = codeAreaTabPane.getTabs().size();
