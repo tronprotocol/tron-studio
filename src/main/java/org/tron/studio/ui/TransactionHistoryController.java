@@ -13,6 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.api.GrpcAPI;
@@ -93,7 +95,7 @@ public class TransactionHistoryController {
         //subList.getItems().add(new Label("details"));
         subList.getItems().add(createDetailTable());
 
-        Node node = new HBox();
+        HBox node = new HBox();
 
         JFXRippler ripper = new JFXRippler();
         ripper.setStyle(":cons-rippler1");
@@ -109,7 +111,7 @@ public class TransactionHistoryController {
 
         ripper.getChildren().add(pane);
 
-        ((HBox) node).getChildren().add(ripper);
+        node.getChildren().add(ripper);
 
         String acountAddr = ShareData.currentAccount;
         acountAddr = acountAddr.substring(0,5) + "..." + acountAddr.substring(acountAddr.length()-5);
@@ -122,8 +124,14 @@ public class TransactionHistoryController {
         Label debugInfoLabel = new Label(debugInfo);
         ((HBox) node).getChildren().add(debugInfoLabel);
 
-        Button debugBtn = new Button("Debug");
-        ((HBox) node).getChildren().add(debugBtn);
+        Region region1 = new Region();
+        node.getChildren().add(region1);
+        HBox.setHgrow(region1, Priority.ALWAYS);
+        JFXButton debugBtn = new JFXButton("Debug");
+        node.getChildren().add(debugBtn);
+        Region region2 = new Region();
+        region2.setPrefWidth(20);
+        node.getChildren().add(region1);
 
         debugBtn.setOnAction(event -> {
             ShareData.debugTransactionAction.set(UUID.randomUUID().toString());

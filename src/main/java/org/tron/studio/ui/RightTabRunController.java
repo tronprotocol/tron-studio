@@ -50,8 +50,8 @@ public class RightTabRunController implements Initializable {
     public JFXComboBox<String> accountComboBox;
     public JFXTextField feeLimitTextField;
     public JFXTextField valueTextField;
-    public JFXComboBox feeUnitComboBox;
-    public JFXComboBox valueUnitComboBox;
+    public JFXComboBox<String> feeUnitComboBox;
+    public JFXComboBox<String> valueUnitComboBox;
     public JFXTextField userPayRatio;
     public JFXListView deployedContractList;
 
@@ -70,8 +70,7 @@ public class RightTabRunController implements Initializable {
         environmentComboBox.getSelectionModel().selectFirst();
 
         accountComboBox.setItems(FXCollections.observableArrayList(ShareData.testAccount.keySet()));
-        accountComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-                    String address = newValue;
+        accountComboBox.valueProperty().addListener((observable, oldValue, address) -> {
                     String privateKey = ShareData.testAccount.get(address);
                     ShareData.wallet = new WalletClient(Hex.decode(privateKey));
                 }
