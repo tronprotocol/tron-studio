@@ -1,19 +1,19 @@
 package org.tron.studio.ui;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXRippler;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.control.Label;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import com.jfoenix.controls.*;
 import javafx.scene.layout.StackPane;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import org.tron.studio.ShareData;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class RightTabDebugController implements Initializable {
 
@@ -34,7 +34,8 @@ public class RightTabDebugController implements Initializable {
             String[] nodes = {"Instructions", "Solidity Locals",
                     "Solidity State", "Step detail", "Stack",
                     "Storage completely loaded", "Memory", "Call Data", "Call Stack",
-                    "Return Value", "Full Storages Changes\n"};
+                    "Return Value", "Full Storages Changes"};
+
             String[] labels = {"test"};
 
             for (String nodename: nodes

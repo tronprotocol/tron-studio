@@ -11,9 +11,10 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.fxmisc.richtext.CodeArea?>
+<?import com.jfoenix.controls.JFXTabPane?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="Infinity" maxWidth="Infinity" prefHeight="450"
-    prefWidth="800" xmlns="http://javafx.com/javafx/8.0.121"
-    fx:controller="org.tron.studio.MainController">
+           prefWidth="800" xmlns="http://javafx.com/javafx/8.0.121"
+           fx:controller="org.tron.studio.MainController">
     <AnchorPane>
         <children>
             <fx:include source="ui/top.fxml"
@@ -24,28 +25,19 @@
                   AnchorPane.topAnchor="64" AnchorPane.bottomAnchor="50">
                     <fx:include source="ui/left_code_list.fxml"/>
                     <SplitPane prefWidth="400" AnchorPane.bottomAnchor="0" orientation="VERTICAL">
-                        <TabPane fx:id="codeAreaTabPane" tabClosingPolicy="SELECTED_TAB" VBox.vgrow="ALWAYS"
-                                 HBox.hgrow="ALWAYS">
+                        <JFXTabPane fx:id="codeAreaTabPane" tabClosingPolicy="SELECTED_TAB" styleClass="custom-tab-pane"
+                                    VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
                             <tabs>
-                                <Tab fx:id="defaultTab" text="VoteContract" >
+                                <Tab fx:id="defaultCodeAreaTab" text="VoteContract" >
                                     <content>
-                                        <CodeArea fx:id="codeArea" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
-                                                  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                                  AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <stylesheets>
-                                                <URL value="@/css/mainTextView.css"/>
-                                                <URL value="@/css/caret.css"/>
-                                                <URL value="@/css/linecount.css"/>
-                                                <URL value="@/css/codeAreaStyles.css"/>
-                                            </stylesheets>
-                                        </CodeArea>
+                                        <fx:include source="ui/code_area.fxml"/>
                                     </content>
                                 </Tab>
                             </tabs>
-                        </TabPane>
+                        </JFXTabPane>
                         <fx:include VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" source="ui/transaction_history.fxml"/>
                     </SplitPane>
-                    <TabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE">
+                    <JFXTabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="custom-tab-pane">
                         <tabs>
                             <Tab text="Compile">
                                 <content>
@@ -63,7 +55,7 @@
                                 </content>
                             </Tab>
                         </tabs>
-                    </TabPane>
+                    </JFXTabPane>
             </SplitPane>
             <fx:include source="ui/bottom.fxml"
                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"

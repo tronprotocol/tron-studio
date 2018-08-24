@@ -50,14 +50,14 @@ public class RightTabRunController implements Initializable {
     public JFXComboBox<String> accountComboBox;
     public JFXTextField feeLimitTextField;
     public JFXTextField valueTextField;
-    public JFXComboBox feeUnitComboBox;
-    public JFXComboBox valueUnitComboBox;
+    public JFXComboBox<String> feeUnitComboBox;
+    public JFXComboBox<String> valueUnitComboBox;
     public JFXTextField userPayRatio;
     public JFXListView deployedContractList;
 
     public JFXTextField constructorParaTextField;
 
-    private static String DEFAULT_FEE_LIMIT = String.valueOf(10);
+    private static String DEFAULT_FEE_LIMIT = String.valueOf(100);
     private static String DEFAULT_VALUE = String.valueOf(0);
     private static String DEFAULT_RATIO = String.valueOf(100);
 
@@ -70,8 +70,7 @@ public class RightTabRunController implements Initializable {
         environmentComboBox.getSelectionModel().selectFirst();
 
         accountComboBox.setItems(FXCollections.observableArrayList(ShareData.testAccount.keySet()));
-        accountComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-                    String address = newValue;
+        accountComboBox.valueProperty().addListener((observable, oldValue, address) -> {
                     String privateKey = ShareData.testAccount.get(address);
                     ShareData.wallet = new WalletClient(Hex.decode(privateKey));
                 }
@@ -193,9 +192,8 @@ public class RightTabRunController implements Initializable {
         }
 
         ShareData.currentContractName.set(currentContractName);
-        ShareData.currentTransactionExtention = transactionExtention;
         ShareData.currentAccount = accountComboBox.valueProperty().get();
-        ShareData.cuurentValue = valueTextField.getText();
+        ShareData.currentValue = valueTextField.getText();
 
         Transaction transaction = ShareData.wallet.getLastTransaction();
         transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
@@ -314,14 +312,15 @@ public class RightTabRunController implements Initializable {
             try {
                 byte[] data = Hex.decode(AbiUtil.parseMethod(methodStr, parameterText.getText().trim(), false));
                 ShareData.wallet.triggerContract(contractAddress, callValue, data, feeLimit);
-                processResult();
+                processTriggerContractResult();
             } catch (IOException | CipherException | CancelException e) {
                 e.printStackTrace();
             } catch (Exception e) {
                 System.out.println(e);
             }
         }
-        private void processResult() {
+
+        private void processTriggerContractResult() {
             TransactionExtention transactionExtention = ShareData.wallet.getLastTransactionExtention();
             String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
             if (!transactionExtention.getResult().getResult()) {

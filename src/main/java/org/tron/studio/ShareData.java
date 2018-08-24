@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,14 +48,10 @@ public class ShareData {
     //当前合约文件中，被选中的合约（合约文件中可能包含多份合约）
     public static SimpleObjectProperty<String> currentContractName = new SimpleObjectProperty<>();
 
-
     //当前正在编辑的合约文件
-    public static SimpleObjectProperty<String> currentContractFileName = new SimpleObjectProperty<>();
+    public static SimpleStringProperty currentContractFileName = new SimpleStringProperty();
     //新建的合约文件
-    public static SimpleObjectProperty<String> newContractFileName = new SimpleObjectProperty<>();
-    //所有被打开的合约文件列表
-    public static SimpleListProperty<String> activeContractFileNameList = new SimpleListProperty<>(
-        FXCollections.observableArrayList());
+    public static SimpleStringProperty newContractFileName = new SimpleStringProperty();
     //所有的合约文件列表
     public static SimpleListProperty<String> allContractFileName = new SimpleListProperty<>(
         FXCollections.observableArrayList());
@@ -62,16 +61,18 @@ public class ShareData {
     //包括上链的交易：Transaction
     //包括错误交易信息：ErrorInfo
     public static HashMap<String, TransactionHistoryItem> transactionHistory = new HashMap<>();
-    public static SimpleObjectProperty<String> addTransactionAction = new SimpleObjectProperty<>();
-    public static SimpleObjectProperty<String> debugTransactionAction = new SimpleObjectProperty<>();
-
-    public static SimpleObjectProperty<String> selectFile = new SimpleObjectProperty<>();
-    public static int currentFileIndex;
+    public static SimpleStringProperty addTransactionAction = new SimpleStringProperty();
+    public static SimpleStringProperty debugTransactionAction = new SimpleStringProperty();
 
     public static String currentAccount;
-    public static String cuurentValue;
+    public static String currentValue;
 
-    public static GrpcAPI.TransactionExtention currentTransactionExtention;
+    //自动编译
+    public static SimpleBooleanProperty isAutoCompile = new SimpleBooleanProperty();
+    //当前合约文件源代码
+    public static SimpleStringProperty currentContractSourceCode = new SimpleStringProperty();
+    //所有合约文件源代码
+    public static HashMap<String, String> allContractSourceCode = new HashMap<>();
 
     private ShareData() {
 

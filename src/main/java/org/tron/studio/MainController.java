@@ -7,6 +7,7 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.tron.studio.ui.SolidityHighlight;
@@ -18,73 +19,57 @@ import java.nio.file.Paths;
 
 @Slf4j
 public class MainController {
-    public CodeArea codeArea;
+    public TabPane rightContentTabPane;
     public TabPane codeAreaTabPane;
 
-    public Tab defaultTab;
-    public TabPane rightContentTabPane;
+    public Tab defaultCodeAreaTab;
+    public CodeArea defaultCodeArea;
+
+    private String defaultContractFile = "/template/Ballot.sol";
 
     @PostConstruct
     public void initialize() throws IOException {
         StringBuilder builder = new StringBuilder();
         try {
-            Files.lines(Paths.get(getClass().getResource("/template/Ballot.sol").getPath())).forEach(line -> {
+            Files.lines(Paths.get(getClass().getResource(defaultContractFile).getPath())).forEach(line -> {
                 builder.append(line).append(System.getProperty("line.separator"));
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        defaultTab.setOnCloseRequest(new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-                int tabs_size = codeAreaTabPane.getTabs().size();
-                System.out.println(tabs_size);
-                if (tabs_size == 1) {
-                    // Create blank file when closing last file
-                    ShareData.newContractFileName.set("/template/Ballot.sol");
+        defaultCodeAreaTab.setText(defaultContractFile);
+        //Just not allow to close the default tab
+        defaultCodeAreaTab.setClosable(false);
+
+        defaultCodeArea = (CodeArea) defaultCodeAreaTab.getContent();
+        new SolidityHighlight(defaultCodeArea).highlight();
+        defaultCodeArea.replaceText(0, 0, builder.toString());
+        defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
+
+        SingleSelectionModel<Tab> selectionModel = codeAreaTabPane.getSelectionModel();
+
+        ShareData.currentContractFileName.addListener((observable, oldValue, newValue) -> {
+            for (Tab tab : codeAreaTabPane.getTabs()) {
+                if(StringUtils.equals(tab.getText(), newValue)) {
+                    selectionModel.select(tab);
                 }
             }
         });
 
-        new SolidityHighlight(codeArea).highlight();
-        codeArea.replaceText(0, 0, builder.toString());
-        codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-
-        SingleSelectionModel<Tab> selectionModel = codeAreaTabPane.getSelectionModel();
-
-        ShareData.selectFile.addListener((observable, oldValue, newValue) -> {
-            selectionModel.select(ShareData.currentFileIndex);
-        });
-
-        ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
-            rightContentTabPane.getSelectionModel().selectLast();
-        });
-
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
             try {
-                Tab codeTab = FXMLLoader.load(getClass().getResource("ui/code_panel.fxml"));
+                Tab codeTab = new Tab();
                 codeTab.setText(newValue);
                 codeTab.setClosable(true);
-
-                codeTab.setOnCloseRequest(new EventHandler<Event>() {
-                    @Override
-                    public void handle(Event event) {
-                        int tabs_size = codeAreaTabPane.getTabs().size();
-                        System.out.println(tabs_size);
-                        if (tabs_size == 1) {
-                            // Create blank file when closing last file
-                            ShareData.newContractFileName.set("/template/Ballot.sol");
-                        }
-                    }
-                });
-
+                CodeArea codeArea = FXMLLoader.load(getClass().getResource("ui/code_area.fxml"));
+                codeTab.setContent(codeArea);
                 codeAreaTabPane.getTabs().add(codeTab);
+
                 StringBuilder templateBuilder = new StringBuilder();
-                templateBuilder.append("pragma solidity ^0.4.0;").append("\n");
+                templateBuilder.append("pragma solidity ^0.4.24;").append("\n");
                 templateBuilder.append("contract ").append(newValue).append(" {").append("\n");
                 templateBuilder.append("}").append("\n");
-                CodeArea codeArea = (CodeArea) codeTab.getContent();
 
                 new SolidityHighlight(codeArea).highlight();
                 codeArea.replaceText(0, 0, templateBuilder.toString());
@@ -95,6 +80,11 @@ public class MainController {
                 logger.error(e.getMessage());
             }
         });
+
+        ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
+            rightContentTabPane.getSelectionModel().selectLast();
+        });
+
     }
 
     private String debugContract() {

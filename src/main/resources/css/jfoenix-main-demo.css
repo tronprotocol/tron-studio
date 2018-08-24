@@ -352,7 +352,23 @@
     -fx-wrap-text: true;
     -fx-text-alignment: center;
 }
+/*******************************************************************************
+ *                                                                             *
+ * Tab Pane			                                                           *
+ *                                                                             *
+ ******************************************************************************/
 
+.custom-tab-pane .tab-header-background{
+    -fx-background-color: #5264AE;
+}
+
+.custom-tab-pane .headers-region .tab-selected-line {
+    -fx-background-color: white;
+}
+
+.custom-tab-pane .headers-region > .tab > .jfx-rippler {
+    -jfx-rippler-fill: white;
+}
 /*******************************************************************************
 *                                                                              *
 * JFX Check Box                                                                *
