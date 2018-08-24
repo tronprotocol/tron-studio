@@ -4,20 +4,27 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
-import java.util.Optional;
-import java.util.function.Function;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.control.*;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.ShareData;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 public class LeftCodeListController {
     static final Logger logger = LoggerFactory.getLogger(RightTabCompileController.class);
@@ -27,6 +34,8 @@ public class LeftCodeListController {
     public StackPane dialogRoot;
 
     private ObservableList<FileName> fileNameData;
+
+    //private MaterialDesignIconView newContract;
 
     @FXML
     public void initialize() {
@@ -46,6 +55,34 @@ public class LeftCodeListController {
             }
         });
 
+        ContextMenu cm = new ContextMenu();
+        MenuItem delMenu = new MenuItem("Delete");
+        cm.getItems().add(delMenu);
+
+        delMenu.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("remove");
+                //System.out.println(ShareData.allContractFileName.get());
+                //System.out.println(ShareData.currentContractFileName.get());
+
+                //ShareData.allContractFileName.get().remove(ShareData.currentContractFileName);
+                //ShareData.currentContractFileName.set(ShareData.allContractFileName.get(0));
+                //System.out.println(ShareData.allContractFileName.get());
+                //System.out.println(ShareData.currentContractFileName.get());
+            }
+        });
+
+        fileNameTable.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent t) {
+                if(t.getButton() == MouseButton.SECONDARY) {
+                    cm.show(fileNameTable, t.getScreenX(), t.getScreenY());
+                }
+            }
+        });
+
         ShareData.newContractFileName.set("/template/Ballot.sol");
     }
 
@@ -59,7 +96,8 @@ public class LeftCodeListController {
         return result.orElse(null);
     }
 
-    public void createContract(ActionEvent actionEvent) {
+    public void createContract(MouseEvent mouseEvent)
+    {
         String contractFileName = showDialog();
         if(contractFileName == null) {
             return;
@@ -67,6 +105,17 @@ public class LeftCodeListController {
         ShareData.newContractFileName.set(contractFileName);
         ShareData.allContractFileName.get().add(contractFileName);
     }
+
+    public void saveContract(MouseEvent mouseEvent)
+    {
+        System.out.println("save contract");
+    }
+
+    public void openContract(MouseEvent mouseEvent)
+    {
+        System.out.println("save contract");
+    }
+
 
     private <T> void setupCellValueFactory(JFXTreeTableColumn<FileName, T> column, Function<FileName, ObservableValue<T>> mapper) {
         column.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileName, T> param) -> {

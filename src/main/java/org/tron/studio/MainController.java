@@ -1,7 +1,5 @@
 package org.tron.studio;
 
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
@@ -37,6 +35,9 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Add default contract into the list of contracts
+        //ShareData.allContractFileName.get().add(defaultContractFile);
 
         defaultCodeAreaTab.setText(defaultContractFile);
         //Just not allow to close the default tab
