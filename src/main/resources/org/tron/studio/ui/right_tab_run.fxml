@@ -42,11 +42,11 @@
                     <MaterialDesignIconView glyphName="CONTENT_COPY" styleClass="icon"/>
                 </StackPane>
             </JFXRippler>
-            <JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickAddAddress">
-                <StackPane style="-fx-padding: 2;">
-                    <MaterialDesignIconView glyphName="PLUS_BOX" styleClass="icon"/>
-                </StackPane>
-            </JFXRippler>
+            <!--<JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickAddAddress">-->
+                <!--<StackPane style="-fx-padding: 2;">-->
+                    <!--<MaterialDesignIconView glyphName="PLUS_BOX" styleClass="icon"/>-->
+                <!--</StackPane>-->
+            <!--</JFXRippler>-->
         </HBox>
     </GridPane>
     <GridPane hgap="5" vgap="5" styleClass="jfx-drawer-overlay-pane">

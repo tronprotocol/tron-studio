@@ -436,7 +436,7 @@
     -fx-prompt-text-fill: #808080;
     -fx-alignment: top-left;
     -fx-max-width: 800;
-    -fx-pref-width: 240.0;
+    -fx-pref-width: 100.0;
     -jfx-focus-color: #4059A9;
     -jfx-unfocus-color: #4d4d4d;
 }
@@ -1008,6 +1008,26 @@
 
 .scroll-pane .corner {
     -fx-background-insets: 0;
+}
+
+
+/*******************************************************************************
+*                                                                              *
+* Label                                                                        *
+*                                                                              *
+*******************************************************************************/
+
+.compile-error-label {
+    -fx-background-color: #D34336;
+    -fx-font-weight: bold;
+}
+.compile-warn-label {
+    -fx-background-color: #dddd00;
+    -fx-font-weight: bold;
+}
+.compile-succ-label {
+    -fx-background-color: #00dd00;
+    -fx-font-weight: bold;
 }
 
 /*******************************************************************************

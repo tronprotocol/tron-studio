@@ -1,20 +1,8 @@
 package org.tron.studio.ui;
 
-import static org.tron.studio.solc.SolidityCompiler.Options.ABI;
-import static org.tron.studio.solc.SolidityCompiler.Options.BIN;
-import static org.tron.studio.solc.SolidityCompiler.Options.INTERFACE;
-import static org.tron.studio.solc.SolidityCompiler.Options.METADATA;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jfoenix.controls.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -22,79 +10,144 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.ShareData;
+import org.tron.studio.solc.CompilationErrorResult;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.SolidityCompiler;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import static org.tron.studio.solc.SolidityCompiler.Options.*;
 
 public class RightTabCompileController implements Initializable {
     static final Logger logger = LoggerFactory.getLogger(RightTabCompileController.class);
 
-    public JFXComboBox contractComboBox;
+    public JFXComboBox<String> contractComboBox;
     public JFXCheckBox autoCompileCheckBox;
     public JFXButton compileButton;
-    public JFXListView compileResultInfoListView;
+    public JFXListView<Label> compileResultInfoListView;
 
     List<String> contractABI = new ArrayList<>();
     List<String> contractNameList = new ArrayList<>();
     List<String> contractBin = new ArrayList<>();
 
     int currentContractIndex = -1;
+    boolean isCompiling;
 
     public RightTabCompileController() {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
-
+        isCompiling = false;
     }
 
     @FXML
     protected void onClickCompile() {
         logger.debug("onClickCompile");
-        compileButton.setDisable(true);
+        if (isCompiling) {
+            return;
+        }
+        isCompiling = true;
         contractComboBox.requestFocus();
         ShareData.currentContractFileName.set(null);
 
         String contractFileName = "/template/Ballot.sol";
         new Thread(() -> {
+            boolean compileSuccess = true;
             try {
-                SolidityCompiler.Result res = SolidityCompiler.compile(
-                    new File(getClass().getResource(contractFileName).getPath()), true, ABI, BIN, INTERFACE,
-                    METADATA);
-
-                logger.debug("Compile Out: '" + res.output + "'");
-                logger.debug("Compile Err: '" + res.errors + "'");
-                CompilationResult compilationResult = CompilationResult.parse(res.output);
-                ShareData.setCompilationResult(contractFileName, compilationResult);
-
-                contractNameList.clear();
-                compilationResult.getContracts().forEach(contractResult -> {
-                    contractBin.add(contractResult.bin);
-                    contractABI.add(contractResult.abi);
-                    JSONObject metaData = JSON.parseObject(contractResult.metadata);
-                    JSONObject compilationTarget = metaData.getJSONObject("settings").getJSONObject("compilationTarget");
-                    compilationTarget.forEach((sol, value) -> {
-                        contractNameList.add((String) value);
+                SolidityCompiler.Result solidityCompilerResult = SolidityCompiler.compile(
+                        new File(getClass().getResource(contractFileName).getPath()), true, ABI, BIN, INTERFACE,
+                        METADATA);
+//
+//                logger.debug("Compile Out: '" + res.output + "'");
+//                logger.debug("Compile Err: '" + res.errors + "'");
+                CompilationErrorResult.parse(solidityCompilerResult.errors);
+                //There are warnings
+//                if(!CompilationErrorResult.getWarnings().isEmpty()) {
+//                    CompilationErrorResult.getWarnings().forEach(info -> {
+//                        Text text = new Text(info);
+//                        compileResultInfoListView.getItems().add(text);
+//
+//                    });
+//                }
+                //There are errors
+                if (!CompilationErrorResult.getErrors().isEmpty()) {
+                    compileSuccess = false;
+                    Platform.runLater(() -> {
+                        compileResultInfoListView.getItems().clear();
+                        CompilationErrorResult.getErrors().forEach(infoList -> {
+                            Label text = new Label(infoList);
+                            text.getStyleClass().add("compile-error-label");
+                            text.setMinHeight(50);
+                            compileResultInfoListView.getItems().add(text);
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty());
+                        });
+                        CompilationErrorResult.getWarnings().forEach(infoList -> {
+                            Label text = new Label(infoList);
+                            text.getStyleClass().add("compile-warn-label");
+                            text.setMinHeight(50);
+                            compileResultInfoListView.getItems().add(text);
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty());
+                        });
                     });
-                });
-                contractComboBox.setItems(FXCollections.observableArrayList(
-                    contractNameList
-                ));
+                    return;
+                } else {
+                    CompilationResult compilationResult = CompilationResult.parse(solidityCompilerResult.output);
+                    ShareData.setSolidityCompilerResult(contractFileName, solidityCompilerResult);
+
+                    contractNameList.clear();
+                    compilationResult.getContracts().forEach(contractResult -> {
+                        contractBin.add(contractResult.bin);
+                        contractABI.add(contractResult.abi);
+                        JSONObject metaData = JSON.parseObject(contractResult.metadata);
+                        JSONObject compilationTarget = metaData.getJSONObject("settings").getJSONObject("compilationTarget");
+                        compilationTarget.forEach((sol, value) -> {
+                            contractNameList.add((String) value);
+                        });
+                    });
+                    contractComboBox.setItems(FXCollections.observableArrayList(
+                            contractNameList
+                    ));
+
+                    Platform.runLater(() -> {
+                        compileResultInfoListView.getItems().clear();
+                        CompilationErrorResult.getWarnings().forEach(infoList -> {
+                            Label text = new Label(infoList);
+                            text.getStyleClass().add("compile-warn-label");
+                            text.setMinHeight(50);
+                            compileResultInfoListView.getItems().add(text);
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty());
+                        });
+                        contractNameList.forEach(contractName -> {
+                            Label text = new Label(contractName);
+                            text.getStyleClass().add("compile-succ-label");
+                            text.setMinHeight(50);
+                            compileResultInfoListView.getItems().add(text);
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty());
+                        });
+                    });
+                }
 
             } catch (IOException e) {
                 logger.error("Build failed: {} {}", e.getMessage(), e);
-                return;
             } finally {
-                Platform.runLater(() -> {
-                  contractComboBox.getSelectionModel().selectFirst();
-                  ShareData.currentContractFileName.set(contractFileName);
-                  compileButton.setDisable(false);
-                });
+                if (compileSuccess) {
+                    Platform.runLater(() -> {
+                        contractComboBox.getSelectionModel().selectFirst();
+                        ShareData.currentContractFileName.set(contractFileName);
+                    });
+                }
+                isCompiling = false;
             }
         }).start();
     }
@@ -110,7 +163,7 @@ public class RightTabCompileController implements Initializable {
             return;
         }
 
-        Button btn = (Button)actionEvent.getSource();
+        Button btn = (Button) actionEvent.getSource();
 
         JFXAlert alert = new JFXAlert((Stage) btn.getScene().getWindow());
         alert.initModality(Modality.APPLICATION_MODAL);

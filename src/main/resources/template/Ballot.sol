@@ -112,6 +112,7 @@ contract StandardToken is BasicToken {
     uint allowanceValue = _allowances[msg.sender][agent];
     if (value > allowanceValue) {
       _allowances[msg.sender][agent] = 0;
+      uint i=1;
     } else {
       _allowances[msg.sender][agent] = allowanceValue.sub(value);
     }
@@ -142,7 +143,6 @@ contract DACCToken is StandardToken {
     _balances[msg.sender] = _totalSupply;
     emit Transfer(0x0, msg.sender, _totalSupply);
   }
-
 
   // internal functions
 }

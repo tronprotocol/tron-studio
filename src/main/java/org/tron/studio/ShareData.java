@@ -1,26 +1,13 @@
 package org.tron.studio;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.stereotype.Component;
-import org.tron.api.GrpcAPI;
-import org.tron.common.overlay.discover.node.NodeManager;
-import org.tron.core.Wallet;
-import org.tron.core.WalletSolidity;
-import org.tron.core.db.Manager;
-import org.tron.studio.solc.CompilationResult;
+import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.walletserver.WalletClient;
 
 public class ShareData {
@@ -43,7 +30,7 @@ public class ShareData {
     public static final HashMap<String, String> testAccount = new HashMap<>();
     public static WalletClient wallet;
 
-    private static Map<String, CompilationResult> compilationResultHashMap = new HashMap<>();
+    private static HashMap<String, SolidityCompiler.Result> solidityCompilerResultMap = new HashMap<>();
 
     //当前合约文件中，被选中的合约（合约文件中可能包含多份合约）
     public static SimpleObjectProperty<String> currentContractName = new SimpleObjectProperty<>();
@@ -85,13 +72,12 @@ public class ShareData {
         testAccount.put(testAccountAddress[4], testAccountPrivateKey[4]);
     }
 
-    public static CompilationResult getCompilationResult(String contractName) {
-        return compilationResultHashMap.get(contractName);
+    public static SolidityCompiler.Result getSolidityCompilerResult(String contractName) {
+        return solidityCompilerResultMap.get(contractName);
     }
 
-    public static void setCompilationResult(String contractName,
-        CompilationResult compilationResult) {
-        compilationResultHashMap.put(contractName, compilationResult);
+    public static void setSolidityCompilerResult(String contractName, SolidityCompiler.Result compilationResult) {
+        solidityCompilerResultMap.put(contractName, compilationResult);
     }
 
 }

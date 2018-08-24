@@ -35,6 +35,7 @@ import org.tron.studio.ShareData;
 import org.tron.studio.TransactionHistoryItem;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.CompilationResult.ContractMetadata;
+import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.utils.AbiUtil;
 import org.tron.studio.walletserver.WalletClient;
 
@@ -97,10 +98,17 @@ public class RightTabRunController implements Initializable {
     }
 
     private void reloadContract() {
-        ShareData.currentContractFileName.addListener((observable, oldValue, newValue) -> {
+        ShareData.currentContractFileName.addListener((observable, oldValue, contractFileName) -> {
             List<String> contractNameList = new ArrayList<>();
-            if (newValue != null) {
-                CompilationResult compilationResult = ShareData.getCompilationResult(newValue);
+            if (StringUtils.isNotEmpty(contractFileName)) {
+                SolidityCompiler.Result solidityCompileResult = ShareData.getSolidityCompilerResult(contractFileName);
+                CompilationResult compilationResult;
+                try {
+                    compilationResult = CompilationResult.parse(solidityCompileResult.output);
+                } catch (IOException e) {
+                    logger.error("Failed to parse compile result {}", e);
+                    return;
+                }
                 compilationResult.getContracts().forEach(contractResult -> {
                     JSONObject metaData = JSON.parseObject(contractResult.metadata);
                     JSONObject compilationTarget = metaData.getJSONObject("settings")
@@ -118,15 +126,22 @@ public class RightTabRunController implements Initializable {
     }
 
     public void onClickDeploy(ActionEvent actionEvent) {
-        CompilationResult result = ShareData
-                .getCompilationResult(ShareData.currentContractFileName.get());
-        if (result == null) {
+        SolidityCompiler.Result solidityCompileResult = ShareData.getSolidityCompilerResult(ShareData.currentContractFileName.get());
+        CompilationResult compilationResult = null;
+        try {
+            compilationResult = CompilationResult.parse(solidityCompileResult.output);
+        } catch (IOException e) {
+            logger.error("Failed to parse compile result {}", e);
+            return;
+        }
+
+        if (compilationResult == null) {
             logger.error("No CompilationResult found");
             return;
         }
         String currentContractName = contractComboBox.valueProperty().get();
 
-        ContractMetadata currentContract = result.getContract(currentContractName);
+        ContractMetadata currentContract = compilationResult.getContract(currentContractName);
 
         boolean deployContractResult = false;
         StringBuilder bin = new StringBuilder(currentContract.bin);
