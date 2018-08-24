@@ -1,5 +1,7 @@
 package org.tron.studio.solc;
 
+import org.tron.studio.ShareData;
+
 import static java.util.stream.Collectors.toList;
 
 import java.io.BufferedOutputStream;
@@ -29,7 +31,7 @@ public class SolidityCompiler {
     }
 
     public static Result compile(File sourceDirectory, boolean combinedJson, Option... options) throws IOException {
-        return getInstance().compileSrc(sourceDirectory, false, combinedJson, options);
+        return getInstance().compileSrc(sourceDirectory, ShareData.enableOptimize, combinedJson, options);
     }
 
     /**

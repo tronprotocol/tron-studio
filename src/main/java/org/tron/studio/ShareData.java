@@ -27,6 +27,9 @@ public class ShareData {
         "7b0b316f60cf3954f0c54c292001f6b59f4a80328a04feafef539f0824ba5078"
     };
 
+
+    public static Boolean enableOptimize = false;
+
     public static final HashMap<String, String> testAccount = new HashMap<>();
     public static WalletClient wallet;
 

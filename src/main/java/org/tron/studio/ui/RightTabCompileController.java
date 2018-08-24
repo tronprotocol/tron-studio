@@ -34,6 +34,7 @@ public class RightTabCompileController implements Initializable {
 
     public JFXComboBox<String> contractComboBox;
     public JFXCheckBox autoCompileCheckBox;
+    public JFXCheckBox enableOtimizeCheckBox;
     public JFXButton compileButton;
     public JFXListView<Label> compileResultInfoListView;
 
@@ -68,18 +69,9 @@ public class RightTabCompileController implements Initializable {
                 SolidityCompiler.Result solidityCompilerResult = SolidityCompiler.compile(
                         new File(getClass().getResource(contractFileName).getPath()), true, ABI, BIN, INTERFACE,
                         METADATA);
-//
-//                logger.debug("Compile Out: '" + res.output + "'");
-//                logger.debug("Compile Err: '" + res.errors + "'");
+
                 CompilationErrorResult.parse(solidityCompilerResult.errors);
-                //There are warnings
-//                if(!CompilationErrorResult.getWarnings().isEmpty()) {
-//                    CompilationErrorResult.getWarnings().forEach(info -> {
-//                        Text text = new Text(info);
-//                        compileResultInfoListView.getItems().add(text);
-//
-//                    });
-//                }
+
                 //There are errors
                 if (!CompilationErrorResult.getErrors().isEmpty()) {
                     compileSuccess = false;
@@ -106,6 +98,8 @@ public class RightTabCompileController implements Initializable {
                     ShareData.setSolidityCompilerResult(contractFileName, solidityCompilerResult);
 
                     contractNameList.clear();
+                    contractBin.clear();
+                    contractABI.clear();
                     compilationResult.getContracts().forEach(contractResult -> {
                         contractBin.add(contractResult.bin);
                         contractABI.add(contractResult.abi);
@@ -192,5 +186,9 @@ public class RightTabCompileController implements Initializable {
 
     public void onSelectContract(ActionEvent actionEvent) {
         currentContractIndex = contractComboBox.getSelectionModel().getSelectedIndex();
+    }
+
+    public void onClickEnableOptimize(ActionEvent actionEvent) {
+        ShareData.enableOptimize = enableOtimizeCheckBox.isSelected();
     }
 }

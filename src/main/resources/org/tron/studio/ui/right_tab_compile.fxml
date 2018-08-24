@@ -15,7 +15,8 @@
     </padding>
     <HBox spacing="10" alignment="CENTER_LEFT">
         <JFXButton fx:id="compileButton" styleClass="custom-jfx-button-raised" onAction="#onClickCompile" text="Compile"/>
-        <JFXCheckBox fx:id="autoCompileCheckBox" onAction="#onClickAutoCompile" text="Auto Compile"/>
+        <!--<JFXCheckBox fx:id="autoCompileCheckBox" onAction="#onClickAutoCompile" text="Auto Compile"/>-->
+        <JFXCheckBox fx:id="enableOtimizeCheckBox" onAction="#onClickEnableOptimize" text="Enable Optimize"/>
     </HBox>
     <HBox spacing="10">
         <JFXComboBox fx:id="contractComboBox" onAction="#onSelectContract" HBox.hgrow="ALWAYS"/>
