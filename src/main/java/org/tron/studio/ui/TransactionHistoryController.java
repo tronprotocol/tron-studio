@@ -128,10 +128,11 @@ public class TransactionHistoryController {
         node.getChildren().add(region1);
         HBox.setHgrow(region1, Priority.ALWAYS);
         JFXButton debugBtn = new JFXButton("Debug");
+        debugBtn.getStyleClass().add("custom-jfx-button-raised-fix-width");
         node.getChildren().add(debugBtn);
         Region region2 = new Region();
-        region2.setPrefWidth(20);
-        node.getChildren().add(region1);
+        region2.setPrefWidth(30);
+        node.getChildren().add(region2);
 
         debugBtn.setOnAction(event -> {
             ShareData.debugTransactionAction.set(UUID.randomUUID().toString());
