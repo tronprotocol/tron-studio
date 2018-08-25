@@ -348,6 +348,10 @@ public class Runtime {
    **/
   private void create()
       throws ContractExeException, ContractValidateException {
+    if (!deposit.getDbManager().getDynamicPropertiesStore().supportVM()) {
+      throw new ContractExeException("VM work is off, need to be opened by the committee");
+    }
+
     CreateSmartContract contract = ContractCapsule.getSmartContractFromTransaction(trx);
     SmartContract newSmartContract = contract.getNewContract();
 
@@ -432,6 +436,11 @@ public class Runtime {
 
   private void call()
       throws ContractExeException, ContractValidateException {
+
+    if (!deposit.getDbManager().getDynamicPropertiesStore().supportVM()) {
+      throw new ContractExeException("VM work is off, need to be opened by the committee");
+    }
+
     Contract.TriggerSmartContract contract = ContractCapsule.getTriggerContractFromTransaction(trx);
     if (contract == null) {
       return;
@@ -502,15 +511,6 @@ public class Runtime {
 
         program.getResult().setRet(result.getRet());
         result = program.getResult();
-        if (isCallConstant()) {
-          long callValue = TransactionCapsule.getCallValue(trx.getRawData().getContract(0));
-          if (callValue > 0) {
-            runtimeError = "constant cannot set call value.";
-          }
-          return;
-        }
-
-        // todo: consume bandwidth for successful creating contract
 
         if (result.getException() != null || result.isRevert()) {
           result.getDeleteAccounts().clear();
@@ -527,19 +527,20 @@ public class Runtime {
         } else {
           deposit.commit();
         }
-
       } else {
         deposit.commit();
       }
     } catch (OutOfResourceException e) {
-      logger.error(e.getMessage());
+      logger.error("runtime error is :{}", e.getMessage());
       throw new OutOfSlotTimeException(e.getMessage());
     } catch (Throwable e) {
-      result.setException(new RuntimeException("Unknown Throwable"));
-      logger.error(e.getMessage());
-      if (StringUtils.isEmpty(runtimeError)) {
-        runtimeError = e.getMessage();
+      if (Objects.isNull(result.getException())) {
+        result.setException(new RuntimeException("Unknown Throwable"));
       }
+      if (StringUtils.isEmpty(runtimeError)) {
+        runtimeError = result.getException().getMessage();
+      }
+      logger.error("runtime error is :{}", result.getException().getMessage());
     }
     trace.setBill(result.getEnergyUsed());
   }
@@ -553,10 +554,14 @@ public class Runtime {
         .divide(BigInteger.valueOf(callerEnergyTotal)).longValue();
   }
 
-  private boolean isCallConstant() {
+  public boolean isCallConstant() {
+    TriggerSmartContract triggerContractFromTransaction = ContractCapsule
+        .getTriggerContractFromTransaction(trx);
     if (TRX_CONTRACT_CALL_TYPE.equals(trxType)) {
-      ABI abi = deposit.getContract(result.getContractAddress()).getInstance().getAbi();
-      if (Wallet.isConstant(abi, ContractCapsule.getTriggerContractFromTransaction(trx))) {
+      ABI abi = deposit
+          .getContract(triggerContractFromTransaction.getContractAddress().toByteArray())
+          .getInstance().getAbi();
+      if (Wallet.isConstant(abi, triggerContractFromTransaction)) {
         return true;
       }
     }

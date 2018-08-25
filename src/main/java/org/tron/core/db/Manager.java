@@ -683,6 +683,7 @@ public class Manager {
     processBlock(block);
     this.blockStore.put(block.getBlockId().getBytes(), block);
     this.blockIndexStore.put(block.getBlockId());
+    updateFork();
   }
 
   private void switchFork(BlockCapsule newHead)
@@ -1009,6 +1010,7 @@ public class Manager {
     if (trxCap == null) {
       return false;
     }
+
     validateTapos(trxCap);
     validateCommon(trxCap);
 
@@ -1031,8 +1033,10 @@ public class Manager {
 //    }
 
     DepositImpl deposit = DepositImpl.createRoot(this);
-    Runtime runtime = new Runtime(trace, block, deposit,
-        new ProgramInvokeFactoryImpl());
+    Runtime runtime = new Runtime(trace, block, deposit, new ProgramInvokeFactoryImpl());
+    if (runtime.isCallConstant()) {
+      throw new UnsupportVMException("cannot call constant method ");
+    }
     consumeBandwidth(trxCap, runtime.getResult().getRet(), trace);
 
     trace.init();
@@ -1300,7 +1304,15 @@ public class Manager {
     }
     getDynamicPropertiesStore().saveLatestSolidifiedBlockNum(latestSolidifiedBlockNum);
     logger.info("update solid block, num = {}", latestSolidifiedBlockNum);
+  }
+
+  public void updateFork() {
+    if (forkController.shouldBeForked()) {
+      return;
+    }
+
     try {
+      long latestSolidifiedBlockNum = dynamicPropertiesStore.getLatestSolidifiedBlockNum();
       BlockCapsule solidifiedBlock = getBlockByNum(latestSolidifiedBlockNum);
       forkController.update(solidifiedBlock);
     } catch (ItemNotFoundException | BadItemException e) {
