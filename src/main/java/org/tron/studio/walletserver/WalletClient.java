@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -79,7 +81,8 @@ public class WalletClient {
   private static TransactionExtention lastTransactionExtention = null;
   private static Transaction lastTransaction = null;
 
-  private static GrpcClient rpcCli = init();
+  @Getter
+  public static GrpcClient rpcCli = init();
 
   public static GrpcClient init() {
     String fullNode = "127.0.0.1" + ":" + Args.getInstance().getRpcPort();

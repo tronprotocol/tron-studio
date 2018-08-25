@@ -151,7 +151,7 @@ public class RightTabCompileController implements Initializable {
     }
 
     public void onClickDetail(ActionEvent actionEvent) {
-        logger.debug("onClickDetail {}", autoCompileCheckBox.isSelected());
+//        logger.debug("onClickDetail {}", autoCompileCheckBox.isSelected());
 
         if (currentContractIndex == -1) {
             return;

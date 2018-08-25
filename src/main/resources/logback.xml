@@ -50,6 +50,7 @@
   </root>
 
   <logger name="CodeAreaController" level="INFO" />
+  <logger name="BottomController" level="INFO" />
 
 </configuration>
 
