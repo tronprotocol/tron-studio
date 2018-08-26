@@ -28,7 +28,11 @@ public class SolidityFileUtil {
         List<File> list = new ArrayList<>();
         try {
             Stream<Path> fileList = Files.list(Paths.get(Config.SOLIDITY_SOURCE_PATH).toAbsolutePath());
-            fileList.forEach(item -> list.add(item.toFile()));
+            fileList.forEach(item -> {
+                if (item.toFile().getName().endsWith(".sol")) {
+                    list.add(item.toFile());
+                }
+            });
         } catch (IOException e) {
             logger.error("Failed to get file from {}", Config.SOLIDITY_SOURCE_PATH);
             return list;
@@ -61,8 +65,12 @@ public class SolidityFileUtil {
         }
     }
 
+    public static File getExistFile(String fileName) {
+        return new File(Config.SOLIDITY_SOURCE_PATH, fileName.trim());
+    }
+
     public static String getSourceCode(String fileName) {
-        File existFile = new File(Config.SOLIDITY_SOURCE_PATH, fileName.trim());
+        File existFile = getExistFile(fileName);
         StringBuilder builder = new StringBuilder();
         try {
             Files.lines(Paths.get(existFile.toURI())).forEach(line -> {

@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.ShareData;
+import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.solc.CompilationErrorResult;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.SolidityCompiler;
@@ -48,6 +49,8 @@ public class RightTabCompileController implements Initializable {
     int currentContractIndex = -1;
     boolean isCompiling;
 
+    String contractFileName = "Ballot.sol";
+
     public RightTabCompileController() {
     }
 
@@ -65,12 +68,11 @@ public class RightTabCompileController implements Initializable {
         contractComboBox.requestFocus();
         ShareData.currentContractFileName.set(null);
 
-        String contractFileName = "/template/Ballot.sol";
         new Thread(() -> {
             boolean compileSuccess = true;
             try {
                 SolidityCompiler.Result solidityCompilerResult = SolidityCompiler.compile(
-                        new File(getClass().getResource(contractFileName).getPath()), true, ABI, BIN, INTERFACE,
+                        SolidityFileUtil.getExistFile(contractFileName), true, ABI, BIN, INTERFACE,
                         METADATA);
 
                 CompilationErrorResult.parse(solidityCompilerResult.errors);
