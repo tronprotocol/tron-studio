@@ -63,7 +63,7 @@ public class TopController {
         JFXDialog dialog = new JFXDialog();
         JFXDialogLayout layout = new JFXDialogLayout();
         layout.setPrefWidth(800);
-        layout.setHeading(new Label("BlackChain Status"));
+        layout.setHeading(new Label("Blockchain Status"));
         TextArea textArea = new TextArea();
         layout.setBody(textArea);
         dialog.setContent(layout);
