@@ -83,14 +83,18 @@ public class RightTabCompileController implements Initializable {
                         CompilationErrorResult.getErrors().forEach(infoList -> {
                             Label text = new Label(infoList);
                             text.getStyleClass().add("compile-error-label");
-                            text.setMinHeight(50);
+                            String[] infos = infoList.split("\n");
+                            int lines = infos.length;
+                            text.setPrefHeight(lines * 30);
                             compileResultInfoListView.getItems().add(text);
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
                         CompilationErrorResult.getWarnings().forEach(infoList -> {
                             Label text = new Label(infoList);
                             text.getStyleClass().add("compile-warn-label");
-                            text.setMinHeight(50);
+                            String[] infos = infoList.split("\n");
+                            int lines = infos.length;
+                            text.setPrefHeight(lines * 30);
                             compileResultInfoListView.getItems().add(text);
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
@@ -121,14 +125,16 @@ public class RightTabCompileController implements Initializable {
                         CompilationErrorResult.getWarnings().forEach(infoList -> {
                             Label text = new Label(infoList);
                             text.getStyleClass().add("compile-warn-label");
-                            text.setMinHeight(50);
+                            String[] infos = infoList.split("\n");
+                            int lines = infos.length;
+                            text.setPrefHeight(lines * 30);
                             compileResultInfoListView.getItems().add(text);
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
                         contractNameList.forEach(contractName -> {
                             Label text = new Label(contractName);
                             text.getStyleClass().add("compile-succ-label");
-                            text.setMinHeight(50);
+                            text.setPrefHeight(40);
                             compileResultInfoListView.getItems().add(text);
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
