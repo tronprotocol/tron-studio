@@ -25,6 +25,9 @@ public class MainController {
 
     private String defaultContractFile = "/template/Ballot.sol";
 
+    private int contractFileNum = 0;
+    private String previousValue = "";
+
     @PostConstruct
     public void initialize() throws IOException {
         StringBuilder builder = new StringBuilder();
@@ -35,6 +38,8 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        contractFileNum = ShareData.allContractFileName.size();
 
         // Add default contract into the list of contracts
         //ShareData.allContractFileName.get().add(defaultContractFile);
@@ -48,14 +53,29 @@ public class MainController {
         defaultCodeArea.replaceText(0, 0, builder.toString());
         defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
 
+        previousValue = ShareData.currentContractName.get();
+
         SingleSelectionModel<Tab> selectionModel = codeAreaTabPane.getSelectionModel();
 
         ShareData.currentContractFileName.addListener((observable, oldValue, newValue) -> {
+            if (contractFileNum > ShareData.allContractFileName.size())
+            {
+                for (Tab tab : codeAreaTabPane.getTabs()) {
+                    if(StringUtils.equals(tab.getText(), previousValue))
+                    {
+                        codeAreaTabPane.getTabs().remove(tab);
+                        break;
+                    }
+                }
+            }
+
             for (Tab tab : codeAreaTabPane.getTabs()) {
                 if(StringUtils.equals(tab.getText(), newValue)) {
                     selectionModel.select(tab);
                 }
             }
+            previousValue = newValue;
+            contractFileNum = ShareData.allContractFileName.size();
         });
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
@@ -85,7 +105,6 @@ public class MainController {
         ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
             rightContentTabPane.getSelectionModel().selectLast();
         });
-
     }
 
     private String debugContract() {

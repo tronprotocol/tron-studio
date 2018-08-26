@@ -100,10 +100,14 @@ public class RightTabRunController implements Initializable {
     private void reloadContract() {
         ShareData.currentContractFileName.addListener((observable, oldValue, contractFileName) -> {
             List<String> contractNameList = new ArrayList<>();
+
             if (StringUtils.isNotEmpty(contractFileName)) {
                 SolidityCompiler.Result solidityCompileResult = ShareData.getSolidityCompilerResult(contractFileName);
                 CompilationResult compilationResult;
                 try {
+                    if (solidityCompileResult == null) {
+                        return;
+                    }
                     compilationResult = CompilationResult.parse(solidityCompileResult.output);
                 } catch (IOException e) {
                     logger.error("Failed to parse compile result {}", e);

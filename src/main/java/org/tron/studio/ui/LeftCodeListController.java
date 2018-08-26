@@ -62,14 +62,30 @@ public class LeftCodeListController {
         delMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("remove");
-                //System.out.println(ShareData.allContractFileName.get());
-                //System.out.println(ShareData.currentContractFileName.get());
+                int currentIndex = ShareData.allContractFileName.indexOf(ShareData.currentContractFileName.get());
 
-                //ShareData.allContractFileName.get().remove(ShareData.currentContractFileName);
-                //ShareData.currentContractFileName.set(ShareData.allContractFileName.get(0));
-                //System.out.println(ShareData.allContractFileName.get());
-                //System.out.println(ShareData.currentContractFileName.get());
+                ShareData.allContractFileName.remove(ShareData.currentContractFileName.get());
+                fileNameData.remove(currentIndex);
+
+                int file_num = ShareData.allContractFileName.get().size();
+                int nextCurrentIndex = 0;
+
+                if (file_num != 0)
+                {
+                    if (currentIndex < file_num - 1)
+                    {
+                        nextCurrentIndex = currentIndex + 1;
+                    } else
+                    {
+                        nextCurrentIndex = file_num - 1;
+                    }
+
+                    ShareData.currentContractFileName.set(ShareData.allContractFileName.get(nextCurrentIndex));
+                    fileNameTable.getSelectionModel().select(nextCurrentIndex);
+
+                } else {
+                    logger.info("No file to show");
+                }
             }
         });
 
@@ -84,6 +100,7 @@ public class LeftCodeListController {
         });
 
         ShareData.newContractFileName.set("/template/Ballot.sol");
+        ShareData.allContractFileName.add(ShareData.newContractFileName.get());
     }
 
     private String showDialog()  {
