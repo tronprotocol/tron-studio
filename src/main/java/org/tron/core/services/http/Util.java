@@ -13,6 +13,7 @@ import org.tron.api.GrpcAPI.TransactionList;
 import org.tron.common.crypto.Hash;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.Sha256Hash;
+import org.tron.core.Wallet;
 import org.tron.core.capsule.BlockCapsule;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.core.services.http.JsonFormat.ParseException;
@@ -33,6 +34,7 @@ import org.tron.protos.Contract.VoteWitnessContract;
 import org.tron.protos.Contract.WithdrawBalanceContract;
 import org.tron.protos.Contract.WitnessCreateContract;
 import org.tron.protos.Contract.WitnessUpdateContract;
+import org.tron.protos.Protocol;
 import org.tron.protos.Protocol.Block;
 import org.tron.protos.Protocol.SmartContract;
 import org.tron.protos.Protocol.Transaction;
@@ -102,6 +104,123 @@ public class Util {
 
   public static String printTransaction(Transaction transaction) {
     return printTransactionToJSON(transaction).toJSONString();
+  }
+
+  private static String printReceipt(Protocol.ResourceReceipt receipt) {
+    String result = "";
+    result += "EnergyUsage: ";
+    result += "\n";
+    result += receipt.getEnergyUsage();
+    result += "\n";
+    result += "EnergyFee(SUN): ";
+    result += "\n";
+    result += receipt.getEnergyFee();
+    result += "\n";
+    result += "OriginEnergyUsage: ";
+    result += "\n";
+    result += receipt.getOriginEnergyUsage();
+    result += "\n";
+    result += "EnergyUsageTotal: ";
+    result += "\n";
+    result += receipt.getEnergyUsageTotal();
+    result += "\n";
+    result += "NetUsage: ";
+    result += "\n";
+    result += receipt.getNetUsage();
+    result += "\n";
+    result += "NetFee: ";
+    result += "\n";
+    result += receipt.getNetFee();
+    result += "\n";
+    return result;
+  }
+  
+  public static String printLogList(List<Protocol.TransactionInfo.Log> logList) {
+    StringBuilder result = new StringBuilder("");
+    logList.forEach(log -> {
+              result.append("address:\n");
+              result.append(ByteArray.toHexString(log.getAddress().toByteArray()));
+              result.append("\n");
+              result.append("data:\n");
+              result.append(ByteArray.toHexString(log.getData().toByteArray()));
+              result.append("\n");
+              result.append("TopicsList\n");
+              StringBuilder topics = new StringBuilder("");
+
+              log.getTopicsList().forEach(bytes -> {
+                topics.append(ByteArray.toHexString(bytes.toByteArray()));
+                topics.append("\n");
+              });
+              result.append(topics);
+            }
+    );
+
+    return result.toString();
+  }
+  public static String printTransactionInfo(Protocol.TransactionInfo transactionInfo) {
+    String result = "";
+    result += "txid: ";
+    result += "\n";
+    result += ByteArray.toHexString(transactionInfo.getId().toByteArray());
+    result += "\n";
+    result += "fee: ";
+    result += "\n";
+    result += transactionInfo.getFee();
+    result += "\n";
+    result += "blockNumber: ";
+    result += "\n";
+    result += transactionInfo.getBlockNumber();
+    result += "\n";
+    result += "blockTimeStamp: ";
+    result += "\n";
+    result += transactionInfo.getBlockTimeStamp();
+    result += "\n";
+    result += "result: ";
+    result += "\n";
+    if (transactionInfo.getResult().equals(Protocol.TransactionInfo.code.SUCESS)) {
+      result += "SUCCESS";
+    } else {
+      result += "FAILED";
+    }
+    result += "\n";
+    result += "resMessage: ";
+    result += "\n";
+    result += ByteArray.toStr(transactionInfo.getResMessage().toByteArray());
+    result += "\n";
+    result += "contractResult: ";
+    result += "\n";
+    result += ByteArray.toHexString(transactionInfo.getContractResult(0).toByteArray());
+    result += "\n";
+    result += "contractAddress: ";
+    result += "\n";
+    result += Wallet.encode58Check(transactionInfo.getContractAddress().toByteArray());
+    result += "\n";
+    result += "logList: ";
+    result += "\n";
+    result += printLogList(transactionInfo.getLogList());
+    result += "\n";
+    result += "receipt: ";
+    result += "\n";
+    result += printReceipt(transactionInfo.getReceipt());
+    result += "\n";
+    return result;
+  }
+
+  public static String printTransactionsExt(List<TransactionExtention> transactionList) {
+    String result = "\n";
+    int i = 0;
+    for (TransactionExtention transaction : transactionList) {
+      result += "transaction " + i + " :::";
+      result += "\n";
+      result += "[";
+      result += "\n";
+      result += printTransactionExtention(transaction);
+      result += "]";
+      result += "\n";
+      result += "\n";
+      i++;
+    }
+    return result;
   }
 
   public static String printTransactionExtention(TransactionExtention transactionExtention) {
