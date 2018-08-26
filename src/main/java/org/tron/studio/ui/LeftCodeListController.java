@@ -35,7 +35,6 @@ public class LeftCodeListController {
 
     public JFXTreeTableView<FileName> fileNameTable;
     public JFXTreeTableColumn<FileName, String> fileNameColumn;
-    public StackPane dialogRoot;
 
     private ObservableList<FileName> fileNameData;
 

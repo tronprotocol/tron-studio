@@ -14,7 +14,7 @@
 <VBox spacing="10" prefWidth="200" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.tron.studio.ui.LeftCodeListController">
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
+        <Insets left="10" right="10"/>
     </padding>
     <HBox>
         <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#createContract">
@@ -33,10 +33,12 @@
             </StackPane>
         </JFXRippler>
     </HBox>
-    <JFXTreeTableView fx:id="fileNameTable">
+    <JFXTreeTableView fx:id="fileNameTable" VBox.vgrow="ALWAYS">
         <columns>
-            <JFXTreeTableColumn fx:id="fileNameColumn" text="FileName"/>
+            <JFXTreeTableColumn fx:id="fileNameColumn" text="FileName" />
         </columns>
+        <columnResizePolicy>
+            <JFXTreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
     </JFXTreeTableView>
-    <StackPane fx:id="dialogRoot"/>
 </VBox>
