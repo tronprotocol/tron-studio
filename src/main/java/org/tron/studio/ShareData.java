@@ -1,7 +1,5 @@
 package org.tron.studio;
 
-import java.util.HashMap;
-
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -9,6 +7,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.walletserver.WalletClient;
+
+import java.util.HashMap;
 
 public class ShareData {
 
@@ -54,6 +54,7 @@ public class ShareData {
     public static HashMap<String, TransactionHistoryItem> transactionHistory = new HashMap<>();
     public static SimpleStringProperty addTransactionAction = new SimpleStringProperty();
     public static SimpleStringProperty debugTransactionAction = new SimpleStringProperty();
+    public static SimpleStringProperty openContract = new SimpleStringProperty();
 
     public static String currentAccount;
     public static String currentValue;

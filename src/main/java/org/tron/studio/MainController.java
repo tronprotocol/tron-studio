@@ -89,9 +89,50 @@ public class MainController {
             newTab(newValue);
         });
 
+        ShareData.openContract.addListener((observable, oldValue, newValue) ->{
+            String file_path = ShareData.openContract.get();
+            File newFile = new File(file_path);
+
+            Tab newTab = setTap(newFile);
+            ShareData.currentContractName.set(newFile.getName());
+            ShareData.allContractFileName.add(newFile.getName());
+            selectionModel.select(newTab);
+        });
+
         ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
             rightContentTabPane.getSelectionModel().selectLast();
         });
+    }
+
+    private Tab setTap(File file) {
+        Tab tab = new Tab();
+
+        System.out.println("set tab");
+        CodeArea codeArea = new CodeArea();
+        // Print new file in codearea
+        StringBuilder builder = new StringBuilder();
+        try {
+            Files.lines(Paths.get(file.getAbsolutePath())).forEach(line -> {
+                builder.append(line).append(System.getProperty("line.separator"));
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        tab.setText(file.getName());
+        //Just not allow to close the default tab
+        tab.setClosable(true);
+        tab.setContent(codeArea);
+        codeAreaTabPane.getTabs().add(tab);
+
+        new SolidityHighlight(codeArea).highlight();
+        codeArea.replaceText(0, 0, builder.toString());
+        codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+
+        ShareData.allContractFileName.add(file.getName());
+        ShareData.currentContractName.set(file.getName());
+
+        return tab;
     }
 
     private void newTab(String tabName) {
