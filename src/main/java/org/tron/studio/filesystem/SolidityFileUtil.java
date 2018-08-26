@@ -89,4 +89,8 @@ public class SolidityFileUtil {
         }
         return builder.toString();
     }
+
+    public static String getSourcePath() {
+        return Config.SOLIDITY_SOURCE_PATH;
+    }
 }

@@ -42,6 +42,8 @@ import org.tron.studio.walletserver.WalletClient;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RightTabRunController implements Initializable {
 
@@ -158,14 +160,14 @@ public class RightTabRunController implements Initializable {
             return;
         }
 
-        ContractMetadata currentContract = compilationResult.getContract(currentContractName);
+        ContractMetadata currentContractFileMetadata = compilationResult.getContract(currentContractName);
 
         final boolean[] deployContractResult = {false};
-        StringBuilder bin = new StringBuilder(currentContract.bin);
+        StringBuilder bin = new StringBuilder(currentContractFileMetadata.bin);
 
         {
             //Find out constructor, and encode constructor parameter, then append it to the end of bytecode
-            List<JSONObject> abiJson = JSONArray.parseArray(currentContract.abi, JSONObject.class);
+            List<JSONObject> abiJson = JSONArray.parseArray(currentContractFileMetadata.abi, JSONObject.class);
             Optional<JSONObject> constructorJSONObject = abiJson.stream()
                     .filter(entry -> StringUtils.equalsIgnoreCase("constructor", entry.getString("type")))
                     .findFirst();
@@ -199,9 +201,13 @@ public class RightTabRunController implements Initializable {
             }
             long finalFeeLimit = feeLimit;
             long finalCallValue = callValue;
+            String byteCode = bin.toString();
             try {
+                if (hasLibrary(byteCode)) {
+                    byteCode = deployLibrary(compilationResult, currentContractName, byteCode, finalFeeLimit);
+                }
                 deployContractResult[0] = ShareData.wallet
-                        .deployContract(currentContractName, currentContract.abi, bin.toString(),
+                        .deployContract(currentContractName, currentContractFileMetadata.abi, byteCode,
                                 finalFeeLimit, finalCallValue,
                                 Long.parseLong(userPayRatio.getText()), null);
 
@@ -243,9 +249,10 @@ public class RightTabRunController implements Initializable {
         byte[] ownerAddress = Wallet.decodeFromBase58Check(accountComboBox.getSelectionModel().getSelectedItem());
         byte[] contractAddress = Util.generateContractAddress(transaction, ownerAddress);
         deployedContractList.getItems()
-                .add(getContractRunPanel(currentContractName, contractAddress, currentContract.abi));
+                .add(getContractRunPanel(currentContractName, contractAddress, currentContractFileMetadata.abi));
         isDeploying = false;
     }
+
 
     private JFXListView getContractRunPanel(String contractName, byte[] contractAddress, String abi) {
         JFXListView listView = new JFXListView();
@@ -308,10 +315,57 @@ public class RightTabRunController implements Initializable {
         return listView;
     }
 
-
     private void addTransactionHistoryItem(String id, TransactionHistoryItem item) {
         ShareData.transactionHistory.put(id, item);
         ShareData.addTransactionAction.set(id);
+    }
+
+    private boolean hasLibrary(String byteCode) {
+        if (StringUtils.isEmpty(byteCode.trim())) {
+            return false;
+        }
+        return byteCode.matches(".*__.*__.*");
+    }
+
+    private Set<String> getMatchers(String regex, String source) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(source);
+        Set<String> set = new HashSet<>();
+        while (matcher.find()) {
+            set.add(matcher.group());
+        }
+        return set;
+    }
+
+    private String deployLibrary(CompilationResult compilationResult, String currentContractName, String byteCode, long finalFeeLimit) {
+        Map<String, String> libraryDeployedAddress = new HashMap<>();
+        Set<String> usedLibrarySet = getMatchers("(__.*?_*__)", byteCode);
+        for (String usedLibrary : usedLibrarySet) {
+            String libraryContractName = getMatchers(".*[a-zA-Z0-9]", usedLibrary).stream().findFirst().get().split(":")[1];
+            ContractMetadata libraryMetadata = compilationResult.getContract(libraryContractName);
+            try {
+                boolean deployLibraryResult = ShareData.wallet
+                        .deployContract(currentContractName, libraryMetadata.abi, libraryMetadata.bin,
+                                finalFeeLimit, 0,
+                                Long.parseLong(userPayRatio.getText()), null);
+                if (!deployLibraryResult) {
+                    logger.error("Failed to deployed library {}", libraryContractName);
+                } else {
+                    Transaction lastTransaction = ShareData.wallet.getLastTransaction();
+                    byte[] ownerAddress = Wallet.decodeFromBase58Check(accountComboBox.getSelectionModel().getSelectedItem());
+                    byte[] contractAddress = Util.generateContractAddress(lastTransaction, ownerAddress);
+                    libraryDeployedAddress.put(usedLibrary, Hex.toHexString(contractAddress));
+                }
+            } catch (Exception e) {
+                logger.error("Failed to deployed library {} {}", libraryContractName, e);
+            }
+        }
+        final String[] returnByteCode = {byteCode};
+        libraryDeployedAddress.forEach((libraryName, address) -> {
+            String libraryAddress = address.substring(2);
+            returnByteCode[0] = returnByteCode[0].replace(libraryName, libraryAddress);
+        });
+        return returnByteCode[0];
     }
 
     public void onClickClear(MouseEvent actionEvent) {
@@ -375,4 +429,6 @@ public class RightTabRunController implements Initializable {
             addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction));
         }
     }
+
+
 }

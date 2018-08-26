@@ -1,6 +1,7 @@
 package org.tron.studio.solc;
 
 import org.tron.studio.ShareData;
+import org.tron.studio.filesystem.SolidityFileUtil;
 
 import static java.util.stream.Collectors.toList;
 
@@ -202,10 +203,10 @@ public class SolidityCompiler {
     public Result compileSrc(File source, boolean optimize, boolean combinedJson, Option... options) throws IOException {
         List<String> commandParts = prepareCommandOptions(optimize, combinedJson, options);
 
-        commandParts.add(source.getAbsolutePath());
+        commandParts.add(source.getName());
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandParts)
-                .directory(solc.getExecutable().getParentFile());
+                .directory(new File(SolidityFileUtil.getSourcePath()));
         processBuilder.environment().put("LD_LIBRARY_PATH",
                 solc.getExecutable().getParentFile().getCanonicalPath());
 
