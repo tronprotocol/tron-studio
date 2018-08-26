@@ -22,7 +22,10 @@ import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.ShareData;
+import org.tron.studio.filesystem.SolidityFileUtil;
 
+import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -99,6 +102,7 @@ public class LeftCodeListController {
             }
         });
 
+        List<File> files = SolidityFileUtil.getFileNameList();
         ShareData.newContractFileName.set("/template/Ballot.sol");
         ShareData.allContractFileName.add(ShareData.newContractFileName.get());
     }
