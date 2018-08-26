@@ -58,7 +58,8 @@ public class LeftCodeListController {
 
         fileNameTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                ShareData.currentContractFileName.set(fileNameTable.getSelectionModel().getSelectedItem().getValue().fileName.getValue());
+                File fileName = SolidityFileUtil.getExistFile(newSelection.getValue().fileName.getValue());
+                ShareData.currentContractFileName.set(fileName.getName());
             }
         });
 
@@ -122,6 +123,7 @@ public class LeftCodeListController {
         if (contractFileName == null) {
             return;
         }
+        contractFileName = SolidityFileUtil.formatFileName(contractFileName);
         SolidityFileUtil.createNewFile(contractFileName);
         ShareData.newContractFileName.set(contractFileName);
         ShareData.allContractFileName.get().add(contractFileName);

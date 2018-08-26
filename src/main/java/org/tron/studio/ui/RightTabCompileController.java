@@ -61,18 +61,18 @@ public class RightTabCompileController implements Initializable {
     @FXML
     protected void onClickCompile() {
         logger.debug("onClickCompile");
+        contractComboBox.requestFocus();
         if (isCompiling) {
             return;
         }
         isCompiling = true;
-        contractComboBox.requestFocus();
         ShareData.currentContractFileName.set(null);
 
         new Thread(() -> {
             boolean compileSuccess = true;
             try {
                 SolidityCompiler.Result solidityCompilerResult = SolidityCompiler.compile(
-                        SolidityFileUtil.getExistFile(contractFileName), true, ABI, BIN, INTERFACE,
+                        SolidityFileUtil.getExistFile(contractFileName), true, ABI, BIN, HASHES, INTERFACE,
                         METADATA);
 
                 CompilationErrorResult.parse(solidityCompilerResult.errors);
@@ -118,11 +118,13 @@ public class RightTabCompileController implements Initializable {
                             contractNameList.add((String) value);
                         });
                     });
-                    contractComboBox.setItems(FXCollections.observableArrayList(
-                            contractNameList
-                    ));
 
                     Platform.runLater(() -> {
+
+                        contractComboBox.setItems(FXCollections.observableArrayList(
+                                contractNameList
+                        ));
+
                         compileResultInfoListView.getItems().clear();
                         CompilationErrorResult.getWarnings().forEach(infoList -> {
                             Label text = new Label(infoList);

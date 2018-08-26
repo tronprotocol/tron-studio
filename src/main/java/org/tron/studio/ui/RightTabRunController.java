@@ -62,7 +62,10 @@ public class RightTabRunController implements Initializable {
     private static String DEFAULT_VALUE = String.valueOf(0);
     private static String DEFAULT_RATIO = String.valueOf(100);
 
+    private boolean isDeploying;
+
     public void initialize(URL location, ResourceBundle resources) {
+        isDeploying = false;
         environmentComboBox.setItems(FXCollections.observableArrayList(
                 "Local TVM",
                 "Test Net",
@@ -103,7 +106,7 @@ public class RightTabRunController implements Initializable {
 
             if (StringUtils.isNotEmpty(contractFileName)) {
                 SolidityCompiler.Result solidityCompileResult = ShareData.getSolidityCompilerResult(contractFileName);
-                if(solidityCompileResult == null) {
+                if (solidityCompileResult == null) {
                     return;
                 }
                 CompilationResult compilationResult;
@@ -130,24 +133,34 @@ public class RightTabRunController implements Initializable {
     }
 
     public void onClickDeploy(ActionEvent actionEvent) {
+        if (isDeploying) {
+            return;
+        }
+        isDeploying = true;
+        String currentContractName = contractComboBox.valueProperty().get();
+        ShareData.currentContractName.set(currentContractName);
+        ShareData.currentAccount = accountComboBox.valueProperty().get();
+        ShareData.currentValue = valueTextField.getText();
+
         SolidityCompiler.Result solidityCompileResult = ShareData.getSolidityCompilerResult(ShareData.currentContractFileName.get());
         CompilationResult compilationResult = null;
         try {
             compilationResult = CompilationResult.parse(solidityCompileResult.output);
         } catch (IOException e) {
             logger.error("Failed to parse compile result {}", e);
+            isDeploying = false;
             return;
         }
 
         if (compilationResult == null) {
             logger.error("No CompilationResult found");
+            isDeploying = false;
             return;
         }
-        String currentContractName = contractComboBox.valueProperty().get();
 
         ContractMetadata currentContract = compilationResult.getContract(currentContractName);
 
-        boolean deployContractResult = false;
+        final boolean[] deployContractResult = {false};
         StringBuilder bin = new StringBuilder(currentContract.bin);
 
         {
@@ -175,7 +188,7 @@ public class RightTabRunController implements Initializable {
                 }
             }
         }
-        try {
+        {
             long callValue = Long.parseLong(valueTextField.getText());
             if (valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
                 callValue *= ShareData.TRX_SUN_UNIT;
@@ -184,19 +197,29 @@ public class RightTabRunController implements Initializable {
             if (feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
                 feeLimit *= ShareData.TRX_SUN_UNIT;
             }
-            deployContractResult = ShareData.wallet
-                    .deployContract(currentContractName, currentContract.abi, bin.toString(),
-                            feeLimit, callValue,
-                            Long.parseLong(userPayRatio.getText()), null);
-        } catch (IOException | CipherException | CancelException e) {
-            logger.error("Failed to deployContract{} {}", e.getMessage(), e);
-            return;
+            long finalFeeLimit = feeLimit;
+            long finalCallValue = callValue;
+            try {
+                deployContractResult[0] = ShareData.wallet
+                        .deployContract(currentContractName, currentContract.abi, bin.toString(),
+                                finalFeeLimit, finalCallValue,
+                                Long.parseLong(userPayRatio.getText()), null);
+
+            } catch (Exception e) {
+                String uuid = UUID.randomUUID().toString();
+                addTransactionHistoryItem(uuid, new TransactionHistoryItem(
+                        TransactionHistoryItem.Type.ERROR, "Failed to deployContract. " + e.getMessage()));
+                logger.error("Failed to deployContract {}", e);
+                isDeploying = false;
+                return;
+            }
         }
 
-        if (!deployContractResult) {
+        if (!deployContractResult[0]) {
             String uuid = UUID.randomUUID().toString();
             addTransactionHistoryItem(uuid, new TransactionHistoryItem(TransactionHistoryItem.Type.ERROR,
                     "Failed to deployContract. Please check tron.log"));
+            isDeploying = false;
             return;
         }
 
@@ -207,12 +230,9 @@ public class RightTabRunController implements Initializable {
                     TransactionHistoryItem.Type.ERROR,
                     String.format("Unable to get last TransactionExtention: %s",
                             transactionExtention.getResult().getMessage().toStringUtf8())));
+            isDeploying = false;
             return;
         }
-
-        ShareData.currentContractName.set(currentContractName);
-        ShareData.currentAccount = accountComboBox.valueProperty().get();
-        ShareData.currentValue = valueTextField.getText();
 
         Transaction transaction = ShareData.wallet.getLastTransaction();
         transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
@@ -224,7 +244,7 @@ public class RightTabRunController implements Initializable {
         byte[] contractAddress = Util.generateContractAddress(transaction, ownerAddress);
         deployedContractList.getItems()
                 .add(getContractRunPanel(currentContractName, contractAddress, currentContract.abi));
-
+        isDeploying = false;
     }
 
     private JFXListView getContractRunPanel(String contractName, byte[] contractAddress, String abi) {

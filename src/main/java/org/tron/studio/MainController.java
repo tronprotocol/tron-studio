@@ -62,46 +62,31 @@ public class MainController {
 
         SingleSelectionModel<Tab> selectionModel = codeAreaTabPane.getSelectionModel();
 
-        ShareData.currentContractFileName.addListener((observable, oldValue, newValue) -> {
-            if (contractFileNum > ShareData.allContractFileName.size())
-            {
+        ShareData.currentContractFileName.addListener((observable, oldValue, currentContractName) -> {
+            if (contractFileNum > ShareData.allContractFileName.size()) {
                 for (Tab tab : codeAreaTabPane.getTabs()) {
-                    if(StringUtils.equals(tab.getText(), previousValue))
-                    {
+                    if (StringUtils.equals(tab.getText(), previousValue)) {
                         codeAreaTabPane.getTabs().remove(tab);
                         break;
                     }
                 }
             }
-
+            boolean alreadyOpen = false;
             for (Tab tab : codeAreaTabPane.getTabs()) {
-                if(StringUtils.equals(tab.getText(), newValue)) {
+                if (StringUtils.equals(tab.getText(), currentContractName)) {
                     selectionModel.select(tab);
+                    alreadyOpen = true;
                 }
             }
-            previousValue = newValue;
+            if (!alreadyOpen) {
+                newTab(currentContractName);
+            }
+            previousValue = currentContractName;
             contractFileNum = ShareData.allContractFileName.size();
         });
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
-            try {
-                Tab codeTab = new Tab();
-                codeTab.setText(newValue);
-                codeTab.setClosable(true);
-                CodeArea codeArea = FXMLLoader.load(getClass().getResource("ui/code_area.fxml"));
-                codeTab.setContent(codeArea);
-                codeAreaTabPane.getTabs().add(codeTab);
-
-                String sourceCode = SolidityFileUtil.getSourceCode(newValue);
-
-                new SolidityHighlight(codeArea).highlight();
-                codeArea.insertText(0, sourceCode);
-                codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-
-                codeAreaTabPane.getSelectionModel().select(codeTab);
-            } catch (IOException e) {
-                logger.error(e.getMessage());
-            }
+            newTab(newValue);
         });
 
         ShareData.openContract.addListener((observable, oldValue, newValue) ->{
@@ -119,8 +104,7 @@ public class MainController {
         });
     }
 
-    private Tab setTap(File file)
-    {
+    private Tab setTap(File file) {
         Tab tab = new Tab();
 
         System.out.println("set tab");
@@ -149,6 +133,27 @@ public class MainController {
         ShareData.currentContractName.set(file.getName());
 
         return tab;
+    }
+
+    private void newTab(String tabName) {
+        try {
+            Tab codeTab = new Tab();
+            codeTab.setText(tabName);
+            codeTab.setClosable(true);
+            CodeArea codeArea = FXMLLoader.load(getClass().getResource("ui/code_area.fxml"));
+            codeTab.setContent(codeArea);
+            codeAreaTabPane.getTabs().add(codeTab);
+
+            String sourceCode = SolidityFileUtil.getSourceCode(tabName);
+
+            new SolidityHighlight(codeArea).highlight();
+            codeArea.insertText(0, sourceCode);
+            codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+
+            codeAreaTabPane.getSelectionModel().select(codeTab);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     private String debugContract() {
