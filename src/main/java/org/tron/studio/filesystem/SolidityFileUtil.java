@@ -26,8 +26,6 @@ public class SolidityFileUtil {
         dir.mkdirs();
     }
 
-
-
     public static List<File> getFileNameList() {
         List<File> list = new ArrayList<>();
         try {

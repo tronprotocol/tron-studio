@@ -25,9 +25,11 @@ import org.tron.studio.ShareData;
 import org.tron.studio.filesystem.SolidityFileUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.io.FileWriter;
 
 public class LeftCodeListController {
     static final Logger logger = LoggerFactory.getLogger(RightTabCompileController.class);
@@ -152,7 +154,25 @@ public class LeftCodeListController {
     }
 
     public void saveContract(MouseEvent mouseEvent) {
+        logger.info("save contract");
+        System.out.println(SolidityFileUtil.fileNameList);
+        System.out.println(ShareData.currentContractName);
+        for(File file: SolidityFileUtil.fileNameList){
+            if (file.getName().equals(ShareData.currentContractName.getName()))
+            {
+                // save contract
+                try {
+                    FileWriter writer = new FileWriter(file);
+                    System.out.println(ShareData.currentContractArea.getText());
+                    writer.write(ShareData.currentContractArea.getText());
+                    writer.close();
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
 
+            }
+        }
     }
 
     private void openFile(File file) {

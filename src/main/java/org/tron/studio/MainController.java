@@ -47,9 +47,6 @@ public class MainController {
 
         contractFileNum = ShareData.allContractFileName.size();
 
-        // Add default contract into the list of contracts
-        //ShareData.allContractFileName.get().add(defaultContractFile);
-
         defaultCodeAreaTab.setText(defaultContractFile.getName());
         //Just not allow to close the default tab
         defaultCodeAreaTab.setClosable(false);
@@ -57,9 +54,12 @@ public class MainController {
         defaultCodeArea = (CodeArea) defaultCodeAreaTab.getContent();
         new SolidityHighlight(defaultCodeArea).highlight();
         defaultCodeArea.replaceText(0, 0, builder.toString());
+
         defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
 
         previousValue = ShareData.currentContractName.get();
+
+        ShareData.currentContractArea = defaultCodeArea;
 
         SingleSelectionModel<Tab> codeAreaTabPaneSelectionModel = codeAreaTabPane.getSelectionModel();
 
@@ -131,6 +131,7 @@ public class MainController {
 
         ShareData.allContractFileName.add(file.getName());
         ShareData.currentContractName.set(file.getName());
+        ShareData.currentContractArea = codeArea;
 
         return tab;
     }
@@ -151,6 +152,7 @@ public class MainController {
             codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
             codeAreaTabPane.getSelectionModel().select(codeTab);
+            ShareData.currentContractArea = codeArea;
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

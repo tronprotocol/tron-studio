@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import org.fxmisc.richtext.CodeArea;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.walletserver.WalletClient;
 
@@ -53,11 +54,14 @@ public class ShareData {
     //包括上链的交易：Transaction
     //包括错误交易信息：ErrorInfo
     public static HashMap<String, TransactionHistoryItem> transactionHistory = new HashMap<>();
+
+    // Add transaction
     public static SimpleStringProperty addTransactionAction = new SimpleStringProperty();
     public static SimpleStringProperty debugTransactionAction = new SimpleStringProperty();
     public static SimpleStringProperty openContract = new SimpleStringProperty();
     public static SimpleStringProperty deleteContract = new SimpleStringProperty();
     public static SimpleStringProperty openContractFileName = new SimpleStringProperty();
+    public static CodeArea currentContractArea;
 
     public static String currentAccount;
     public static String currentValue;
