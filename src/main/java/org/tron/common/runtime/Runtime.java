@@ -408,6 +408,7 @@ public class Runtime {
       this.program = new Program(ops, programInvoke, internalTransaction, config);
       Program.setRootTransactionId(new TransactionCapsule(trx).getTransactionId().getBytes());
       Program.resetNonce();
+      Program.setRootCallConstant(isCallConstant());
     } catch (Exception e) {
       logger.error(e.getMessage());
       throw new ContractExeException(e.getMessage());
@@ -489,6 +490,7 @@ public class Runtime {
       this.program = new Program(null, code, programInvoke, internalTransaction, config);
       Program.setRootTransactionId(new TransactionCapsule(trx).getTransactionId().getBytes());
       Program.resetNonce();
+      Program.setRootCallConstant(isCallConstant());
     }
 
     program.getResult().setContractAddress(contractAddress);
@@ -511,6 +513,14 @@ public class Runtime {
 
         program.getResult().setRet(result.getRet());
         result = program.getResult();
+
+        if (isCallConstant()) {
+          long callValue = TransactionCapsule.getCallValue(trx.getRawData().getContract(0));
+          if (callValue > 0) {
+            runtimeError = "constant cannot set call value.";
+          }
+          return;
+        }
 
         if (result.getException() != null || result.isRevert()) {
           result.getDeleteAccounts().clear();
