@@ -1020,14 +1020,17 @@
 .compile-error-label {
     -fx-background-color: #D34336;
     -fx-font-weight: bold;
+    -fx-font-family: Monaco;
 }
 .compile-warn-label {
     -fx-background-color: #dddd00;
     -fx-font-weight: bold;
+    -fx-font-family: Monaco;
 }
 .compile-succ-label {
     -fx-background-color: #00dd00;
     -fx-font-weight: bold;
+    -fx-font-family: Monaco;
 }
 
 /*******************************************************************************

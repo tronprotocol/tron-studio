@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -82,14 +85,14 @@ public class RightTabCompileController implements Initializable {
                             text.getStyleClass().add("compile-error-label");
                             text.setMinHeight(50);
                             compileResultInfoListView.getItems().add(text);
-                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty());
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(30));
                         });
                         CompilationErrorResult.getWarnings().forEach(infoList -> {
                             Label text = new Label(infoList);
                             text.getStyleClass().add("compile-warn-label");
                             text.setMinHeight(50);
                             compileResultInfoListView.getItems().add(text);
-                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty());
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(30));
                         });
                     });
                     return;
@@ -120,14 +123,14 @@ public class RightTabCompileController implements Initializable {
                             text.getStyleClass().add("compile-warn-label");
                             text.setMinHeight(50);
                             compileResultInfoListView.getItems().add(text);
-                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty());
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(30));
                         });
                         contractNameList.forEach(contractName -> {
                             Label text = new Label(contractName);
                             text.getStyleClass().add("compile-succ-label");
                             text.setMinHeight(50);
                             compileResultInfoListView.getItems().add(text);
-                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty());
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(30));
                         });
                     });
                 }

@@ -4,7 +4,7 @@ pragma solidity ^0.4.23;
 //import "./ERC20.sol";
 //import "./ERC20Basic.sol";
 library SafeMath {
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+  function mul(uint256 a, uint256 b) pure returns (uint256) {
     if (a == 0) {
       return 0;
     }

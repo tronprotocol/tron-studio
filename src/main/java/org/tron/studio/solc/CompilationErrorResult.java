@@ -45,7 +45,7 @@ public class CompilationErrorResult {
             if (currentLine.matches(".*:[1-9]\\d*:[1-9]\\d*:.*")) {
                 startLine = true;
                 isWarningType = currentLine.matches(".*: Warning:.*");
-            } else if (currentLine.matches(".*\\^.*\\^.*")) {
+            } else if (currentLine.matches(".*\\^.*")) {
                 endLine = true;
             } else {
                 startLine = false;
