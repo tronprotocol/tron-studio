@@ -21,6 +21,7 @@ import org.tron.api.GrpcAPI;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.protos.Protocol;
 import org.tron.studio.ShareData;
+import org.tron.studio.TransactionHistoryItem;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -39,8 +40,7 @@ public class TransactionHistoryController {
             String transactionHeadMsg = String.format("creation of %s pending...", currentContractName);
             transactionHistoryListView.getItems().add(new Label(transactionHeadMsg));
 
-            String[] labels = {"labels"};
-            JFXListView<Object> subList = createSubList(labels);
+            JFXListView<Object> subList = createSubList(ShareData.transactionHistory.get(newValue));
             transactionHistoryListView.getItems().add(subList);
 
             /**
@@ -89,11 +89,14 @@ public class TransactionHistoryController {
         return detailTable;
     }
 
-    private JFXListView<Object> createSubList(String[] labels) {
+    private JFXListView<Object> createSubList(TransactionHistoryItem transactionHistoryItem) {
         JFXListView<Object> subList = new JFXListView<>();
 
-        //subList.getItems().add(new Label("details"));
-        subList.getItems().add(createDetailTable());
+        if(transactionHistoryItem.getType() == TransactionHistoryItem.Type.ERROR) {
+            subList.getItems().add(new Label(transactionHistoryItem.getErrorInfo()));
+        } else {
+            subList.getItems().add(createDetailTable());
+        }
 
         HBox node = new HBox();
 

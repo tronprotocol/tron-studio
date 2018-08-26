@@ -15,9 +15,9 @@ import java.util.stream.Stream;
 @Slf4j(topic = "SolidityFileUtil")
 public class SolidityFileUtil {
 
-
-    private static final String sampleContractFile = "/template/Sample.sol";
-    private static final String emptyContractFile = "/template/Empty.sol";
+    private static final String SUFFIX = ".sol";
+    private static final String SAMPLE_CONTRACT_FILE = "/template/Sample.sol";
+    private static final String EMPTY_CONTRACT_FILE = "/template/Empty.sol";
 
     static {
         File dir = new File(Config.SOLIDITY_SOURCE_PATH);
@@ -41,7 +41,7 @@ public class SolidityFileUtil {
             File sampleFile = new File(Config.SOLIDITY_SOURCE_PATH, "Sample.sol");
             StringBuilder builder = new StringBuilder();
             try {
-                Files.lines(Paths.get(SolidityFileUtil.class.getResource(sampleContractFile).getPath())).forEach(line -> {
+                Files.lines(Paths.get(SolidityFileUtil.class.getResource(SAMPLE_CONTRACT_FILE).getPath())).forEach(line -> {
                     builder.append(line).append(System.getProperty("line.separator"));
                 });
                 Files.write(Paths.get(sampleFile.toURI()), builder.toString().getBytes(), StandardOpenOption.CREATE);
@@ -52,11 +52,19 @@ public class SolidityFileUtil {
         return list;
     }
 
+    public static String formatFileName(String fileName) {
+        if (!fileName.endsWith(SUFFIX)) {
+            fileName += SUFFIX;
+        }
+        return fileName;
+    }
+
     public static void createNewFile(String fileName) {
+        fileName = formatFileName(fileName);
         File newFile = new File(Config.SOLIDITY_SOURCE_PATH, fileName.trim());
         StringBuilder builder = new StringBuilder();
         try {
-            Files.lines(Paths.get(SolidityFileUtil.class.getResource(emptyContractFile).getPath())).forEach(line -> {
+            Files.lines(Paths.get(SolidityFileUtil.class.getResource(EMPTY_CONTRACT_FILE).getPath())).forEach(line -> {
                 builder.append(line).append(System.getProperty("line.separator"));
             });
             Files.write(Paths.get(newFile.toURI()), builder.toString().getBytes(), StandardOpenOption.CREATE);

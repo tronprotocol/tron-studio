@@ -118,11 +118,13 @@ public class RightTabCompileController implements Initializable {
                             contractNameList.add((String) value);
                         });
                     });
-                    contractComboBox.setItems(FXCollections.observableArrayList(
-                            contractNameList
-                    ));
 
                     Platform.runLater(() -> {
+
+                        contractComboBox.setItems(FXCollections.observableArrayList(
+                                contractNameList
+                        ));
+
                         compileResultInfoListView.getItems().clear();
                         CompilationErrorResult.getWarnings().forEach(infoList -> {
                             Label text = new Label(infoList);

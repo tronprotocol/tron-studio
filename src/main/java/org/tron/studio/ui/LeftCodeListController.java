@@ -123,6 +123,7 @@ public class LeftCodeListController {
         if (contractFileName == null) {
             return;
         }
+        contractFileName = SolidityFileUtil.formatFileName(contractFileName);
         SolidityFileUtil.createNewFile(contractFileName);
         ShareData.newContractFileName.set(contractFileName);
         ShareData.allContractFileName.get().add(contractFileName);
