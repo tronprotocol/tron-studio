@@ -62,15 +62,16 @@ public class MainController {
 
         SingleSelectionModel<Tab> selectionModel = codeAreaTabPane.getSelectionModel();
 
-        ShareData.currentContractFileName.addListener((observable, oldValue, currentContractName) -> {
-            if (contractFileNum > ShareData.allContractFileName.size()) {
-                for (Tab tab : codeAreaTabPane.getTabs()) {
-                    if (StringUtils.equals(tab.getText(), previousValue)) {
-                        codeAreaTabPane.getTabs().remove(tab);
-                        break;
-                    }
+        ShareData.deleteContract.addListener((observable, oldValue, currentContractName) -> {
+            for (Tab tab : codeAreaTabPane.getTabs()) {
+                if (StringUtils.equals(tab.getText(), currentContractName)) {
+                    codeAreaTabPane.getTabs().remove(tab);
+                    break;
                 }
             }
+        });
+
+        ShareData.currentContractFileName.addListener((observable, oldValue, currentContractName) -> {
             boolean alreadyOpen = false;
             for (Tab tab : codeAreaTabPane.getTabs()) {
                 if (StringUtils.equals(tab.getText(), currentContractName)) {
@@ -82,7 +83,6 @@ public class MainController {
                 newTab(currentContractName);
             }
             previousValue = currentContractName;
-            contractFileNum = ShareData.allContractFileName.size();
         });
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
@@ -107,7 +107,6 @@ public class MainController {
     private Tab setTap(File file) {
         Tab tab = new Tab();
 
-        System.out.println("set tab");
         CodeArea codeArea = new CodeArea();
         // Print new file in codearea
         StringBuilder builder = new StringBuilder();

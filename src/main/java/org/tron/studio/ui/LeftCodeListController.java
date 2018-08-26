@@ -45,7 +45,7 @@ public class LeftCodeListController {
     public void initialize() {
         //监听新建的合约列表，
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
-            List<File> files = SolidityFileUtil.getFileNameList();
+            List<File> files = SolidityFileUtil.fileNameList;
             fileNameData.clear();
             files.forEach(file -> {
                 fileNameData.add(new FileName(file.getName()));
@@ -56,10 +56,12 @@ public class LeftCodeListController {
         fileNameTable.setRoot(new RecursiveTreeItem<>(fileNameData, RecursiveTreeObject::getChildren));
         fileNameTable.setShowRoot(false);
 
-        fileNameTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+        fileNameTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 File fileName = SolidityFileUtil.getExistFile(newSelection.getValue().fileName.getValue());
                 ShareData.currentContractFileName.set(fileName.getName());
+                ShareData.allContractFileName.add(fileName.getName());
             }
         });
 
@@ -70,22 +72,44 @@ public class LeftCodeListController {
         delMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                int currentIndex = ShareData.allContractFileName.indexOf(ShareData.currentContractFileName.get());
+                String currentFile = ShareData.currentContractFileName.get();
+                int currentIndex = -1;
 
-                ShareData.allContractFileName.remove(ShareData.currentContractFileName.get());
+                ShareData.deleteContract.set(currentFile);
+
+                for (int i = 0; i < SolidityFileUtil.fileNameList.size(); i++)
+                {
+                    if (SolidityFileUtil.fileNameList.get(i).getName().equals(
+                            ShareData.currentContractFileName.get()))
+                    {
+                        currentIndex = i;
+                        break;
+                    }
+                }
+
+                if (currentIndex == -1)
+                {
+                    return;
+                }
+
+                if (ShareData.allContractFileName.contains(currentFile))
+                {
+                    ShareData.allContractFileName.remove(ShareData.currentContractFileName.get());
+                }
+
                 fileNameData.remove(currentIndex);
+                SolidityFileUtil.fileNameList.remove(currentIndex);
 
-                int file_num = ShareData.allContractFileName.get().size();
-                int nextCurrentIndex = 0;
+                int file_num = SolidityFileUtil.fileNameList.size();
+                int nextCurrentIndex = currentIndex;
 
                 if (file_num != 0) {
-                    if (currentIndex < file_num - 1) {
+                    if (currentIndex > file_num - 1) {
                         nextCurrentIndex = currentIndex + 1;
-                    } else {
-                        nextCurrentIndex = file_num - 1;
                     }
 
-                    ShareData.currentContractFileName.set(ShareData.allContractFileName.get(nextCurrentIndex));
+                    ShareData.currentContractFileName.set(
+                            ShareData.allContractFileName.get(ShareData.allContractFileName.size()-1));
                     fileNameTable.getSelectionModel().select(nextCurrentIndex);
 
                 } else {
@@ -103,7 +127,7 @@ public class LeftCodeListController {
             }
         });
 
-        List<File> files = SolidityFileUtil.getFileNameList();
+        List<File> files = SolidityFileUtil.fileNameList;
         ShareData.newContractFileName.set(files.get(0).getName());
         ShareData.allContractFileName.add(files.get(0).getName());
     }
@@ -145,6 +169,13 @@ public class LeftCodeListController {
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
             openFile(file);
+
+            String fileName = file.getName();
+            fileName = SolidityFileUtil.formatFileName(fileName);
+            SolidityFileUtil.createNewFile(fileName);
+            ShareData.newContractFileName.set(fileName);
+            ShareData.allContractFileName.get().add(fileName);
+            ShareData.currentContractName.set(fileName);
         }
     }
 

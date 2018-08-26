@@ -55,6 +55,7 @@ public class ShareData {
     public static SimpleStringProperty addTransactionAction = new SimpleStringProperty();
     public static SimpleStringProperty debugTransactionAction = new SimpleStringProperty();
     public static SimpleStringProperty openContract = new SimpleStringProperty();
+    public static SimpleStringProperty deleteContract = new SimpleStringProperty();
 
     public static String currentAccount;
     public static String currentValue;
