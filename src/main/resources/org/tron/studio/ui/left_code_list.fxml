@@ -19,17 +19,17 @@
     <HBox>
         <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#createContract">
             <StackPane style="-fx-padding: 10;">
-                <MaterialDesignIconView glyphSize="20" glyphName="NOTE_PLUS_OUTLINE" />
+                <MaterialDesignIconView glyphSize="20" glyphName="NOTE_PLUS_OUTLINE" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
         <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#saveContract">
             <StackPane style="-fx-padding: 10;">
-                <MaterialDesignIconView glyphSize="20" glyphName="CONTENT_SAVE" />
+                <MaterialDesignIconView glyphSize="20" glyphName="CONTENT_SAVE" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
         <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#openContract">
             <StackPane style="-fx-padding: 10;">
-                <MaterialDesignIconView glyphSize="20" glyphName="FOLDER_OUTLINE" />
+                <MaterialDesignIconView glyphSize="20" glyphName="FOLDER_OUTLINE" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
     </HBox>
