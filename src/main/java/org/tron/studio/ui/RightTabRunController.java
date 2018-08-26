@@ -12,6 +12,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -380,6 +382,10 @@ public class RightTabRunController implements Initializable {
     }
 
     public void onClickCopyAddress(MouseEvent mouseEvent) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putString(accountComboBox.valueProperty().get());
+        clipboard.setContent(clipboardContent);
     }
 
     class ClickTriggerAction implements EventHandler<ActionEvent> {
