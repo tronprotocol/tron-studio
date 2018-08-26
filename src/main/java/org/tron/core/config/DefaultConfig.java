@@ -27,7 +27,7 @@ public class DefaultConfig {
   CommonConfig commonConfig;
 
   public DefaultConfig() {
-    Thread.setDefaultUncaughtExceptionHandler((t, e) -> logger.error("Uncaught exception", e));
+    Thread.setDefaultUncaughtExceptionHandler((t, e) -> logger.error("Uncaught exception {}", e));
   }
 
   @Bean

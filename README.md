@@ -4,4 +4,4 @@ TronStudio是用于开发、部署、调试基于TVM的智能合约的工具，�
 TronStudio未来计划提供功能更加丰富的开发工具，为社区提供学习波场智能合约开发的资料教程，也同时考虑打造类似LOOM Network的侧链和生态环境。
 
 ## Screenshot
-![](image/screenshot1.png)
+![](image/screenshot.png)

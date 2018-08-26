@@ -34,18 +34,19 @@ public class ShareData {
     public static final HashMap<String, String> testAccount = new HashMap<>();
     public static WalletClient wallet;
 
+    //合约的编译结果
+    public static SimpleObjectProperty<SolidityCompiler.Result> currentSolidityCompilerResult = new SimpleObjectProperty<>();
     private static HashMap<String, SolidityCompiler.Result> solidityCompilerResultMap = new HashMap<>();
 
     //当前合约文件中，被选中的合约（合约文件中可能包含多份合约）
-    public static SimpleObjectProperty<String> currentContractName = new SimpleObjectProperty<>();
+    public static SimpleStringProperty currentContractName = new SimpleStringProperty();
 
     //当前正在编辑的合约文件
     public static SimpleStringProperty currentContractFileName = new SimpleStringProperty();
     //新建的合约文件
     public static SimpleStringProperty newContractFileName = new SimpleStringProperty();
     //所有的合约文件列表
-    public static SimpleListProperty<String> allContractFileName = new SimpleListProperty<>(
-        FXCollections.observableArrayList());
+    public static SimpleListProperty<String> allContractFileName = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     //所有的交易历史记录
     //包括不上链的交易：TransactionExtension
@@ -56,6 +57,7 @@ public class ShareData {
     public static SimpleStringProperty debugTransactionAction = new SimpleStringProperty();
     public static SimpleStringProperty openContract = new SimpleStringProperty();
     public static SimpleStringProperty deleteContract = new SimpleStringProperty();
+    public static SimpleStringProperty openContractFileName = new SimpleStringProperty();
 
     public static String currentAccount;
     public static String currentValue;
@@ -64,8 +66,6 @@ public class ShareData {
     public static SimpleBooleanProperty isAutoCompile = new SimpleBooleanProperty();
     //当前合约文件源代码
     public static SimpleStringProperty currentContractSourceCode = new SimpleStringProperty();
-    //所有合约文件源代码
-    public static HashMap<String, String> allContractSourceCode = new HashMap<>();
 
     private ShareData() {
 
@@ -82,8 +82,9 @@ public class ShareData {
         return solidityCompilerResultMap.get(contractName);
     }
 
-    public static void setSolidityCompilerResult(String contractName, SolidityCompiler.Result compilationResult) {
-        solidityCompilerResultMap.put(contractName, compilationResult);
+    public static void setSolidityCompilerResult(String contractName, SolidityCompiler.Result solidityCompilerResult) {
+        solidityCompilerResultMap.put(contractName, solidityCompilerResult);
+        currentSolidityCompilerResult.set(solidityCompilerResult);
     }
 
 }

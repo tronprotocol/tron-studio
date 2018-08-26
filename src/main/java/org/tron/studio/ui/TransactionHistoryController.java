@@ -8,8 +8,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.layout.HBox;
@@ -18,6 +16,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.api.GrpcAPI;
+import org.tron.common.utils.ByteArray;
+import org.tron.core.Wallet;
 import org.tron.core.capsule.TransactionCapsule;
 import org.tron.protos.Protocol;
 import org.tron.studio.ShareData;
@@ -68,21 +68,45 @@ public class TransactionHistoryController {
         GrpcAPI.TransactionExtention lastTransactionExtention = ShareData.wallet.getLastTransactionExtention();
         Protocol.Transaction lastTransaction = ShareData.wallet.getLastTransaction();
         String transactionId;
-        int hashcode;
-        if(lastTransactionExtention.getConstantResultCount() > 0) {
+        ObservableList<TransactionDetail> detailTableData = null;
+        if (lastTransactionExtention.getConstantResultCount() > 0) {
             transactionId = Hex.toHexString(lastTransactionExtention.getTxid().toByteArray());
-            hashcode = lastTransactionExtention.hashCode();
+
+            StringBuilder builder = new StringBuilder();
+            lastTransactionExtention.getConstantResultList().forEach(result -> {
+                builder.append(result.toStringUtf8()).append("\n");
+            });
+
+            detailTableData = FXCollections.observableArrayList(
+                    new TransactionDetail("transaction_id", transactionId),
+                    new TransactionDetail("log", builder.toString())
+            );
         } else {
             transactionId = Hex.toHexString(new TransactionCapsule(lastTransaction).getTransactionId().getBytes());
-            hashcode = lastTransaction.hashCode();
 
+            Protocol.TransactionInfo transactionInfo = ShareData.wallet.getTransactionInfoById(transactionId).get();
+            StringBuilder builder = new StringBuilder();
+
+            detailTableData = FXCollections.observableArrayList(
+                    new TransactionDetail("transaction_id", transactionId),
+                    new TransactionDetail("fee", Long.toString(transactionInfo.getFee())),
+                    new TransactionDetail("block_number", Long.toString(transactionInfo.getBlockNumber())),
+                    new TransactionDetail("time_stamp", Long.toString(transactionInfo.getBlockTimeStamp())),
+                    new TransactionDetail("result", transactionInfo.getResult().equals(Protocol.TransactionInfo.code.SUCESS)?"success":"fail"),
+                    new TransactionDetail("result_message", ByteArray.toStr(transactionInfo.getResMessage().toByteArray())),
+                    new TransactionDetail("contract_result", ByteArray.toHexString(transactionInfo.getContractResult(0).toByteArray())),
+                    new TransactionDetail("contract_address", Wallet.encode58Check(transactionInfo.getContractAddress().toByteArray())),
+                    new TransactionDetail("energy_usage", Long.toString(transactionInfo.getReceipt().getEnergyUsage())),
+                    new TransactionDetail("energy_fee(sun)", Long.toString(transactionInfo.getReceipt().getEnergyFee())),
+                    new TransactionDetail("origin_energy_usage", Long.toString(transactionInfo.getReceipt().getOriginEnergyUsage())),
+                    new TransactionDetail("energy_usage_total", Long.toString(transactionInfo.getReceipt().getEnergyUsageTotal())),
+                    new TransactionDetail("net_usage", Long.toString(transactionInfo.getReceipt().getNetUsage())),
+                    new TransactionDetail("net_fee", Long.toString(transactionInfo.getReceipt().getNetFee())),
+                    new TransactionDetail("log", builder.toString())
+            );
         }
 
-        System.out.println(hashcode);
 
-        ObservableList<TransactionDetail> detailTableData = FXCollections.observableArrayList(
-                new TransactionDetail("transaction id", transactionId)
-        );
         detailTable.setRoot(new RecursiveTreeItem<>(detailTableData, RecursiveTreeObject::getChildren));
         detailTable.setShowRoot(false);
 
@@ -92,7 +116,7 @@ public class TransactionHistoryController {
     private JFXListView<Object> createSubList(TransactionHistoryItem transactionHistoryItem) {
         JFXListView<Object> subList = new JFXListView<>();
 
-        if(transactionHistoryItem.getType() == TransactionHistoryItem.Type.ERROR) {
+        if (transactionHistoryItem.getType() == TransactionHistoryItem.Type.ERROR) {
             subList.getItems().add(new Label(transactionHistoryItem.getErrorInfo()));
         } else {
             subList.getItems().add(createDetailTable());
@@ -117,7 +141,7 @@ public class TransactionHistoryController {
         node.getChildren().add(ripper);
 
         String acountAddr = ShareData.currentAccount;
-        acountAddr = acountAddr.substring(0,5) + "..." + acountAddr.substring(acountAddr.length()-5);
+        acountAddr = acountAddr.substring(0, 5) + "..." + acountAddr.substring(acountAddr.length() - 5);
 
         String currentContract = ShareData.currentContractName.get();
         String currentValue = ShareData.currentValue;

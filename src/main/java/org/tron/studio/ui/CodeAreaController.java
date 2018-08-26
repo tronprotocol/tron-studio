@@ -16,7 +16,7 @@ public class CodeAreaController {
     @PostConstruct
     public void initialize() throws IOException {
         codeArea.textProperty().addListener((observable, oldValue, newValue) -> {
-            ShareData.currentContractSourceCode.setValue(newValue);
+            ShareData.currentContractSourceCode.set(newValue);
         });
     }
 }

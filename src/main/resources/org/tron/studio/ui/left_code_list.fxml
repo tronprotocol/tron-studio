@@ -14,29 +14,31 @@
 <VBox spacing="10" prefWidth="200" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.tron.studio.ui.LeftCodeListController">
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
+        <Insets left="10" right="10"/>
     </padding>
     <HBox>
         <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#createContract">
             <StackPane style="-fx-padding: 10;">
-                <MaterialDesignIconView glyphSize="20" glyphName="NOTE_PLUS_OUTLINE" />
+                <MaterialDesignIconView glyphSize="20" glyphName="NOTE_PLUS_OUTLINE" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
         <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#saveContract">
             <StackPane style="-fx-padding: 10;">
-                <MaterialDesignIconView glyphSize="20" glyphName="CONTENT_SAVE" />
+                <MaterialDesignIconView glyphSize="20" glyphName="CONTENT_SAVE" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
         <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#openContract">
             <StackPane style="-fx-padding: 10;">
-                <MaterialDesignIconView glyphSize="20" glyphName="FOLDER_OUTLINE" />
+                <MaterialDesignIconView glyphSize="20" glyphName="FILE_IMPORT" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
     </HBox>
-    <JFXTreeTableView fx:id="fileNameTable">
+    <JFXTreeTableView fx:id="fileNameTable" VBox.vgrow="ALWAYS">
         <columns>
-            <JFXTreeTableColumn fx:id="fileNameColumn" text="FileName"/>
+            <JFXTreeTableColumn fx:id="fileNameColumn" text="FileName" />
         </columns>
+        <columnResizePolicy>
+            <JFXTreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
     </JFXTreeTableView>
-    <StackPane fx:id="dialogRoot"/>
 </VBox>

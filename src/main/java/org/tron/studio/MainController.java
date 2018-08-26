@@ -34,6 +34,7 @@ public class MainController {
     public void initialize() throws IOException {
         List<File> files = SolidityFileUtil.getFileNameList();
         File defaultContractFile = files.get(0);
+        ShareData.currentContractFileName.set(defaultContractFile.getName());
 
         StringBuilder builder = new StringBuilder();
         try {
@@ -60,7 +61,7 @@ public class MainController {
 
         previousValue = ShareData.currentContractName.get();
 
-        SingleSelectionModel<Tab> selectionModel = codeAreaTabPane.getSelectionModel();
+        SingleSelectionModel<Tab> codeAreaTabPaneSelectionModel = codeAreaTabPane.getSelectionModel();
 
         ShareData.deleteContract.addListener((observable, oldValue, currentContractName) -> {
             for (Tab tab : codeAreaTabPane.getTabs()) {
@@ -75,28 +76,28 @@ public class MainController {
             boolean alreadyOpen = false;
             for (Tab tab : codeAreaTabPane.getTabs()) {
                 if (StringUtils.equals(tab.getText(), currentContractName)) {
-                    selectionModel.select(tab);
+                    codeAreaTabPaneSelectionModel.select(tab);
                     alreadyOpen = true;
                 }
             }
             if (!alreadyOpen) {
-                newTab(currentContractName);
+                createTabForFileSystemFile(currentContractName);
             }
             previousValue = currentContractName;
         });
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
-            newTab(newValue);
+            createTabForFileSystemFile(newValue);
         });
 
-        ShareData.openContract.addListener((observable, oldValue, newValue) ->{
-            String file_path = ShareData.openContract.get();
-            File newFile = new File(file_path);
+        ShareData.openContractFileName.addListener((observable, oldValue, newValue) ->{
+            String filePath = ShareData.openContractFileName.get();
+            File newFile = new File(filePath);
 
-            Tab newTab = setTap(newFile);
+            Tab newTab = setTab(newFile);
             ShareData.currentContractName.set(newFile.getName());
             ShareData.allContractFileName.add(newFile.getName());
-            selectionModel.select(newTab);
+            codeAreaTabPaneSelectionModel.select(newTab);
         });
 
         ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
@@ -104,9 +105,9 @@ public class MainController {
         });
     }
 
-    private Tab setTap(File file) {
+    private Tab setTab(File file) {
         Tab tab = new Tab();
-
+        logger.info("set tab");
         CodeArea codeArea = new CodeArea();
         // Print new file in codearea
         StringBuilder builder = new StringBuilder();
@@ -134,16 +135,16 @@ public class MainController {
         return tab;
     }
 
-    private void newTab(String tabName) {
+    private void createTabForFileSystemFile(String fileName) {
         try {
             Tab codeTab = new Tab();
-            codeTab.setText(tabName);
+            codeTab.setText(fileName);
             codeTab.setClosable(true);
             CodeArea codeArea = FXMLLoader.load(getClass().getResource("ui/code_area.fxml"));
             codeTab.setContent(codeArea);
             codeAreaTabPane.getTabs().add(codeTab);
 
-            String sourceCode = SolidityFileUtil.getSourceCode(tabName);
+            String sourceCode = SolidityFileUtil.getSourceCode(fileName);
 
             new SolidityHighlight(codeArea).highlight();
             codeArea.insertText(0, sourceCode);
@@ -154,12 +155,5 @@ public class MainController {
             logger.error(e.getMessage());
         }
     }
-
-    private String debugContract() {
-        String address = ShareData.wallet.getClass().getName();
-        String msg = String.format("from: %s", address);
-        return msg;
-    }
-
 
 }

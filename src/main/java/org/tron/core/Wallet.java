@@ -881,7 +881,7 @@ public class Wallet {
         return trxCap.getInstance();
       }
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error("Failed to triggerContract {}", e);
       return null;
     }
   }
