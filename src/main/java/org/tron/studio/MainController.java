@@ -8,12 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.ui.SolidityHighlight;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Slf4j
 public class MainController {
@@ -23,16 +26,18 @@ public class MainController {
     public Tab defaultCodeAreaTab;
     public CodeArea defaultCodeArea;
 
-    private String defaultContractFile = "/template/Ballot.sol";
 
     private int contractFileNum = 0;
     private String previousValue = "";
 
     @PostConstruct
     public void initialize() throws IOException {
+        List<File> files = SolidityFileUtil.getFileNameList();
+        File defaultContractFile = files.get(0);
+
         StringBuilder builder = new StringBuilder();
         try {
-            Files.lines(Paths.get(getClass().getResource(defaultContractFile).getPath())).forEach(line -> {
+            Files.lines(Paths.get(defaultContractFile.getAbsolutePath())).forEach(line -> {
                 builder.append(line).append(System.getProperty("line.separator"));
             });
         } catch (IOException e) {
@@ -44,7 +49,7 @@ public class MainController {
         // Add default contract into the list of contracts
         //ShareData.allContractFileName.get().add(defaultContractFile);
 
-        defaultCodeAreaTab.setText(defaultContractFile);
+        defaultCodeAreaTab.setText(defaultContractFile.getName());
         //Just not allow to close the default tab
         defaultCodeAreaTab.setClosable(false);
 
@@ -87,13 +92,10 @@ public class MainController {
                 codeTab.setContent(codeArea);
                 codeAreaTabPane.getTabs().add(codeTab);
 
-                StringBuilder templateBuilder = new StringBuilder();
-                templateBuilder.append("pragma solidity ^0.4.24;").append("\n");
-                templateBuilder.append("contract ").append(newValue).append(" {").append("\n");
-                templateBuilder.append("}").append("\n");
+                String sourceCode = SolidityFileUtil.getSourceCode(newValue);
 
                 new SolidityHighlight(codeArea).highlight();
-                codeArea.replaceText(0, 0, templateBuilder.toString());
+                codeArea.insertText(0, sourceCode);
                 codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
                 codeAreaTabPane.getSelectionModel().select(codeTab);

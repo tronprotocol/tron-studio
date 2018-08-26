@@ -45,7 +45,11 @@ public class LeftCodeListController {
 
         //监听新建的合约列表，
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
-            fileNameData.add(new FileName(newValue));
+            List<File> files = SolidityFileUtil.getFileNameList();
+            fileNameData.clear();
+            files.forEach(file -> {
+                fileNameData.add(new FileName(file.getName()));
+            });
         });
         setupCellValueFactory(fileNameColumn, FileName::fileNameProperty);
         fileNameData = FXCollections.observableArrayList();
@@ -73,13 +77,10 @@ public class LeftCodeListController {
                 int file_num = ShareData.allContractFileName.get().size();
                 int nextCurrentIndex = 0;
 
-                if (file_num != 0)
-                {
-                    if (currentIndex < file_num - 1)
-                    {
+                if (file_num != 0) {
+                    if (currentIndex < file_num - 1) {
                         nextCurrentIndex = currentIndex + 1;
-                    } else
-                    {
+                    } else {
                         nextCurrentIndex = file_num - 1;
                     }
 
@@ -96,18 +97,18 @@ public class LeftCodeListController {
 
             @Override
             public void handle(MouseEvent t) {
-                if(t.getButton() == MouseButton.SECONDARY) {
+                if (t.getButton() == MouseButton.SECONDARY) {
                     cm.show(fileNameTable, t.getScreenX(), t.getScreenY());
                 }
             }
         });
 
         List<File> files = SolidityFileUtil.getFileNameList();
-        ShareData.newContractFileName.set("/template/Ballot.sol");
-        ShareData.allContractFileName.add(ShareData.newContractFileName.get());
+        ShareData.newContractFileName.set(files.get(0).getName());
+        ShareData.allContractFileName.add(files.get(0).getName());
     }
 
-    private String showDialog()  {
+    private String showDialog() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Create Smart Contract");
         dialog.setHeaderText("Please input contract name");
@@ -117,26 +118,23 @@ public class LeftCodeListController {
         return result.orElse(null);
     }
 
-    public void createContract(MouseEvent mouseEvent)
-    {
+    public void createContract(MouseEvent mouseEvent) {
         String contractFileName = showDialog();
-        if(contractFileName == null) {
+        if (contractFileName == null) {
             return;
         }
+        SolidityFileUtil.createNewFile(contractFileName);
         ShareData.newContractFileName.set(contractFileName);
         ShareData.allContractFileName.get().add(contractFileName);
     }
 
-    public void saveContract(MouseEvent mouseEvent)
-    {
+    public void saveContract(MouseEvent mouseEvent) {
         System.out.println("save contract");
     }
 
-    public void openContract(MouseEvent mouseEvent)
-    {
+    public void openContract(MouseEvent mouseEvent) {
         System.out.println("save contract");
     }
-
 
     private <T> void setupCellValueFactory(JFXTreeTableColumn<FileName, T> column, Function<FileName, ObservableValue<T>> mapper) {
         column.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileName, T> param) -> {

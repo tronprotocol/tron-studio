@@ -17,6 +17,7 @@ public class SolidityFileUtil {
 
 
     private static final String sampleContractFile = "/template/Sample.sol";
+    private static final String emptyContractFile = "/template/Empty.sol";
 
     static {
         File dir = new File(Config.SOLIDITY_SOURCE_PATH);
@@ -45,5 +46,31 @@ public class SolidityFileUtil {
             }
         }
         return list;
+    }
+
+    public static void createNewFile(String fileName) {
+        File newFile = new File(Config.SOLIDITY_SOURCE_PATH, fileName.trim());
+        StringBuilder builder = new StringBuilder();
+        try {
+            Files.lines(Paths.get(SolidityFileUtil.class.getResource(emptyContractFile).getPath())).forEach(line -> {
+                builder.append(line).append(System.getProperty("line.separator"));
+            });
+            Files.write(Paths.get(newFile.toURI()), builder.toString().getBytes(), StandardOpenOption.CREATE);
+        } catch (IOException e) {
+            logger.error("Failed create {}", newFile.getAbsolutePath());
+        }
+    }
+
+    public static String getSourceCode(String fileName) {
+        File existFile = new File(Config.SOLIDITY_SOURCE_PATH, fileName.trim());
+        StringBuilder builder = new StringBuilder();
+        try {
+            Files.lines(Paths.get(existFile.toURI())).forEach(line -> {
+                builder.append(line).append(System.getProperty("line.separator"));
+            });
+        } catch (IOException e) {
+            logger.error("Failed get {}", existFile.getAbsolutePath());
+        }
+        return builder.toString();
     }
 }

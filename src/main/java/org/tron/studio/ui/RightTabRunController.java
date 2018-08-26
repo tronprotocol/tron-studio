@@ -103,6 +103,9 @@ public class RightTabRunController implements Initializable {
 
             if (StringUtils.isNotEmpty(contractFileName)) {
                 SolidityCompiler.Result solidityCompileResult = ShareData.getSolidityCompilerResult(contractFileName);
+                if(solidityCompileResult == null) {
+                    return;
+                }
                 CompilationResult compilationResult;
                 try {
                     if (solidityCompileResult == null) {
