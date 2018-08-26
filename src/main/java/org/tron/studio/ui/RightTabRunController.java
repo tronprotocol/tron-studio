@@ -79,14 +79,14 @@ public class RightTabRunController implements Initializable {
         accountComboBox.getSelectionModel().selectFirst();
 
         feeUnitComboBox.setItems(FXCollections.observableArrayList(
-                "TRX",
-                "SUN"
+                "trx",
+                "sun"
         ));
         feeUnitComboBox.getSelectionModel().selectFirst();
 
         valueUnitComboBox.setItems(FXCollections.observableArrayList(
-                "TRX",
-                "SUN"
+                "trx",
+                "sun"
         ));
         valueUnitComboBox.getSelectionModel().selectFirst();
 
@@ -108,9 +108,6 @@ public class RightTabRunController implements Initializable {
                 }
                 CompilationResult compilationResult;
                 try {
-                    if (solidityCompileResult == null) {
-                        return;
-                    }
                     compilationResult = CompilationResult.parse(solidityCompileResult.output);
                 } catch (IOException e) {
                     logger.error("Failed to parse compile result {}", e);
@@ -181,11 +178,11 @@ public class RightTabRunController implements Initializable {
         try {
             long callValue = Long.parseLong(valueTextField.getText());
             if (valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                callValue *= 1_000_000;
+                callValue *= ShareData.TRX_SUN_UNIT;
             }
             long feeLimit = Long.parseLong(feeLimitTextField.getText());
             if (feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                feeLimit *= 1_000_000;
+                feeLimit *= ShareData.TRX_SUN_UNIT;
             }
             deployContractResult = ShareData.wallet
                     .deployContract(currentContractName, currentContract.abi, bin.toString(),
@@ -325,11 +322,11 @@ public class RightTabRunController implements Initializable {
         public void handle(ActionEvent event) {
             long callValue = Long.parseLong(valueTextField.getText());
             if (valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                callValue *= 1_000_000;
+                callValue *= ShareData.TRX_SUN_UNIT;
             }
             long feeLimit = Long.parseLong(feeLimitTextField.getText());
             if (feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                feeLimit *= 1_000_000;
+                feeLimit *= ShareData.TRX_SUN_UNIT;
             }
             try {
                 byte[] data = Hex.decode(AbiUtil.parseMethod(methodStr, parameterText.getText().trim(), false));

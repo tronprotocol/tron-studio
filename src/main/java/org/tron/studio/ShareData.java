@@ -29,6 +29,7 @@ public class ShareData {
 
 
     public static Boolean enableOptimize = false;
+    public static long TRX_SUN_UNIT = 1_000_000;
 
     public static final HashMap<String, String> testAccount = new HashMap<>();
     public static WalletClient wallet;

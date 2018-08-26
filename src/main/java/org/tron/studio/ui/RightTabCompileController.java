@@ -85,14 +85,14 @@ public class RightTabCompileController implements Initializable {
                             text.getStyleClass().add("compile-error-label");
                             text.setMinHeight(50);
                             compileResultInfoListView.getItems().add(text);
-                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(30));
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
                         CompilationErrorResult.getWarnings().forEach(infoList -> {
                             Label text = new Label(infoList);
                             text.getStyleClass().add("compile-warn-label");
                             text.setMinHeight(50);
                             compileResultInfoListView.getItems().add(text);
-                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(30));
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
                     });
                     return;
@@ -123,14 +123,14 @@ public class RightTabCompileController implements Initializable {
                             text.getStyleClass().add("compile-warn-label");
                             text.setMinHeight(50);
                             compileResultInfoListView.getItems().add(text);
-                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(30));
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
                         contractNameList.forEach(contractName -> {
                             Label text = new Label(contractName);
                             text.getStyleClass().add("compile-succ-label");
                             text.setMinHeight(50);
                             compileResultInfoListView.getItems().add(text);
-                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(30));
+                            text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
                     });
                 }
