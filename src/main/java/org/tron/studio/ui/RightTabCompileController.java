@@ -4,9 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,7 +21,6 @@ import org.tron.studio.solc.CompilationErrorResult;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.SolidityCompiler;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -42,17 +38,13 @@ public class RightTabCompileController implements Initializable {
     public JFXButton compileButton;
     public JFXListView<Label> compileResultInfoListView;
 
-    List<String> contractABI = new ArrayList<>();
-    List<String> contractNameList = new ArrayList<>();
-    List<String> contractBin = new ArrayList<>();
+    private List<String> contractABI = new ArrayList<>();
+    private List<String> contractNameList = new ArrayList<>();
+    private List<String> contractBin = new ArrayList<>();
 
-    int currentContractIndex = -1;
-    boolean isCompiling;
-
-    String contractFileName = "Ballot.sol";
-
-    public RightTabCompileController() {
-    }
+    private int currentContractIndex = -1;
+    private boolean isCompiling;
+    private String contractFileName;
 
     public void initialize(URL location, ResourceBundle resources) {
         isCompiling = false;
@@ -66,8 +58,8 @@ public class RightTabCompileController implements Initializable {
             return;
         }
         isCompiling = true;
-        ShareData.currentContractFileName.set(null);
-
+        contractFileName = ShareData.currentContractFileName.getValue();
+        ShareData.currentSolidityCompilerResult.set(null);
         new Thread(() -> {
             boolean compileSuccess = true;
             try {
@@ -75,6 +67,7 @@ public class RightTabCompileController implements Initializable {
                         SolidityFileUtil.getExistFile(contractFileName), true, ABI, BIN, HASHES, INTERFACE,
                         METADATA);
 
+                Platform.runLater(() -> ShareData.setSolidityCompilerResult(contractFileName, solidityCompilerResult));
                 CompilationErrorResult.parse(solidityCompilerResult.errors);
 
                 //There are errors
@@ -104,7 +97,6 @@ public class RightTabCompileController implements Initializable {
                     return;
                 } else {
                     CompilationResult compilationResult = CompilationResult.parse(solidityCompilerResult.output);
-                    ShareData.setSolidityCompilerResult(contractFileName, solidityCompilerResult);
 
                     contractNameList.clear();
                     contractBin.clear();
@@ -151,7 +143,6 @@ public class RightTabCompileController implements Initializable {
                 if (compileSuccess) {
                     Platform.runLater(() -> {
                         contractComboBox.getSelectionModel().selectFirst();
-                        ShareData.currentContractFileName.set(contractFileName);
                     });
                 }
                 isCompiling = false;

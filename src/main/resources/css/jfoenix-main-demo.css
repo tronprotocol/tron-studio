@@ -3,7 +3,7 @@
  */
 
 .root {
-    -fx-font-family: "Roboto";
+    -fx-font-family: "Courier";
     -fx-font-smoothing-type: gray;
 }
 
@@ -341,6 +341,7 @@
     -fx-background-color: #5264AE;
     -fx-text-fill: WHITE;
     -fx-min-width: 75;
+    -fx-font-family:  "Courier";
 }
 
 .custom-jfx-button-raised-fix-width {
@@ -350,6 +351,7 @@
     -fx-min-width: 100;
     -fx-max-width: 100;
     -fx-wrap-text: true;
+    -fx-font-family: "Courier";
     -fx-text-alignment: center;
 }
 /*******************************************************************************
@@ -859,6 +861,7 @@
 
 .tree-table-view:focused .tree-table-row-cell:selected .tree-table-cell {
     -fx-text-fill: BLACK;
+    -fx-padding: 16 0 16 0;
 }
 
 .tree-table-view .jfx-rippler {
@@ -877,7 +880,7 @@
 }
 
 .tree-table-view .column-header .label {
-    -fx-text-fill: #949494;
+    -fx-text-fill: black;
     -fx-padding: 16 0 16 0;
 }
 
@@ -1018,19 +1021,16 @@
 *******************************************************************************/
 
 .compile-error-label {
-    -fx-background-color: #D34336;
+    -fx-background-color: #f1cad1;
     -fx-font-weight: bold;
-    -fx-font-family: Monaco;
 }
 .compile-warn-label {
-    -fx-background-color: #dddd00;
+    -fx-background-color: #f6d281;
     -fx-font-weight: bold;
-    -fx-font-family: Monaco;
 }
 .compile-succ-label {
-    -fx-background-color: #00dd00;
+    -fx-background-color: #cef2e3;
     -fx-font-weight: bold;
-    -fx-font-family: Monaco;
 }
 
 /*******************************************************************************

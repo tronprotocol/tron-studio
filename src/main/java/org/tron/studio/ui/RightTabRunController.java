@@ -100,38 +100,40 @@ public class RightTabRunController implements Initializable {
         userPayRatio.setText(DEFAULT_RATIO);
 
         reloadContract();
+
+        ShareData.currentSolidityCompilerResult.addListener((observable, oldValue, solidityCompilerResult) -> {
+
+                }
+        );
     }
 
     private void reloadContract() {
-        ShareData.currentContractFileName.addListener((observable, oldValue, contractFileName) -> {
-            List<String> contractNameList = new ArrayList<>();
-
-            if (StringUtils.isNotEmpty(contractFileName)) {
-                SolidityCompiler.Result solidityCompileResult = ShareData.getSolidityCompilerResult(contractFileName);
-                if (solidityCompileResult == null) {
-                    return;
-                }
-                CompilationResult compilationResult;
-                try {
-                    compilationResult = CompilationResult.parse(solidityCompileResult.output);
-                } catch (IOException e) {
-                    logger.error("Failed to parse compile result {}", e);
-                    return;
-                }
-                compilationResult.getContracts().forEach(contractResult -> {
-                    JSONObject metaData = JSON.parseObject(contractResult.metadata);
-                    JSONObject compilationTarget = metaData.getJSONObject("settings")
-                            .getJSONObject("compilationTarget");
-                    compilationTarget.forEach((sol, value) -> {
-                        contractNameList.add((String) value);
-                    });
-                });
+        ShareData.currentSolidityCompilerResult.addListener((observable, oldValue, solidityCompilerResult) -> {
+            if (solidityCompilerResult == null) {
+                return;
             }
+            List<String> contractNameList = new ArrayList<>();
+            CompilationResult compilationResult;
+            try {
+                compilationResult = CompilationResult.parse(solidityCompilerResult.output);
+            } catch (IOException e) {
+                logger.error("Failed to parse compile result {}", e);
+                return;
+            }
+            compilationResult.getContracts().forEach(contractResult -> {
+                JSONObject metaData = JSON.parseObject(contractResult.metadata);
+                JSONObject compilationTarget = metaData.getJSONObject("settings")
+                        .getJSONObject("compilationTarget");
+                compilationTarget.forEach((sol, value) -> {
+                    contractNameList.add((String) value);
+                });
+            });
             contractComboBox.setItems(FXCollections.observableArrayList(
                     contractNameList
             ));
             contractComboBox.getSelectionModel().selectFirst();
         });
+
     }
 
     public void onClickDeploy(ActionEvent actionEvent) {

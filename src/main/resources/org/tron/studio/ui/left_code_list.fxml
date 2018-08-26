@@ -29,7 +29,7 @@
         </JFXRippler>
         <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#openContract">
             <StackPane style="-fx-padding: 10;">
-                <MaterialDesignIconView glyphSize="20" glyphName="FOLDER_OUTLINE" styleClass="icon"/>
+                <MaterialDesignIconView glyphSize="20" glyphName="FILE_IMPORT" styleClass="icon"/>
             </StackPane>
         </JFXRippler>
     </HBox>

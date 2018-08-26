@@ -18,7 +18,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,7 +133,7 @@ public class LeftCodeListController {
 
     private void openFile(File file) {
         try {
-            ShareData.openContract.set(file.getPath());
+            ShareData.openContractFileName.set(file.getPath());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -2,8 +2,7 @@
 .styled-text-area {
     -fx-background-color: #ffffff;
     -fx-font-size: 13px;
-    -fx-font-weight: Bold;
-    -fx-font-family: Monaco;
+    -fx-font-family: "Courier";
 }
 
 .styled-text-area .text {
