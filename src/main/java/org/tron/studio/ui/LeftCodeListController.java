@@ -19,6 +19,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.ShareData;
@@ -38,11 +39,10 @@ public class LeftCodeListController {
 
     private ObservableList<FileName> fileNameData;
 
-    //private MaterialDesignIconView newContract;
+    final FileChooser fileChooser = new FileChooser();
 
     @FXML
     public void initialize() {
-
         //监听新建的合约列表，
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
             List<File> files = SolidityFileUtil.getFileNameList();
@@ -94,7 +94,6 @@ public class LeftCodeListController {
         });
 
         fileNameTable.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-
             @Override
             public void handle(MouseEvent t) {
                 if (t.getButton() == MouseButton.SECONDARY) {
@@ -129,11 +128,22 @@ public class LeftCodeListController {
     }
 
     public void saveContract(MouseEvent mouseEvent) {
-        System.out.println("save contract");
+
+    }
+
+    private void openFile(File file) {
+        try {
+            ShareData.openContract.set(file.getPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void openContract(MouseEvent mouseEvent) {
-        System.out.println("save contract");
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            openFile(file);
+        }
     }
 
     private <T> void setupCellValueFactory(JFXTreeTableColumn<FileName, T> column, Function<FileName, ObservableValue<T>> mapper) {
