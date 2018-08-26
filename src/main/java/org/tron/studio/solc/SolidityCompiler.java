@@ -41,6 +41,7 @@ public class SolidityCompiler {
     public static final class Options {
         public static final OutputOption AST = OutputOption.AST;
         public static final OutputOption BIN = OutputOption.BIN;
+        public static final OutputOption HASHES = OutputOption.HASHES;
         public static final OutputOption INTERFACE = OutputOption.INTERFACE;
         public static final OutputOption ABI = OutputOption.ABI;
         public static final OutputOption METADATA = OutputOption.METADATA;
@@ -118,6 +119,7 @@ public class SolidityCompiler {
         BIN("bin"),
         INTERFACE("interface"),
         ABI("abi"),
+        HASHES("hashes"),
         METADATA("metadata"),
         ASTJSON("ast-json");
 

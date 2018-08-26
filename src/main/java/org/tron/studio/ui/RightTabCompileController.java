@@ -61,18 +61,18 @@ public class RightTabCompileController implements Initializable {
     @FXML
     protected void onClickCompile() {
         logger.debug("onClickCompile");
+        contractComboBox.requestFocus();
         if (isCompiling) {
             return;
         }
         isCompiling = true;
-        contractComboBox.requestFocus();
         ShareData.currentContractFileName.set(null);
 
         new Thread(() -> {
             boolean compileSuccess = true;
             try {
                 SolidityCompiler.Result solidityCompilerResult = SolidityCompiler.compile(
-                        SolidityFileUtil.getExistFile(contractFileName), true, ABI, BIN, INTERFACE,
+                        SolidityFileUtil.getExistFile(contractFileName), true, ABI, BIN, HASHES, INTERFACE,
                         METADATA);
 
                 CompilationErrorResult.parse(solidityCompilerResult.errors);

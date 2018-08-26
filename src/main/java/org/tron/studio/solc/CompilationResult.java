@@ -127,6 +127,7 @@ public class CompilationResult {
         public String bin;
         public String solInterface;
         public String metadata;
+        public Map<String, String> hashes;
 
         public String getInterface() {
             return solInterface;
