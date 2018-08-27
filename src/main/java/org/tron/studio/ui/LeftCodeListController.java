@@ -108,15 +108,20 @@ public class LeftCodeListController {
                     }
                 }
 
-                //fileNameData.remove(currentIndex);
                 for (File file: SolidityFileUtil.getFileNameList())
                 {
                     if (file.getName().contains(currentFile))
                     {
                         SolidityFileUtil.getFileNameList().remove(file);
+                        if (file.delete())
+                        {
+                            logger.info(String.format("%s is deleted", file.getName()));
+                        } else
+                        {
+                            logger.info(String.format("Deleting %s failed", file.getName()));
+                        }
                     }
                 }
-                //SolidityFileUtil.getFileNameList().remove(currentIndex);
 
                 int file_num = SolidityFileUtil.getFileNameList().size();
                 int nextCurrentIndex = currentIndex;
