@@ -1,5 +1,6 @@
 package org.tron.studio.ui;
 
+import com.alibaba.fastjson.JSON;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXRippler;
 import com.jfoenix.controls.JFXTextField;
@@ -11,11 +12,19 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import lombok.extern.slf4j.Slf4j;
+import org.tron.common.runtime.vm.trace.Op;
+import org.tron.common.runtime.vm.trace.ProgramTrace;
 import org.tron.studio.ShareData;
+import org.tron.studio.filesystem.VmTraceFileUtil;
 
+import java.io.File;
 import java.net.URL;
+import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
+@Slf4j
 public class RightTabDebugController implements Initializable {
 
     public JFXListView debugList;
@@ -26,7 +35,20 @@ public class RightTabDebugController implements Initializable {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
-        ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
+        ShareData.debugTransactionAction.addListener((observable, oldValue, transactionId) -> {
+
+            List<File> traceFileList = VmTraceFileUtil.getFileNameList();
+            Optional<File> traceFile = traceFileList.stream().filter(file -> file.getName().startsWith(transactionId)).findFirst();
+            if (!traceFile.isPresent()) {
+               return;
+            }
+            String traceContent = VmTraceFileUtil.getTraceContent(traceFile.get().getName());
+            ProgramTrace programTrace = JSON.parseObject(traceContent, ProgramTrace.class);
+            for (Op op : programTrace.getOps()) {
+                logger.error(op.toString());
+            }
+
+            transactionIdTextField.setText(transactionId);
             String[] nodes = {"Instructions", "Solidity Locals",
                     "Solidity State", "Step detail", "Stack",
                     "Storage completely loaded", "Memory", "Call Data", "Call Stack",
@@ -34,6 +56,7 @@ public class RightTabDebugController implements Initializable {
 
             String[] labels = {"test"};
 
+            debugList.getItems().clear();
             for (String nodename : nodes) {
                 JFXListView<Object> subList = createList(labels, nodename);
                 debugList.getItems().add(subList);

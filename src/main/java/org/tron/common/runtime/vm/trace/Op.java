@@ -67,4 +67,16 @@ public class Op {
     public void setActions(OpActions actions) {
         this.actions = actions;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Op{");
+        sb.append("code=").append(code);
+        sb.append(", deep=").append(deep);
+        sb.append(", pc=").append(pc);
+        sb.append(", energy=").append(energy);
+        sb.append(", actions=").append(actions);
+        sb.append('}');
+        return sb.toString();
+    }
 }

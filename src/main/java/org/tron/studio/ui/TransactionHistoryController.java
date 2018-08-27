@@ -23,13 +23,9 @@ import org.tron.core.capsule.TransactionCapsule;
 import org.tron.protos.Protocol;
 import org.tron.studio.ShareData;
 import org.tron.studio.TransactionHistoryItem;
-import org.tron.studio.filesystem.VmTraceFileUtil;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class TransactionHistoryController {
@@ -167,11 +163,7 @@ public class TransactionHistoryController {
         node.getChildren().add(region2);
 
         debugBtn.setOnAction(event -> {
-            List<File> traceFileList = VmTraceFileUtil.getFileNameList();
-            Optional<File> traceFile = traceFileList.stream().filter(file -> file.getName().startsWith(transactionHistoryId)).findFirst();
-            if (traceFile.isPresent()) {
-                ShareData.debugTransactionAction.set(traceFile.get().getName());
-            }
+            ShareData.debugTransactionAction.set(transactionHistoryId);
         });
 
         subList.setGroupnode(node);

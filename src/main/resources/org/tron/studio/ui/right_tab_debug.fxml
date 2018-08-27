@@ -11,15 +11,15 @@
 <?import javafx.scene.layout.Region?>
 <?import com.jfoenix.controls.JFXListView?>
 
-<VBox spacing="10" xmlns:fx="http://javafx.com/fxml"
+<HBox spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.tron.studio.ui.RightTabDebugController">
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-    <VBox spacing="10" VBox.vgrow="ALWAYS">
-        <HBox spacing="10">
+    <VBox spacing="10" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+        <HBox spacing="10" HBox.hgrow="ALWAYS">
             <!--<JFXTextField promptText="Block number" fx:id="blockNumber"/>-->
-            <JFXTextField VBox.vgrow="ALWAYS" promptText="Transaction Id" fx:id="transactionIdTextField"/>
+            <JFXTextField HBox.hgrow="ALWAYS" promptText="Transaction Id" fx:id="transactionIdTextField"/>
         </HBox>
         <HBox spacing="10">
             <Region HBox.hgrow="ALWAYS" />
@@ -62,4 +62,4 @@
         </HBox>
         <JFXListView VBox.vgrow="ALWAYS" fx:id="debugList" styleClass="jfx-list-view" />
     </VBox>
-</VBox>
+</HBox>
