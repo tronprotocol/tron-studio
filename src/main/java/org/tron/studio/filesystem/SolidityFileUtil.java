@@ -24,7 +24,7 @@ public class SolidityFileUtil {
         try {
             Stream<Path> fileList = Files.list(Paths.get(Config.SOLIDITY_SOURCE_PATH).toAbsolutePath());
             fileList.forEach(item -> {
-                if (item.toFile().getName().endsWith(".sol")) {
+                if (item.toFile().getName().endsWith(SUFFIX)) {
                     list.add(item.toFile());
                 }
             });

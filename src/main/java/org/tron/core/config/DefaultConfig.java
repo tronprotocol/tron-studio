@@ -1,5 +1,6 @@
 package org.tron.core.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowire;
@@ -16,9 +17,8 @@ import org.tron.core.db2.core.SnapshotManager;
 
 @Configuration
 @Import(CommonConfig.class)
+@Slf4j(topic = "DefaultConfig")
 public class DefaultConfig {
-
-  private static Logger logger = LoggerFactory.getLogger("general");
 
   @Autowired
   ApplicationContext appCtx;

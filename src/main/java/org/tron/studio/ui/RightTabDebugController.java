@@ -2,6 +2,7 @@ package org.tron.studio.ui;
 
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXRippler;
+import com.jfoenix.controls.JFXTextField;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
@@ -18,7 +19,7 @@ import java.util.ResourceBundle;
 public class RightTabDebugController implements Initializable {
 
     public JFXListView debugList;
-    public boolean showedDebugList = false;
+    public JFXTextField transactionIdTextField;
 
     public RightTabDebugController() {
 
@@ -26,11 +27,6 @@ public class RightTabDebugController implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
         ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
-            if (showedDebugList)
-            {
-                return;
-            }
-
             String[] nodes = {"Instructions", "Solidity Locals",
                     "Solidity State", "Step detail", "Stack",
                     "Storage completely loaded", "Memory", "Call Data", "Call Stack",
@@ -38,25 +34,21 @@ public class RightTabDebugController implements Initializable {
 
             String[] labels = {"test"};
 
-            for (String nodename: nodes
-            ) {
+            for (String nodename : nodes) {
                 JFXListView<Object> subList = createList(labels, nodename);
                 debugList.getItems().add(subList);
             }
-
-            showedDebugList = true;
         });
     }
 
     public void onClickDebug(ActionEvent actionEvent) {
     }
 
-    private JFXListView<Object> createList(String[] labels, String groundName)
-    {
+    private JFXListView<Object> createList(String[] labels, String groundName) {
         JFXListView<Object> subList = new JFXListView<>();
 
-        for (String labelText:
-             labels) {
+        for (String labelText :
+                labels) {
             subList.getItems().add(new Label(labelText));
         }
 

@@ -18,8 +18,8 @@
     </padding>
     <VBox spacing="10" VBox.vgrow="ALWAYS">
         <HBox spacing="10">
-            <JFXTextField promptText="Block number" fx:id="blockNumber"/>
-            <JFXTextField promptText="Transaction Id" fx:id="transactionId"/>
+            <!--<JFXTextField promptText="Block number" fx:id="blockNumber"/>-->
+            <JFXTextField VBox.vgrow="ALWAYS" promptText="Transaction Id" fx:id="transactionIdTextField"/>
         </HBox>
         <HBox spacing="10">
             <Region HBox.hgrow="ALWAYS" />

@@ -23,6 +23,7 @@ import org.spongycastle.util.encoders.Hex;
 import org.tron.common.runtime.config.SystemProperties;
 import org.tron.common.runtime.vm.program.InternalTransaction;
 import org.tron.core.capsule.TransactionCapsule;
+import org.tron.studio.filesystem.VmTraceFileUtil;
 
 import java.io.*;
 import java.util.zip.Deflater;
@@ -58,7 +59,9 @@ public final class VMUtils {
 
             String transactionHash = new TransactionCapsule(internalTransaction.getTransaction()).getTransactionId().toString();
             String internalTransactionHash = Hex.toHexString(internalTransaction.getHash());
-            File file = new File(new File("./", "vm_trace"), transactionHash + "_" + internalTransactionHash + ".json");
+
+
+            File file = new File(new File(VmTraceFileUtil.getTracePath()), transactionHash + "_" + internalTransactionHash + ".json");
 
             if (file.exists()) {
                 if (file.isFile() && file.canWrite()) {

@@ -23,10 +23,13 @@ import org.tron.core.capsule.TransactionCapsule;
 import org.tron.protos.Protocol;
 import org.tron.studio.ShareData;
 import org.tron.studio.TransactionHistoryItem;
+import org.tron.studio.filesystem.VmTraceFileUtil;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class TransactionHistoryController {
@@ -93,7 +96,7 @@ public class TransactionHistoryController {
                     new TransactionDetail("fee", Long.toString(transactionInfo.getFee())),
                     new TransactionDetail("block_number", Long.toString(transactionInfo.getBlockNumber())),
                     new TransactionDetail("time_stamp", Long.toString(transactionInfo.getBlockTimeStamp())),
-                    new TransactionDetail("result", transactionInfo.getResult().equals(Protocol.TransactionInfo.code.SUCESS)?"success":"fail"),
+                    new TransactionDetail("result", transactionInfo.getResult().equals(Protocol.TransactionInfo.code.SUCESS) ? "success" : "fail"),
                     new TransactionDetail("result_message", ByteArray.toStr(transactionInfo.getResMessage().toByteArray())),
                     new TransactionDetail("contract_result", ByteArray.toHexString(transactionInfo.getContractResult(0).toByteArray())),
                     new TransactionDetail("contract_address", Wallet.encode58Check(transactionInfo.getContractAddress().toByteArray())),
@@ -164,7 +167,11 @@ public class TransactionHistoryController {
         node.getChildren().add(region2);
 
         debugBtn.setOnAction(event -> {
-            ShareData.debugTransactionAction.set(UUID.randomUUID().toString());
+            List<File> traceFileList = VmTraceFileUtil.getFileNameList();
+            Optional<File> traceFile = traceFileList.stream().filter(file -> file.getName().startsWith(transactionHistoryId)).findFirst();
+            if (traceFile.isPresent()) {
+                ShareData.debugTransactionAction.set(traceFile.get().getName());
+            }
         });
 
         subList.setGroupnode(node);
