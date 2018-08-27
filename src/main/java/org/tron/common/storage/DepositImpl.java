@@ -136,6 +136,13 @@ public class DepositImpl implements Deposit {
     }
     return accountCapsule;
   }
+  // just for depositRoot
+  @Override
+  public void deleteContract(byte[] address) {
+    getCodeStore().delete(address);
+    getAccountStore().delete(address);
+    getContractStore().delete(address);
+  }
 
   @Override
   public synchronized void createContract(byte[] address, ContractCapsule contractCapsule) {
@@ -205,7 +212,7 @@ public class DepositImpl implements Deposit {
     if (this.parent != null) {
       storage = parent.getStorage(address);
     } else {
-      storage = new Storage(address, dbManager);
+      storage = new Storage(address, dbManager.getStorageRowStore());
     }
     return storage;
   }
