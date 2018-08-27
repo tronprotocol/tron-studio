@@ -19,13 +19,6 @@ public class SolidityFileUtil {
     private static final String SAMPLE_CONTRACT_FILE = "/template/Sample.sol";
     private static final String EMPTY_CONTRACT_FILE = "/template/Empty.sol";
 
-    public static List<File> fileNameList = getFileNameList();
-
-    static {
-        File dir = new File(Config.SOLIDITY_SOURCE_PATH);
-        dir.mkdirs();
-    }
-
     public static List<File> getFileNameList() {
         List<File> list = new ArrayList<>();
         try {
@@ -37,7 +30,6 @@ public class SolidityFileUtil {
             });
         } catch (IOException e) {
             logger.error("Failed to get file from {}", Config.SOLIDITY_SOURCE_PATH);
-            return list;
         }
         if (list.isEmpty()) {
             File sampleFile = new File(Config.SOLIDITY_SOURCE_PATH, "Sample.sol");
@@ -50,6 +42,7 @@ public class SolidityFileUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            list.add(sampleFile);
         }
         return list;
     }
@@ -73,7 +66,6 @@ public class SolidityFileUtil {
         } catch (IOException e) {
             logger.error("Failed create {}", newFile.getAbsolutePath());
         }
-        fileNameList = getFileNameList();
     }
 
     public static File getExistFile(String fileName) {

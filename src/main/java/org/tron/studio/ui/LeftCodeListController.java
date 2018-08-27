@@ -45,7 +45,7 @@ public class LeftCodeListController {
     public void initialize() {
         //监听新建的合约列表，
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
-            List<File> files = SolidityFileUtil.fileNameList;
+            List<File> files = SolidityFileUtil.getFileNameList();
             fileNameData.clear();
             files.forEach(file -> {
                 fileNameData.add(new FileName(file.getName()));
@@ -77,9 +77,9 @@ public class LeftCodeListController {
 
                 ShareData.deleteContract.set(currentFile);
 
-                for (int i = 0; i < SolidityFileUtil.fileNameList.size(); i++)
+                for (int i = 0; i < SolidityFileUtil.getFileNameList().size(); i++)
                 {
-                    if (SolidityFileUtil.fileNameList.get(i).getName().equals(
+                    if (SolidityFileUtil.getFileNameList().get(i).getName().equals(
                             ShareData.currentContractFileName.get()))
                     {
                         currentIndex = i;
@@ -98,9 +98,9 @@ public class LeftCodeListController {
                 }
 
                 fileNameData.remove(currentIndex);
-                SolidityFileUtil.fileNameList.remove(currentIndex);
+                SolidityFileUtil.getFileNameList().remove(currentIndex);
 
-                int file_num = SolidityFileUtil.fileNameList.size();
+                int file_num = SolidityFileUtil.getFileNameList().size();
                 int nextCurrentIndex = currentIndex;
 
                 if (file_num != 0) {
@@ -127,7 +127,7 @@ public class LeftCodeListController {
             }
         });
 
-        List<File> files = SolidityFileUtil.fileNameList;
+        List<File> files = SolidityFileUtil.getFileNameList();
         ShareData.newContractFileName.set(files.get(0).getName());
         ShareData.allContractFileName.add(files.get(0).getName());
     }
@@ -155,9 +155,9 @@ public class LeftCodeListController {
 
     public void saveContract(MouseEvent mouseEvent) {
         logger.info("save contract");
-        System.out.println(SolidityFileUtil.fileNameList);
+        System.out.println(SolidityFileUtil.getFileNameList());
         System.out.println(ShareData.currentContractName);
-        for(File file: SolidityFileUtil.fileNameList){
+        for(File file: SolidityFileUtil.getFileNameList()){
             if (file.getName().equals(ShareData.currentContractName.getName()))
             {
                 // save contract
