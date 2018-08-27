@@ -19,6 +19,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import org.apache.commons.codec.binary.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimerTask;
-import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public class LeftCodeListController {
@@ -43,7 +45,8 @@ public class LeftCodeListController {
 
     private ObservableList<FileName> fileNameData;
 
-    final FileChooser fileChooser = new FileChooser();
+    private final FileChooser fileChooser = new FileChooser();
+    private ScheduledExecutorService autoSaveExecutor = Executors.newSingleThreadScheduledExecutor();
 
     @FXML
     public void initialize() {
@@ -56,13 +59,9 @@ public class LeftCodeListController {
             });
         });
 
-        Timer t = new java.util.Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                saveContractContent();
-            }
-        }, 5000, 5000);
+        autoSaveExecutor.scheduleWithFixedDelay(() -> {
+            saveContractContent();
+        }, 10_000, 5_000, TimeUnit.MILLISECONDS);
 
         setupCellValueFactory(fileNameColumn, FileName::fileNameProperty);
         fileNameData = FXCollections.observableArrayList();
@@ -71,12 +70,12 @@ public class LeftCodeListController {
 
         fileNameTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                File fileName = SolidityFileUtil.getExistFile(newSelection.getValue().fileName.getValue());
-                ShareData.currentContractFileName.set(fileName.getName());
-                ShareData.allContractFileName.add(fileName.getName());
-            }
-        });
+                    if (newSelection != null) {
+                        File fileName = SolidityFileUtil.getExistFile(newSelection.getValue().fileName.getValue());
+                        ShareData.currentContractFileName.set(fileName.getName());
+                        ShareData.allContractFileName.add(fileName.getName());
+                    }
+                });
 
         ContextMenu cm = new ContextMenu();
         MenuItem delMenu = new MenuItem("Delete");
@@ -92,45 +91,35 @@ public class LeftCodeListController {
 
                 ShareData.deleteContract.set(currentFile);
 
-                for (int i = 0; i < SolidityFileUtil.getFileNameList().size(); i++)
-                {
+                for (int i = 0; i < SolidityFileUtil.getFileNameList().size(); i++) {
                     if (SolidityFileUtil.getFileNameList().get(i).getName().equals(
-                            ShareData.currentContractFileName.get()))
-                    {
+                            ShareData.currentContractFileName.get())) {
                         currentIndex = i;
                         break;
                     }
                 }
 
-                if (currentIndex == -1)
-                {
+                if (currentIndex == -1) {
                     return;
                 }
 
-                if (ShareData.allContractFileName.contains(currentFile))
-                {
+                if (ShareData.allContractFileName.contains(currentFile)) {
                     ShareData.allContractFileName.remove(ShareData.currentContractFileName.get());
                 }
 
-                for(FileName filename: fileNameData)
-                {
-                    if(filename.fileName.get().contains(currentFile))
-                    {
+                for (FileName filename : fileNameData) {
+                    if (filename.fileName.get().contains(currentFile)) {
                         fileNameData.remove(filename);
                         break;
                     }
                 }
 
-                for (File file: SolidityFileUtil.getFileNameList())
-                {
-                    if (file.getName().contains(currentFile))
-                    {
+                for (File file : SolidityFileUtil.getFileNameList()) {
+                    if (file.getName().contains(currentFile)) {
                         SolidityFileUtil.getFileNameList().remove(file);
-                        if (file.delete())
-                        {
+                        if (file.delete()) {
                             logger.info(String.format("%s is deleted", file.getName()));
-                        } else
-                        {
+                        } else {
                             logger.info(String.format("Deleting %s failed", file.getName()));
                         }
                     }
@@ -145,7 +134,7 @@ public class LeftCodeListController {
                     }
 
                     ShareData.currentContractFileName.set(
-                            ShareData.allContractFileName.get(ShareData.allContractFileName.size()-1));
+                            ShareData.allContractFileName.get(ShareData.allContractFileName.size() - 1));
                     fileNameTable.getSelectionModel().select(nextCurrentIndex);
 
                 } else {
@@ -195,24 +184,25 @@ public class LeftCodeListController {
     }
 
     private void saveContractContent() {
-        String context = ((CodeArea)ShareData.currentContractTab.getContent()).getText();
-        String filename = ShareData.currentContractTab.getText();
+        try {
+            String context = ((CodeArea) ShareData.currentContractTab.getContent()).getText();
+            String filename = ShareData.currentContractTab.getText();
 
-        for (File file: SolidityFileUtil.getFileNameList())
-        {
-            if (file.getName().contains(filename))
-            {
-                try {
-                    BufferedWriter out = new BufferedWriter(new FileWriter(file));
-                    out.write(context);
-                    out.close();
-                    logger.info(String.format("%s", file));
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
+            for (File file : SolidityFileUtil.getFileNameList()) {
+                if (StringUtils.equals(file.getName(), filename)) {
+                    try {
+                        BufferedWriter out = new BufferedWriter(new FileWriter(file));
+                        out.write(context);
+                        out.close();
+                        logger.info(String.format("%s", file));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
                 }
-                break;
             }
+        } catch (Exception e) {
+            logger.error("Failed to saveContractContent {}", e);
         }
     }
 

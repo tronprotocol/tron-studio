@@ -41,6 +41,6 @@ public class BottomController {
                     logger.error("Error in getNowBlock {}" + t.getMessage(), t);
                 }
             });
-        }, 2000, 500, TimeUnit.MILLISECONDS);
+        }, 2_000, 500, TimeUnit.MILLISECONDS);
     }
 }
