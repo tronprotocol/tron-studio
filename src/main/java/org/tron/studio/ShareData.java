@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import org.fxmisc.richtext.CodeArea;
+import javafx.scene.control.Tab;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.walletserver.WalletClient;
 
@@ -61,7 +61,7 @@ public class ShareData {
     public static SimpleStringProperty openContract = new SimpleStringProperty();
     public static SimpleStringProperty deleteContract = new SimpleStringProperty();
     public static SimpleStringProperty openContractFileName = new SimpleStringProperty();
-    public static CodeArea currentContractArea;
+    public static Tab currentContractTab;
 
     public static String currentAccount;
     public static String currentValue;

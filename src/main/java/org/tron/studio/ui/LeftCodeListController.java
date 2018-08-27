@@ -19,17 +19,21 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.ShareData;
 import org.tron.studio.filesystem.SolidityFileUtil;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimerTask;
+import java.util.Timer;
 import java.util.function.Function;
-import java.io.FileWriter;
 
 public class LeftCodeListController {
     static final Logger logger = LoggerFactory.getLogger(RightTabCompileController.class);
@@ -51,6 +55,15 @@ public class LeftCodeListController {
                 fileNameData.add(new FileName(file.getName()));
             });
         });
+
+        Timer t = new java.util.Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                saveContractContent();
+            }
+        }, 5000, 5000);
+
         setupCellValueFactory(fileNameColumn, FileName::fileNameProperty);
         fileNameData = FXCollections.observableArrayList();
         fileNameTable.setRoot(new RecursiveTreeItem<>(fileNameData, RecursiveTreeObject::getChildren));
@@ -178,22 +191,27 @@ public class LeftCodeListController {
 
     public void saveContract(MouseEvent mouseEvent) {
         logger.info("save contract");
-        System.out.println(SolidityFileUtil.getFileNameList());
-        System.out.println(ShareData.currentContractName);
-        for(File file: SolidityFileUtil.getFileNameList()){
-            if (file.getName().equals(ShareData.currentContractName.getName()))
+        saveContractContent();
+    }
+
+    private void saveContractContent() {
+        String context = ((CodeArea)ShareData.currentContractTab.getContent()).getText();
+        String filename = ShareData.currentContractTab.getText();
+
+        for (File file: SolidityFileUtil.getFileNameList())
+        {
+            if (file.getName().contains(filename))
             {
-                // save contract
                 try {
-                    FileWriter writer = new FileWriter(file);
-                    System.out.println(ShareData.currentContractArea.getText());
-                    writer.write(ShareData.currentContractArea.getText());
-                    writer.close();
+                    BufferedWriter out = new BufferedWriter(new FileWriter(file));
+                    out.write(context);
+                    out.close();
+                    logger.info(String.format("%s", file));
                 } catch (IOException e)
                 {
                     e.printStackTrace();
                 }
-
+                break;
             }
         }
     }

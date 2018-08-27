@@ -59,7 +59,7 @@ public class MainController {
 
         previousValue = ShareData.currentContractName.get();
 
-        ShareData.currentContractArea = defaultCodeArea;
+        ShareData.currentContractTab = defaultCodeAreaTab;
 
         SingleSelectionModel<Tab> codeAreaTabPaneSelectionModel = codeAreaTabPane.getSelectionModel();
 
@@ -131,7 +131,7 @@ public class MainController {
 
         ShareData.allContractFileName.add(file.getName());
         ShareData.currentContractName.set(file.getName());
-        ShareData.currentContractArea = codeArea;
+        ShareData.currentContractTab = tab;
 
         return tab;
     }
@@ -152,7 +152,7 @@ public class MainController {
             codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
             codeAreaTabPane.getSelectionModel().select(codeTab);
-            ShareData.currentContractArea = codeArea;
+            ShareData.currentContractTab = codeTab;
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
