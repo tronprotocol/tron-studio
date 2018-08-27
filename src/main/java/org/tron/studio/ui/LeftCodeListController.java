@@ -72,6 +72,8 @@ public class LeftCodeListController {
         delMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+
+                // Get current file name
                 String currentFile = ShareData.currentContractFileName.get();
                 int currentIndex = -1;
 
@@ -97,8 +99,24 @@ public class LeftCodeListController {
                     ShareData.allContractFileName.remove(ShareData.currentContractFileName.get());
                 }
 
-                fileNameData.remove(currentIndex);
-                SolidityFileUtil.getFileNameList().remove(currentIndex);
+                for(FileName filename: fileNameData)
+                {
+                    if(filename.fileName.get().contains(currentFile))
+                    {
+                        fileNameData.remove(filename);
+                        break;
+                    }
+                }
+
+                //fileNameData.remove(currentIndex);
+                for (File file: SolidityFileUtil.getFileNameList())
+                {
+                    if (file.getName().contains(currentFile))
+                    {
+                        SolidityFileUtil.getFileNameList().remove(file);
+                    }
+                }
+                //SolidityFileUtil.getFileNameList().remove(currentIndex);
 
                 int file_num = SolidityFileUtil.getFileNameList().size();
                 int nextCurrentIndex = currentIndex;
