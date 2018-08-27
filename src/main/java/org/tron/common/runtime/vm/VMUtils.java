@@ -19,7 +19,11 @@ package org.tron.common.runtime.vm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
 import org.tron.common.runtime.config.SystemProperties;
+import org.tron.common.runtime.vm.program.InternalTransaction;
+import org.tron.core.capsule.TransactionCapsule;
+
 import java.io.*;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -47,12 +51,14 @@ public final class VMUtils {
         }
     }
 
-    private static File createProgramTraceFile(SystemProperties config, String txHash) {
+    private static File createProgramTraceFile(SystemProperties config, InternalTransaction internalTransaction) {
         File result = null;
 
         if (config.vmTrace()) {
 
-            File file = new File(new File("./", "vm_trace"), txHash + ".json");
+            String transactionHash = new TransactionCapsule(internalTransaction.getTransaction()).getTransactionId().toString();
+            String internalTransactionHash = Hex.toHexString(internalTransaction.getHash());
+            File file = new File(new File("./", "vm_trace"), transactionHash + "_" + internalTransactionHash + ".json");
 
             if (file.exists()) {
                 if (file.isFile() && file.canWrite()) {
@@ -79,15 +85,15 @@ public final class VMUtils {
             if (data != null) {
                 out.write(data.getBytes("UTF-8"));
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error(format("Cannot write to file '%s': ", file.getAbsolutePath()), e);
         } finally {
             closeQuietly(out);
         }
     }
 
-    public static void saveProgramTraceFile(SystemProperties config, String txHash, String content) {
-        File file = createProgramTraceFile(config, txHash);
+    public static void saveProgramTraceFile(SystemProperties config, InternalTransaction internalTransaction, String content) {
+        File file = createProgramTraceFile(config, internalTransaction);
         if (file != null) {
             writeStringToFile(file, content);
         }

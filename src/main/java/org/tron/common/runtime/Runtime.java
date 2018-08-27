@@ -605,8 +605,7 @@ public class Runtime {
         trace = zipAndEncode(trace);
       }
 
-      String txHash = Hex.toHexString(new InternalTransaction(trx).getHash());
-      saveProgramTraceFile(config, txHash, trace);
+      saveProgramTraceFile(config, new InternalTransaction(trx), trace);
     }
 
   }

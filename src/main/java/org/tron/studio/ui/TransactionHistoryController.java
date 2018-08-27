@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.api.GrpcAPI;
 import org.tron.common.utils.ByteArray;
@@ -40,7 +41,7 @@ public class TransactionHistoryController {
             String transactionHeadMsg = String.format("creation of %s pending...", currentContractName);
             transactionHistoryListView.getItems().add(new Label(transactionHeadMsg));
 
-            JFXListView<Object> subList = createSubList(ShareData.transactionHistory.get(newValue));
+            JFXListView<Object> subList = createSubList(newValue);
             transactionHistoryListView.getItems().add(subList);
 
             /**
@@ -113,7 +114,8 @@ public class TransactionHistoryController {
         return detailTable;
     }
 
-    private JFXListView<Object> createSubList(TransactionHistoryItem transactionHistoryItem) {
+    private JFXListView<Object> createSubList(String transactionHistoryId) {
+        TransactionHistoryItem transactionHistoryItem = ShareData.transactionHistory.get(transactionHistoryId);
         JFXListView<Object> subList = new JFXListView<>();
 
         if (transactionHistoryItem.getType() == TransactionHistoryItem.Type.ERROR) {
@@ -141,13 +143,13 @@ public class TransactionHistoryController {
         node.getChildren().add(ripper);
 
         String acountAddr = ShareData.currentAccount;
-        acountAddr = acountAddr.substring(0, 5) + "..." + acountAddr.substring(acountAddr.length() - 5);
+        acountAddr = StringUtils.left(acountAddr, 10) + "...";
 
         String currentContract = ShareData.currentContractName.get();
         String currentValue = ShareData.currentValue;
 
-        String debugInfo = "[vm] from: %s to: %s.(consructor)\n value:%s data: xxxxx. logs:0 hash:xxxx";
-        debugInfo = String.format(debugInfo, acountAddr, currentContract, currentValue);
+        String debugInfo = "[vm] from: %s to: %s.(consructor)\n value:%s data: xxxxx. logs:0 hash:%s";
+        debugInfo = String.format(debugInfo, acountAddr, currentContract, currentValue, StringUtils.left(transactionHistoryId, 10) + "...");
         Label debugInfoLabel = new Label(debugInfo);
         ((HBox) node).getChildren().add(debugInfoLabel);
 

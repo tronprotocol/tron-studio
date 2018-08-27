@@ -36,6 +36,7 @@ public class ProgramTrace {
     private String result;
     private String error;
     private String contractAddress;
+    private String originTransactionId;
 
     public ProgramTrace() {
         this(null, null);
