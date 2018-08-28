@@ -7,6 +7,7 @@ import java.io.File;
 class Config {
     public static String SOLIDITY_SOURCE_PATH = System.getProperty("user.home") + "/TronStudio/source/";
     public static String TRACE_PATH = System.getProperty("user.home") + "/TronStudio/trace/";
+    public static String SOLC_PATH = System.getProperty("user.home") + "/TronStudio/compiler/";
 
     static {
         {
@@ -17,6 +18,12 @@ class Config {
         }
         {
             File dir = new File(Config.TRACE_PATH);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+        }
+        {
+            File dir = new File(Config.SOLC_PATH);
             if (!dir.exists()) {
                 dir.mkdirs();
             }

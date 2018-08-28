@@ -27,8 +27,8 @@ public class SolidityCompiler {
     private static SolidityCompiler INSTANCE;
 
 //    @Autowired
-    public SolidityCompiler(SystemProperties config) {
-        solc = new Solc(config);
+    public SolidityCompiler() {
+        solc = new Solc();
     }
 
     public static Result compile(File sourceDirectory, boolean combinedJson, Option... options) throws IOException {
@@ -313,7 +313,7 @@ public class SolidityCompiler {
 
     public static SolidityCompiler getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new SolidityCompiler(new SystemProperties());
+            INSTANCE = new SolidityCompiler();
         }
         return INSTANCE;
     }
