@@ -28,3 +28,11 @@
 .paragraph-box:has-caret {
     -fx-background-color: #f2f9fc;
 }
+
+.underlined {
+    -rtfx-background-color: #EE3B3B;
+    -rtfx-underline-color: red;
+    -rtfx-underline-dash-array: 2 2;
+    -rtfx-underline-width: 1;
+    -rtfx-underline-cap: butt;
+}

@@ -8,15 +8,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.reactfx.Subscription;
 import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.ui.SolidityHighlight;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
+import java.text.BreakIterator;
+import java.time.Duration;
+import java.util.*;
 
 @Slf4j
 public class MainController {
@@ -29,6 +33,8 @@ public class MainController {
 
     private int contractFileNum = 0;
     private String previousValue = "";
+
+    private static final Set<String> dictionary = new HashSet<String>();
 
     @PostConstruct
     public void initialize() throws IOException {
@@ -53,6 +59,8 @@ public class MainController {
 
         defaultCodeArea = (CodeArea) defaultCodeAreaTab.getContent();
         new SolidityHighlight(defaultCodeArea).highlight();
+        spellChecking(defaultCodeArea);
+
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
         defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
@@ -158,4 +166,56 @@ public class MainController {
         }
     }
 
+    private void spellChecking(CodeArea textArea)
+    {
+        Subscription cleanupWhenFinished = textArea.plainTextChanges()
+                .successionEnds(Duration.ofMillis(500))
+                .subscribe(change -> {
+                    textArea.setStyleSpans(0, computeHighlighting(textArea.getText()));
+                });
+
+        // call when no longer need it: `cleanupWhenFinished.unsubscribe();`
+
+        // load the dictionary
+        try (InputStream input = getClass().getResourceAsStream("/keywords/solidity.txt");
+             BufferedReader br = new BufferedReader(new InputStreamReader(input))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                dictionary.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static StyleSpans<Collection<String>> computeHighlighting(String text) {
+        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+        BreakIterator wb = BreakIterator.getWordInstance();
+        wb.setText(text);
+
+        int lastIndex = wb.first();
+        int lastKwEnd = 0;
+        String previousWord = null;
+        while(lastIndex != BreakIterator.DONE) {
+            int firstIndex = lastIndex;
+            lastIndex = wb.next();
+
+            if (lastIndex != BreakIterator.DONE
+                    && Character.isLetterOrDigit(text.charAt(firstIndex))) {
+                String word = text.substring(firstIndex, lastIndex).toLowerCase();
+
+                if (!dictionary.contains(word) && (previousWord == null
+                        || !dictionary.contains(previousWord))) {
+                    spansBuilder.add(Collections.emptyList(), firstIndex - lastKwEnd);
+                    spansBuilder.add(Collections.singleton("underlined"), lastIndex - firstIndex);
+                    lastKwEnd = lastIndex;
+                }
+                System.err.println();
+                previousWord = word;
+            }
+        }
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+
+        return spansBuilder.create();
+    }
 }
