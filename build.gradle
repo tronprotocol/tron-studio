@@ -256,7 +256,7 @@ run {
 }
 
 shadowJar {
-    baseName = 'java-tron'
+    baseName = 'TronStudio'
     classifier = null
     version = null
 }
