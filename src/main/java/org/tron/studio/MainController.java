@@ -12,6 +12,7 @@ import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
 import org.tron.studio.filesystem.SolidityFileUtil;
+import org.tron.studio.ui.CodeParserUtil;
 import org.tron.studio.ui.SolidityHighlight;
 
 import javax.annotation.PostConstruct;
@@ -59,7 +60,7 @@ public class MainController {
 
         defaultCodeArea = (CodeArea) defaultCodeAreaTab.getContent();
         new SolidityHighlight(defaultCodeArea).highlight();
-        spellChecking(defaultCodeArea);
+        //spellChecking(defaultCodeArea);
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
@@ -172,6 +173,7 @@ public class MainController {
                 .successionEnds(Duration.ofMillis(500))
                 .subscribe(change -> {
                     textArea.setStyleSpans(0, computeHighlighting(textArea.getText()));
+                    CodeParserUtil.checkInvalidWords(textArea);
                 });
 
         // call when no longer need it: `cleanupWhenFinished.unsubscribe();`
@@ -210,7 +212,6 @@ public class MainController {
                     spansBuilder.add(Collections.singleton("underlined"), lastIndex - firstIndex);
                     lastKwEnd = lastIndex;
                 }
-                System.err.println();
                 previousWord = word;
             }
         }
