@@ -1,5 +1,6 @@
 package org.tron.studio.ui;
 
+import lombok.extern.slf4j.Slf4j;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
@@ -18,9 +19,10 @@ import java.util.stream.Stream;
  *
  * @author Toast kid
  */
+@Slf4j
 public class SolidityHighlight extends Highlight {
 
-    private static final String PATH_TO_KEYWORDS  = "keywords/solidity.txt";
+    private static final String PATH_TO_KEYWORDS  = "/keywords/solidity.txt";
     private static final String PAREN_PATTERN     = "\\(|\\)";
     private static final String BRACE_PATTERN     = "\\{|\\}";
     private static final String BRACKET_PATTERN   = "\\[|\\]";
@@ -68,10 +70,11 @@ public class SolidityHighlight extends Highlight {
      * Make keyword pattern.
      */
     private void makePattern() {
-        try (final Stream<String> lines = new BufferedReader(new InputStreamReader(
-                getClass().getClassLoader().getResourceAsStream(PATH_TO_KEYWORDS))).lines();) {
+        try {
+            final Stream<String> lines = new BufferedReader(new InputStreamReader(
+                    getClass().getResourceAsStream(PATH_TO_KEYWORDS))).lines();
             final String keywords = lines.collect(Collectors.joining("|"));
-            final String pattern  = "\\b(" + keywords + ")\\b";
+            final String pattern = "\\b(" + keywords + ")\\b";
             this.pattern = Pattern.compile(
                     "(?<KEYWORD>" + pattern + ")"
                             + "|(?<PAREN>" + PAREN_PATTERN + ")"
@@ -80,7 +83,9 @@ public class SolidityHighlight extends Highlight {
                             + "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")"
                             + "|(?<STRING>" + STRING_PATTERN + ")"
                             + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
-                    );
+            );
+        } catch (Exception e) {
+            logger.error("failed to make Pattern", e);
         }
     }
 }

@@ -1,9 +1,11 @@
 package org.tron.studio.filesystem;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,16 +34,14 @@ public class SolidityFileUtil {
             logger.error("Failed to get file from {}", Config.SOLIDITY_SOURCE_PATH);
         }
         if (list.isEmpty()) {
+            InputStream stream = SolcFileUtil.class.getResourceAsStream(SAMPLE_CONTRACT_FILE);
             File sampleFile = new File(Config.SOLIDITY_SOURCE_PATH, "Sample.sol");
-            StringBuilder builder = new StringBuilder();
             try {
-                Files.lines(Paths.get(SolidityFileUtil.class.getResource(SAMPLE_CONTRACT_FILE).getPath())).forEach(line -> {
-                    builder.append(line).append(System.getProperty("line.separator"));
-                });
-                Files.write(Paths.get(sampleFile.toURI()), builder.toString().getBytes(), StandardOpenOption.CREATE);
+                FileUtils.copyInputStreamToFile(stream, sampleFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             list.add(sampleFile);
         }
         return list;

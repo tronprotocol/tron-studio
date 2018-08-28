@@ -1,9 +1,11 @@
 package org.tron.studio.filesystem;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +35,14 @@ public class SolcFileUtil {
         if (file.exists()) {
             return file;
         }
+        InputStream stream = SolcFileUtil.class.getResourceAsStream(SOLC_RESOURCE_FILE);
+        File targetFile = new File(SOLC_FILE);
         try {
-            byte[] content = Files.readAllBytes(Paths.get(SolcFileUtil.class.getResource(SOLC_RESOURCE_FILE).getPath()));
-            Files.write(file.toPath(), content, StandardOpenOption.CREATE);
-            file.setExecutable(true);
+            FileUtils.copyInputStreamToFile(stream, targetFile);
         } catch (IOException e) {
-            logger.error("Unable to copy SOLC_FILE {}", e);
-            return null;
+            e.printStackTrace();
         }
-        return new File(SOLC_FILE);
+        targetFile.setExecutable(true);
+        return targetFile;
     }
 }
