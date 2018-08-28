@@ -32,6 +32,7 @@ import org.tron.common.runtime.vm.VM;
 import org.tron.common.runtime.vm.program.InternalTransaction;
 import org.tron.common.runtime.vm.program.InternalTransaction.ExecutorType;
 import org.tron.common.runtime.vm.program.Program;
+import org.tron.common.runtime.vm.program.Program.JVMStackOverFlowException;
 import org.tron.common.runtime.vm.program.Program.OutOfResourceException;
 import org.tron.common.runtime.vm.program.ProgramPrecompile;
 import org.tron.common.runtime.vm.program.ProgramResult;
@@ -74,7 +75,6 @@ public class Runtime {
   private Deposit deposit;
   private ProgramInvokeFactory programInvokeFactory = null;
   private String runtimeError;
-  private boolean readyToExecute = false;
 
   private EnergyProcessor energyProcessor = null;
   private StorageMarket storageMarket = null;
@@ -125,42 +125,6 @@ public class Runtime {
     }
   }
 
-  /**
-   * For pre trx run
-   */
-  @Deprecated
-  public Runtime(Transaction tx, DepositImpl deposit, ProgramInvokeFactory programInvokeFactory) {
-    this.trx = tx;
-    this.deposit = deposit;
-    this.programInvokeFactory = programInvokeFactory;
-    this.executorType = ET_PRE_TYPE;
-    Transaction.Contract.ContractType contractType = tx.getRawData().getContract(0).getType();
-    switch (contractType.getNumber()) {
-      case Transaction.Contract.ContractType.TriggerSmartContract_VALUE:
-        trxType = TRX_CONTRACT_CALL_TYPE;
-        break;
-      case Transaction.Contract.ContractType.CreateSmartContract_VALUE:
-        trxType = TRX_CONTRACT_CREATION_TYPE;
-        break;
-      default:
-        trxType = TRX_PRECOMPILED_TYPE;
-
-    }
-  }
-
-  /**
-   * For constant trx
-   */
-  @Deprecated
-  public Runtime(Transaction tx, ProgramInvokeFactory programInvokeFactory, Deposit deposit) {
-    trx = tx;
-    this.deposit = deposit;
-    this.programInvokeFactory = programInvokeFactory;
-    executorType = ET_CONSTANT_TYPE;
-    trxType = TRX_CONTRACT_CALL_TYPE;
-
-  }
-
 
   /**
    * For constant trx with latest block.
@@ -197,27 +161,6 @@ public class Runtime {
       act.validate();
       act.execute(result.getRet());
     }
-  }
-
-  /**
-   */
-  public void init() {
-    readyToExecute = true;
-    // switch (trxType) {
-    //   case TRX_PRECOMPILED_TYPE:
-    //     readyToExecute = true;
-    //     break;
-    //   case TRX_CONTRACT_CREATION_TYPE:
-    //   case TRX_CONTRACT_CALL_TYPE:
-    //     // if (!curENERGYLimitReachedBlockENERGYLimit()) {
-    //     //   readyToExecute = true;
-    //     // }
-    //     readyToExecute = true;
-    //     break;
-    //   default:
-    //     readyToExecute = true;
-    //     break;
-    // }
   }
 
 
@@ -260,10 +203,6 @@ public class Runtime {
   }
 
   public void execute() throws ContractValidateException, ContractExeException {
-
-    if (!readyToExecute) {
-      return;
-    }
     switch (trxType) {
       case TRX_PRECOMPILED_TYPE:
         precompiled();
@@ -275,7 +214,7 @@ public class Runtime {
         call();
         break;
       default:
-        break;
+        throw new ContractValidateException("Unknown contract type");
     }
   }
 
@@ -474,14 +413,14 @@ public class Runtime {
       long feeLimit = trx.getRawData().getFeeLimit();
       long energyLimit;
       try {
-        energyLimit = getEnergyLimit(creator, caller, contract, feeLimit, callValue);
+        if (isCallConstant(contractAddress)) {
+          energyLimit = Constant.MAX_ENERGY_IN_TX;
+        }
+        else
+          energyLimit = getEnergyLimit(creator, caller, contract, feeLimit, callValue);
       } catch (Exception e) {
         logger.error(e.getMessage());
         throw new ContractExeException(e.getMessage());
-      }
-
-      if (isCallConstant(contractAddress)) {
-        energyLimit = Constant.MAX_ENERGY_IN_TX;
       }
 
       ProgramInvoke programInvoke = programInvokeFactory
@@ -505,9 +444,6 @@ public class Runtime {
   }
 
   public void go() throws OutOfSlotTimeException {
-    if (!readyToExecute) {
-      return;
-    }
 
     try {
       if (vm != null) {
@@ -545,7 +481,11 @@ public class Runtime {
     } catch (OutOfResourceException e) {
       logger.error("runtime error is :{}", e.getMessage());
       throw new OutOfSlotTimeException(e.getMessage());
-    } catch (Throwable e) {
+    } catch (JVMStackOverFlowException e){
+      result.setException(e);
+      runtimeError = result.getException().getMessage();
+      logger.error("runtime error is :{}", result.getException().getMessage());
+    } catch(Throwable e) {
       if (Objects.isNull(result.getException())) {
         result.setException(new RuntimeException("Unknown Throwable"));
       }
