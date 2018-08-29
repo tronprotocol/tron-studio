@@ -1,5 +1,6 @@
 package org.tron.studio;
 
+import com.google.rpc.Code;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
@@ -14,6 +15,7 @@ import org.reactfx.Subscription;
 import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.ui.CodeParserUtil;
 import org.tron.studio.ui.SolidityHighlight;
+import org.tron.studio.ui.AutoCompletion;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -61,6 +63,7 @@ public class MainController {
         defaultCodeArea = (CodeArea) defaultCodeAreaTab.getContent();
         new SolidityHighlight(defaultCodeArea).highlight();
         //spellChecking(defaultCodeArea);
+        AutoCompletion.autoComplete(defaultCodeArea);
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
@@ -128,6 +131,7 @@ public class MainController {
             e.printStackTrace();
         }
 
+        AutoCompletion.autoComplete(codeArea);
         tab.setText(file.getName());
         //Just not allow to close the default tab
         tab.setClosable(true);
@@ -151,6 +155,8 @@ public class MainController {
             codeTab.setText(fileName);
             codeTab.setClosable(true);
             CodeArea codeArea = FXMLLoader.load(getClass().getResource("ui/code_area.fxml"));
+
+            AutoCompletion.autoComplete(codeArea);
             codeTab.setContent(codeArea);
             codeAreaTabPane.getTabs().add(codeTab);
 
