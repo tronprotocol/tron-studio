@@ -1,17 +1,8 @@
 package org.tron.studio.ui;
 
 import com.jfoenix.controls.JFXPopup;
-import com.sun.org.apache.xerces.internal.xs.datatypes.ObjectList;
-import javafx.scene.control.Label;
-import javafx.stage.Popup;
 import org.fxmisc.richtext.CodeArea;
 
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.util.*;
-import java.util.List;
-
-import javafx.event.EventHandler;
 import org.fxmisc.richtext.PopupAlignment;
 import javafx.scene.control.ListView;
 import javafx.collections.ObservableList;
@@ -36,6 +27,13 @@ public class AutoCompletion {
 
     public static void autoComplete(CodeArea textArea)
     {
+        /*
+        textArea.onKeyReleasedProperty().addListener(new ChangeListener<EventHandler<? super KeyEvent>> () {
+            @Override
+            public void changed(ObservableValue<? extends EventHandler<? super KeyEvent>> observable, EventHandler<? super KeyEvent> oldValue, EventHandler<? super KeyEvent> newValue) {
+                System.out.println("changed!");
+            }
+        });*/
         textArea.caretColumnProperty().addListener((observable, oldValue, newValue) -> {
             int caretCol = textArea.getCaretColumn();
             int currPara = textArea.getCurrentParagraph();
@@ -64,7 +62,6 @@ public class AutoCompletion {
                         candWords.add(keyword);
                     }
                 }
-                System.out.println(String.format("cand: %s", candWords));
                 if (candWords.size() != 0)
                 {
                     setList(textArea, candWords, currPara, startCol);
@@ -86,14 +83,8 @@ public class AutoCompletion {
                 System.out.println(String.format("start: %d end: %d", startCol, startCol+newValue.length()));
                 textArea.replaceText(currentPara, startCol, currentPara,
                         startCol+newValue.length(), newValue);
-                System.out.println("complete");
             }
         });
-
-        if (isPopupshowing)
-        {
-            textArea.clear();
-        }
 
         popup.setPopupContent(list);
         textArea.setPopupWindow(popup);
