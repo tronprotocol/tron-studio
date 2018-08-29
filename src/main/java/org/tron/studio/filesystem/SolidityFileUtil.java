@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -58,13 +57,11 @@ public class SolidityFileUtil {
         fileName = formatFileName(fileName);
         File newFile = new File(Config.SOLIDITY_SOURCE_PATH, fileName.trim());
         StringBuilder builder = new StringBuilder();
+        InputStream stream = SolcFileUtil.class.getResourceAsStream(EMPTY_CONTRACT_FILE);
         try {
-            Files.lines(Paths.get(SolidityFileUtil.class.getResource(EMPTY_CONTRACT_FILE).getPath())).forEach(line -> {
-                builder.append(line).append(System.getProperty("line.separator"));
-            });
-            Files.write(Paths.get(newFile.toURI()), builder.toString().getBytes(), StandardOpenOption.CREATE);
+            FileUtils.copyInputStreamToFile(stream, newFile);
         } catch (IOException e) {
-            logger.error("Failed create {}", newFile.getAbsolutePath());
+            logger.error("Failed create {} {}", newFile.getAbsolutePath(), e);
         }
     }
 
