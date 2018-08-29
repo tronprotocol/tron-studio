@@ -1,7 +1,6 @@
 package org.tron.studio.ui;
 
 import com.jfoenix.controls.JFXPopup;
-import com.sun.org.apache.xerces.internal.xs.datatypes.ObjectList;
 import javafx.scene.control.Label;
 import javafx.stage.Popup;
 import org.fxmisc.richtext.CodeArea;
