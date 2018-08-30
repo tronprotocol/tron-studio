@@ -23,6 +23,7 @@ import org.apache.commons.codec.binary.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tron.common.utils.StringUtil;
 import org.tron.studio.ShareData;
 import org.tron.studio.filesystem.SolidityFileUtil;
 
@@ -45,6 +46,9 @@ public class LeftCodeListController {
 
     private ObservableList<FileName> fileNameData;
 
+    private String lastCodeContent;
+    private String lastFileName;
+
     private final FileChooser fileChooser = new FileChooser();
     private ScheduledExecutorService autoSaveExecutor = Executors.newSingleThreadScheduledExecutor();
 
@@ -61,7 +65,7 @@ public class LeftCodeListController {
 
         autoSaveExecutor.scheduleWithFixedDelay(() -> {
             saveContractContent();
-        }, 10_000, 5_000, TimeUnit.MILLISECONDS);
+        }, 5_000, 1_000, TimeUnit.MILLISECONDS);
 
         setupCellValueFactory(fileNameColumn, FileName::fileNameProperty);
         fileNameData = FXCollections.observableArrayList();
@@ -185,14 +189,17 @@ public class LeftCodeListController {
 
     private void saveContractContent() {
         try {
-            String context = ((CodeArea) ShareData.currentContractTab.getContent()).getText();
+            String content = ((CodeArea) ShareData.currentContractTab.getContent()).getText();
             String filename = ShareData.currentContractTab.getText();
+            if(StringUtils.equals(lastFileName, filename) && StringUtils.equals(content, lastCodeContent)) {
+                return;
+            }
 
             for (File file : SolidityFileUtil.getFileNameList()) {
                 if (StringUtils.equals(file.getName(), filename)) {
                     try {
                         BufferedWriter out = new BufferedWriter(new FileWriter(file));
-                        out.write(context);
+                        out.write(content);
                         out.close();
                         logger.info(String.format("%s", file));
                     } catch (IOException e) {
@@ -201,6 +208,8 @@ public class LeftCodeListController {
                     break;
                 }
             }
+            lastFileName = filename;
+            lastCodeContent = content;
         } catch (Exception e) {
             logger.error("Failed to saveContractContent {}", e);
         }

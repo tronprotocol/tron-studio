@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.tron.common.runtime.vm.trace.Op;
 import org.tron.common.runtime.vm.trace.ProgramTrace;
 import org.tron.studio.ShareData;
+import org.tron.studio.debug.VMStatus;
 import org.tron.studio.filesystem.VmTraceFileUtil;
 
 import java.io.File;
@@ -44,7 +45,9 @@ public class RightTabDebugController implements Initializable {
             }
             String traceContent = VmTraceFileUtil.getTraceContent(traceFile.get().getName());
             ProgramTrace programTrace = JSON.parseObject(traceContent, ProgramTrace.class);
+            VMStatus vmStatus = new VMStatus();
             for (Op op : programTrace.getOps()) {
+                vmStatus.addStatus(new VMStatus.StatusItem(op.getCode(), op.getDeep(), op.getPc(), op.getEnergy(), op.getActions()));
                 logger.error(op.toString());
             }
 

@@ -33,10 +33,6 @@ public class MainController {
     public Tab defaultCodeAreaTab;
     public CodeArea defaultCodeArea;
 
-
-    private int contractFileNum = 0;
-    private String previousValue = "";
-
     private static final Set<String> dictionary = new HashSet<String>();
 
     @PostConstruct
@@ -54,8 +50,6 @@ public class MainController {
             e.printStackTrace();
         }
 
-        contractFileNum = ShareData.allContractFileName.size();
-
         defaultCodeAreaTab.setText(defaultContractFile.getName());
         //Just not allow to close the default tab
         defaultCodeAreaTab.setClosable(false);
@@ -70,11 +64,10 @@ public class MainController {
 
         defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
 
-        previousValue = ShareData.currentContractName.get();
-
         ShareData.currentContractTab = defaultCodeAreaTab;
-
-        SingleSelectionModel<Tab> codeAreaTabPaneSelectionModel = codeAreaTabPane.getSelectionModel();
+        codeAreaTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            ShareData.currentContractTab = newValue;
+        });
 
         ShareData.deleteContract.addListener((observable, oldValue, currentContractName) -> {
             for (Tab tab : codeAreaTabPane.getTabs()) {
@@ -89,14 +82,13 @@ public class MainController {
             boolean alreadyOpen = false;
             for (Tab tab : codeAreaTabPane.getTabs()) {
                 if (StringUtils.equals(tab.getText(), currentContractName)) {
-                    codeAreaTabPaneSelectionModel.select(tab);
+                    codeAreaTabPane.getSelectionModel().select(tab);
                     alreadyOpen = true;
                 }
             }
             if (!alreadyOpen) {
                 createTabForFileSystemFile(currentContractName);
             }
-            previousValue = currentContractName;
         });
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
@@ -110,7 +102,7 @@ public class MainController {
             Tab newTab = setTab(newFile);
             ShareData.currentContractName.set(newFile.getName());
             ShareData.allContractFileName.add(newFile.getName());
-            codeAreaTabPaneSelectionModel.select(newTab);
+            codeAreaTabPane.getSelectionModel().select(newTab);
         });
 
         ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
@@ -119,8 +111,8 @@ public class MainController {
     }
 
     private Tab setTab(File file) {
-        Tab tab = new Tab();
-        logger.info("set tab");
+        Tab codeTab = new Tab();
+        logger.info("set codeTab");
         CodeArea codeArea = new CodeArea();
         // Print new file in codearea
         StringBuilder builder = new StringBuilder();
@@ -134,11 +126,11 @@ public class MainController {
 
         AutoCompletion autoCompletion = new AutoCompletion(codeArea);
         autoCompletion.autoComplete(codeArea);
-        tab.setText(file.getName());
+        codeTab.setText(file.getName());
         //Just not allow to close the default tab
-        tab.setClosable(true);
-        tab.setContent(codeArea);
-        codeAreaTabPane.getTabs().add(tab);
+        codeTab.setClosable(true);
+        codeTab.setContent(codeArea);
+        codeAreaTabPane.getTabs().add(codeTab);
 
         new SolidityHighlight(codeArea).highlight();
         codeArea.replaceText(0, 0, builder.toString());
@@ -146,9 +138,9 @@ public class MainController {
 
         ShareData.allContractFileName.add(file.getName());
         ShareData.currentContractName.set(file.getName());
-        ShareData.currentContractTab = tab;
+        ShareData.currentContractTab = codeTab;
 
-        return tab;
+        return codeTab;
     }
 
     private void createTabForFileSystemFile(String fileName) {
