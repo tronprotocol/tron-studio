@@ -63,7 +63,8 @@ public class MainController {
         defaultCodeArea = (CodeArea) defaultCodeAreaTab.getContent();
         new SolidityHighlight(defaultCodeArea).highlight();
         //spellChecking(defaultCodeArea);
-        AutoCompletion.autoComplete(defaultCodeArea);
+        AutoCompletion autocomp = new AutoCompletion(defaultCodeArea);
+        autocomp.autoComplete(defaultCodeArea);
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
@@ -131,7 +132,8 @@ public class MainController {
             e.printStackTrace();
         }
 
-        AutoCompletion.autoComplete(codeArea);
+        AutoCompletion autoCompletion = new AutoCompletion(codeArea);
+        autoCompletion.autoComplete(codeArea);
         tab.setText(file.getName());
         //Just not allow to close the default tab
         tab.setClosable(true);
@@ -156,7 +158,8 @@ public class MainController {
             codeTab.setClosable(true);
             CodeArea codeArea = FXMLLoader.load(getClass().getResource("ui/code_area.fxml"));
 
-            AutoCompletion.autoComplete(codeArea);
+            AutoCompletion autoCompletion = new AutoCompletion(codeArea);
+            autoCompletion.autoComplete(codeArea);
             codeTab.setContent(codeArea);
             codeAreaTabPane.getTabs().add(codeTab);
 
