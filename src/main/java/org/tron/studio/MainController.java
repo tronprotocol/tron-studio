@@ -67,6 +67,7 @@ public class MainController {
         ShareData.currentContractTab = defaultCodeAreaTab;
         codeAreaTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             ShareData.currentContractTab = newValue;
+            ShareData.currentContractFileName.set(newValue.getText());
         });
 
         ShareData.deleteContract.addListener((observable, oldValue, currentContractName) -> {

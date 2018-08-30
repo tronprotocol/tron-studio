@@ -137,10 +137,8 @@ public class LeftCodeListController {
                         nextCurrentIndex = currentIndex + 1;
                     }
 
-                    ShareData.currentContractFileName.set(
-                            ShareData.allContractFileName.get(ShareData.allContractFileName.size() - 1));
                     fileNameTable.getSelectionModel().select(nextCurrentIndex);
-
+                    ShareData.currentContractFileName.set(fileNameTable.getSelectionModel().getSelectedItem().getValue().fileName.getValue());
                 } else {
                     logger.info("No file to show");
                 }

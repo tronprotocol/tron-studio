@@ -1,15 +1,13 @@
 package org.tron.studio;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Tab;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.walletserver.WalletClient;
 
 import java.util.HashMap;
+import java.util.TreeSet;
 
 public class ShareData {
 
@@ -47,7 +45,7 @@ public class ShareData {
     //新建的合约文件
     public static SimpleStringProperty newContractFileName = new SimpleStringProperty();
     //所有的合约文件列表
-    public static SimpleListProperty<String> allContractFileName = new SimpleListProperty<>(FXCollections.observableArrayList());
+    public static SimpleSetProperty<String> allContractFileName = new SimpleSetProperty<>(FXCollections.observableSet(new TreeSet<>()));
 
     //所有的交易历史记录
     //包括不上链的交易：TransactionExtension
