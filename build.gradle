@@ -176,6 +176,8 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
+    // https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7'
 }
 
 check.dependsOn 'lint'
