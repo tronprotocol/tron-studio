@@ -10,8 +10,15 @@ import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 import javafx.scene.input.KeyEvent;
 import javafx.event.*;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AutoCompletion {
     final static int ROW_HEIGHT = 24;
@@ -21,27 +28,22 @@ public class AutoCompletion {
     private int currentPara = 0;
     private int subStrSize = 0;
     private CodeArea textArea;
+    private static final String PATH_TO_KEYWORDS  = "/keywords/solidity.txt";
 
     Map dictionary = new HashMap();
 
-    private static String[] keywords = {
-            "class",
-            "function",
-            "int",
-            "case",
-            "contract",
-            "while",
-            "for"
-    };
+    private static List<String> keywords = new ArrayList<>();
 
     public AutoCompletion(CodeArea textArea){
         this.textArea = textArea;
+
+        keywords = readKeywords();
 
         dictionary.put("{", "\n}");
         dictionary.put("(", " )");
         dictionary.put("\"", "\"");
 
-        extractAllwords(textArea,0,0);
+        //extractAllwords(textArea,0,0);
         textArea.setPopupAlignment(PopupAlignment.SELECTION_BOTTOM_RIGHT);
         popup.setPopupContent(list);
         textArea.setPopupWindow(popup);
@@ -50,8 +52,6 @@ public class AutoCompletion {
             startCol = textArea.getCaretColumn();
             currentPara = textArea.getCurrentParagraph();
         });
-
-
 
         list.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
             @Override
@@ -88,7 +88,7 @@ public class AutoCompletion {
         textArea.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                extractAllwords(textArea,0,0);
+                //extractAllwords(textArea,0,0);
 
                 String subStr = "";
                 for (int i = 1; i <= startCol; i++)
@@ -127,20 +127,59 @@ public class AutoCompletion {
         });
     }
 
-    private void extractAllwords(CodeArea textArea, int startPos, int endPos)
+    private void extractRefWords(CodeArea textArea, int startPos, int endPos, int currCol, int CurrPara)
     {
-        String allText;
-        if (endPos == 0)
-        {
-            allText = textArea.getText();
-        } else
-        {
-            allText = textArea.getText(startPos, endPos);
-        }
+        List<String> refWords = new ArrayList<>();
+        boolean exitFun = false;
+        boolean exitContract = false;
 
-        allText = allText.replaceAll("[\t+\n+\\s+{}()]", " ");
-        allText = allText.replaceAll("\\s+"," ");
-        System.out.println(allText);
+        for (int i = currentPara; i >= 0; i--)
+        {
+            if (exitFun)
+            {
+                continue;
+            }
+            String line = textArea.getText(i);
+            line = line.replaceAll("[\t+\n+\\s+{}()]", " ");
+            line = line.replaceAll("\\s+"," ");
+
+            String[] words = line.split("\\s");
+            for(String word: words)
+            {
+                if (word.equals("function"))
+                {
+                    exitFun = true;
+                    break;
+                }
+                if (word.equals("contract"))
+                {
+                    exitContract = true;
+                    break;
+                }
+                if (keywords.contains(word))
+                {
+                    exitContract = true;
+                    break;
+                }
+                refWords.add(word);
+            }
+
+            if (exitContract) break;
+        }
+    }
+
+    private List<String> readKeywords()
+    {
+        Stream<String> lines = new BufferedReader(new InputStreamReader(
+                getClass().getResourceAsStream(PATH_TO_KEYWORDS))).lines();
+        String[] words = lines.collect(Collectors.joining("|")).split("\\|");
+
+        List<String> keywords = new ArrayList<>();
+        for (String word: words)
+        {
+            keywords.add(word);
+        }
+        return keywords;
     }
 
     private void setList(CodeArea textArea, ObservableList<String> candwords) {
