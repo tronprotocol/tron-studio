@@ -1,6 +1,7 @@
 package org.tron.studio.ui;
 
 import com.jfoenix.controls.JFXPopup;
+import javafx.scene.input.KeyCode;
 import org.fxmisc.richtext.CodeArea;
 
 import org.fxmisc.richtext.PopupAlignment;
@@ -9,6 +10,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 import javafx.scene.input.KeyEvent;
 import javafx.event.*;
+import java.util.Map;
+import java.util.HashMap;
 
 public class AutoCompletion {
     final static int ROW_HEIGHT = 24;
@@ -18,6 +21,8 @@ public class AutoCompletion {
     private int currentPara = 0;
     private int subStrSize = 0;
     private CodeArea textArea;
+
+    Map dictionary = new HashMap();
 
     private static String[] keywords = {
             "class",
@@ -31,24 +36,49 @@ public class AutoCompletion {
 
     public AutoCompletion(CodeArea textArea){
         this.textArea = textArea;
+
+        dictionary.put("{", "\n}");
+        dictionary.put("(", " )");
+        dictionary.put("\"", "\"");
+
         extractAllwords(textArea,0,0);
         textArea.setPopupAlignment(PopupAlignment.SELECTION_BOTTOM_RIGHT);
+        popup.setPopupContent(list);
         textArea.setPopupWindow(popup);
 
-        list.setOnKeyTyped(new EventHandler<KeyEvent>(){
+        this.textArea.caretColumnProperty().addListener((observable, oldValue, currentContractName) -> {
+            startCol = textArea.getCaretColumn();
+            currentPara = textArea.getCurrentParagraph();
+        });
+
+
+
+        list.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
+                if (event.getCode() != KeyCode.ENTER)
+                {
+                    return;
+                }
 
                 String curentValue = list.getSelectionModel().getSelectedItem();
-
-                if (curentValue == null)
+                String currCha = textArea.getText(currentPara, startCol-1,
+                        currentPara, startCol);
+                if (currCha.equals(" "))
                 {
-                    list.getSelectionModel().select(0);
+                    popup.hide();
                     return;
                 }
 
                 textArea.insertText(currentPara, startCol, curentValue.substring(subStrSize));
                 popup.hide();
+            }
+        });
+
+        list.setOnKeyTyped(new EventHandler<KeyEvent>(){
+            @Override
+            public void handle(KeyEvent event) {
+
             }
         });
     }
@@ -59,8 +89,6 @@ public class AutoCompletion {
             @Override
             public void handle(KeyEvent event) {
                 extractAllwords(textArea,0,0);
-                startCol = textArea.getCaretColumn();
-                currentPara = textArea.getCurrentParagraph();
 
                 String subStr = "";
                 for (int i = 1; i <= startCol; i++)
@@ -72,6 +100,7 @@ public class AutoCompletion {
                 }
                 subStr = new StringBuilder(subStr).reverse().toString();
 
+                boolean hidePopup = true;
                 if (subStr.length() != 0)
                 {
                     ObservableList<String> candWords = FXCollections.observableArrayList();
@@ -84,9 +113,15 @@ public class AutoCompletion {
                     }
                     if (candWords.size() != 0)
                     {
+                        hidePopup = false;
                         subStrSize = subStr.length();
                         setList(textArea, candWords);
                     }
+                }
+
+                if (hidePopup && popup.getPopupContent() != null)
+                {
+                    popup.hide();
                 }
             }
         });
