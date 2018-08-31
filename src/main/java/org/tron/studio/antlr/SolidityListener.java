@@ -1,5 +1,5 @@
 // Generated from Solidity.g4 by ANTLR 4.7
-package org.tron.antlr;
+package org.tron.studio.antlr;
 
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
