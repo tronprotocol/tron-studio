@@ -29,12 +29,13 @@ public class BottomController {
             if (ShareData.wallet == null || ShareData.wallet.getRpcCli() == null) {
                 return;
             }
+            Protocol.Account account = ShareData.wallet.queryAccount();
+            String balance = Long.toString(account.getBalance() / 1_000_000);
+            String blockNumber = Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber());
             Platform.runLater(() -> {
                 try {
-                    nowBlockButton.setText("Now Block:" + Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber()));
-
-                    Protocol.Account account = ShareData.wallet.queryAccount();
-                    balanceButton.setText("Balance:" + Long.toString(account.getBalance() / 1_000_000));
+                    nowBlockButton.setText("Now Block:" + blockNumber);
+                    balanceButton.setText("Balance:" + balance);
                 } catch (StatusRuntimeException e) {
                     logger.info("Connecting {}", counter.incrementAndGet());
                 } catch (Exception t) {

@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -42,7 +40,6 @@ import org.tron.common.crypto.Hash;
 import org.tron.common.utils.Base58;
 import org.tron.common.utils.ByteArray;
 import org.tron.common.utils.Sha256Hash;
-import org.tron.core.config.args.Args;
 import org.tron.core.exception.CancelException;
 import org.tron.keystore.CipherException;
 import org.tron.protos.Contract;
@@ -66,6 +63,7 @@ import org.tron.protos.Protocol.Transaction.Result;
 import org.tron.protos.Protocol.TransactionInfo;
 import org.tron.protos.Protocol.TransactionSign;
 import org.tron.protos.Protocol.Witness;
+import org.tron.studio.ShareData;
 import org.tron.studio.utils.CheckStrength;
 import org.tron.studio.utils.Parameter.CommonConstant;
 import org.tron.studio.utils.TransactionUtils;
@@ -76,19 +74,23 @@ public class WalletClient {
   private byte[] address = null;
   private byte[] priKey = null;
   private ECKey ecKey = null;
-  private static byte addressPreFixByte = CommonConstant.ADD_PRE_FIX_BYTE_TESTNET;
+  private static byte addressPreFixByte = CommonConstant.ADD_PRE_FIX_BYTE_MAINNET;
   private static int rpcVersion = 0;
   private static TransactionExtention lastTransactionExtention = null;
   private static Transaction lastTransaction = null;
 
-  @Getter
-  public static GrpcClient rpcCli = init();
+  private static String rpcIp;
+  private static int rpcPort = 0;
+  private static GrpcClient rpcCli;
 
-  public static GrpcClient init() {
-    String fullNode = "127.0.0.1" + ":" + Args.getInstance().getRpcPort();
-    String solidityNode = "";
-    WalletClient.setAddressPreFixByte(CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
-    return new GrpcClient(fullNode, solidityNode);
+  public static GrpcClient getRpcCli() {
+    if (!StringUtils.equals(ShareData.getRpcIp(), rpcIp) || ShareData.getRpcPort() != rpcPort) {
+      WalletClient.setAddressPreFixByte(CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
+      rpcIp = ShareData.getRpcIp();
+      rpcPort = ShareData.getRpcPort();
+      rpcCli = new GrpcClient(rpcIp + ":" + rpcPort, "");
+    }
+    return rpcCli;
   }
 
   public static byte getAddressPreFixByte() {
@@ -123,7 +125,8 @@ public class WalletClient {
     }
 
     System.out.println(
-        "Signed txid = " + ByteArray.toHexString(Sha256Hash.hash(transaction.getRawData().toByteArray())));
+        "Signed txid = " + ByteArray
+            .toHexString(Sha256Hash.hash(transaction.getRawData().toByteArray())));
     transaction = TransactionUtils.sign(transaction, ecKey);
     return transaction;
   }
@@ -146,7 +149,8 @@ public class WalletClient {
       return false;
     }
     System.out.println(
-        "Receive unsigned txid = " + ByteArray.toHexString(transactionExtention.getTxid().toByteArray()));
+        "Receive unsigned txid = " + ByteArray
+            .toHexString(transactionExtention.getTxid().toByteArray()));
     transaction = signTransaction(transaction);
     lastTransaction = transaction;
     return rpcCli.broadcastTransaction(transaction);

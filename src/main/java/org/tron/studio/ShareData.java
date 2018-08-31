@@ -3,6 +3,8 @@ package org.tron.studio;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Tab;
+import lombok.Getter;
+import lombok.Setter;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.walletserver.WalletClient;
 
@@ -26,6 +28,13 @@ public class ShareData {
         "7b0b316f60cf3954f0c54c292001f6b59f4a80328a04feafef539f0824ba5078"
     };
 
+    @Getter
+    @Setter
+    public static String rpcIp = "127.0.0.1";
+
+    @Getter
+    @Setter
+    public static int rpcPort = 16669;
 
     public static Boolean enableOptimize = false;
     public static long TRX_SUN_UNIT = 1_000_000;
