@@ -84,10 +84,10 @@ public class WalletClient {
   private static GrpcClient rpcCli;
 
   public static GrpcClient getRpcCli() {
-    if (!StringUtils.equals(ShareData.getRpcIp(), rpcIp) || ShareData.getRpcPort() != rpcPort) {
+    if (!StringUtils.equals(ShareData.getCurrentRpcIp(), rpcIp) || ShareData.getCurrentRpcPort() != rpcPort) {
       WalletClient.setAddressPreFixByte(CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
-      rpcIp = ShareData.getRpcIp();
-      rpcPort = ShareData.getRpcPort();
+      rpcIp = ShareData.getCurrentRpcIp();
+      rpcPort = ShareData.getCurrentRpcPort();
       rpcCli = new GrpcClient(rpcIp + ":" + rpcPort, "");
     }
     return rpcCli;

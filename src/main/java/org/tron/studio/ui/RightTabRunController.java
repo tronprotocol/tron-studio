@@ -41,6 +41,7 @@ import org.tron.studio.solc.CompilationResult.ContractMetadata;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.utils.AbiUtil;
 import org.tron.studio.walletserver.WalletClient;
+import sun.security.provider.SHA;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,6 +79,18 @@ public class RightTabRunController implements Initializable {
                 "Main Net"
         ));
         environmentComboBox.getSelectionModel().selectFirst();
+        environmentComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(StringUtils.equals(newValue, "Local TVM")) {
+                ShareData.currentRpcIp = ShareData.localRpcIp;
+                ShareData.currentRpcPort = ShareData.localRpcPort;
+            } else if(StringUtils.equals(newValue, "Test Net")) {
+                ShareData.currentRpcIp = ShareData.testNetRpcIp;
+                ShareData.currentRpcPort = ShareData.testNetRpcPort;
+            } else if(StringUtils.equals(newValue, "Main Net")) {
+                ShareData.currentRpcIp = ShareData.mainNetRpcIp;
+                ShareData.currentRpcPort = ShareData.mainNetRpcPort;
+            }
+        });
 
         accountComboBox.setItems(FXCollections.observableArrayList(ShareData.testAccount.keySet()));
         accountComboBox.valueProperty().addListener((observable, oldValue, address) -> {
