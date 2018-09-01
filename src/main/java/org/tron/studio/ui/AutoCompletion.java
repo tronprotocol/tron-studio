@@ -62,9 +62,14 @@ public class AutoCompletion {
                 }
 
                 String curentValue = list.getSelectionModel().getSelectedItem();
-                String currCha = textArea.getText(currentPara, startCol-1,
-                        currentPara, startCol);
-                if (currCha.equals(" "))
+                String currCha = "";
+                if (startCol != 0)
+                {
+                    currCha = textArea.getText(currentPara, startCol - 1,
+                            currentPara, startCol);
+                }
+
+                if (currCha.length() == 0 || currCha.equals(" "))
                 {
                     popup.hide();
                     return;
@@ -136,7 +141,6 @@ public class AutoCompletion {
         boolean exitFun = false;
         boolean enterFun = false;
         boolean exitContract = false;
-        boolean enterContract = false;
 
         for (int i = currentPara; i >= 0; i--)
         {
