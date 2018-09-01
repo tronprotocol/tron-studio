@@ -79,13 +79,6 @@ public class AutoCompletion {
                 popup.hide();
             }
         });
-
-        list.setOnKeyTyped(new EventHandler<KeyEvent>(){
-            @Override
-            public void handle(KeyEvent event) {
-
-            }
-        });
     }
 
     public void autoComplete(CodeArea textArea)
