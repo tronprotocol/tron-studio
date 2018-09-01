@@ -35,6 +35,8 @@ public class BottomController {
                 logger.info("Connecting {}", counter.incrementAndGet());
                 return;
             }
+//            Protocol.Account.AccountResource resource = account.getAccountResource();
+//            Protocol.Account.Frozen frozenBalanceForEnergy = resource.getFrozenBalanceForEnergy();
             String balance = Long.toString(account.getBalance() / 1_000_000);
             String blockNumber = Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber());
             Platform.runLater(() -> {

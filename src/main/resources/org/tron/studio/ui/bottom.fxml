@@ -11,5 +11,5 @@
     <JFXButton fx:id="nowBlockButton" text="Now Block"/>
     <JFXButton fx:id="balanceButton" text="Balance"/>
     <Region HBox.hgrow="ALWAYS"/>
-    <JFXButton fx:id="rpcRestartButton" text="Restart"/>
+    <JFXButton fx:id="rpcRestartButton" text="Restart" visible="false"/>
 </HBox>
