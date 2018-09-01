@@ -1,11 +1,9 @@
 package org.tron.studio.ui;
 
 import com.alibaba.fastjson.JSON;
-import com.google.gson.JsonObject;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXRippler;
 import com.jfoenix.controls.JFXTextField;
-import com.sun.javafx.tools.packager.PackagerException;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
@@ -26,7 +24,6 @@ import org.tron.studio.filesystem.VmTraceFileUtil;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.attribute.FileTime;
 import java.util.*;
 
 import java.nio.file.attribute.BasicFileAttributes;
