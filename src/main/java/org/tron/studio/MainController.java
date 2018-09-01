@@ -25,6 +25,10 @@ import java.text.BreakIterator;
 import java.time.Duration;
 import java.util.*;
 
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
+
 @Slf4j
 public class MainController {
     public TabPane rightContentTabPane;
@@ -68,6 +72,17 @@ public class MainController {
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
         defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
+
+        defaultCodeArea.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent e) {
+                if (e.getCode() == KeyCode.TAB) {
+                    String s = StringUtils.repeat(' ', 2);
+                    defaultCodeArea.insertText(defaultCodeArea.getCaretPosition(), s);
+                    e.consume();
+                }
+            }
+        });
 
         ShareData.currentContractTab = defaultCodeAreaTab;
         ShareData.allContractFileName.add(defaultContractFile.getName());
@@ -152,6 +167,17 @@ public class MainController {
         codeTab.setContent(codeArea);
         codeAreaTabPane.getTabs().add(codeTab);
 
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent e) {
+                if (e.getCode() == KeyCode.TAB) {
+                    String s = StringUtils.repeat(' ', 2);
+                    codeArea.insertText(codeArea.getCaretPosition(), s);
+                    e.consume();
+                }
+            }
+        });
+
         new SolidityHighlight(codeArea).highlight();
         codeArea.replaceText(0, 0, builder.toString());
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
@@ -180,6 +206,17 @@ public class MainController {
             autoCompletion.autoComplete(codeArea);
             codeTab.setContent(codeArea);
             codeAreaTabPane.getTabs().add(codeTab);
+
+            codeArea.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent e) {
+                    if (e.getCode() == KeyCode.TAB) {
+                        String s = StringUtils.repeat(' ', 2);
+                        codeArea.insertText(codeArea.getCaretPosition(), s);
+                        e.consume();
+                    }
+                }
+            });
 
             String sourceCode = SolidityFileUtil.getSourceCode(fileName);
 
