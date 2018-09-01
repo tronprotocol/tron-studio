@@ -35,12 +35,14 @@ import org.tron.keystore.CipherException;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.studio.ShareData;
 import org.tron.studio.TransactionHistoryItem;
+import org.tron.studio.filesystem.VmTraceFileUtil;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.CompilationResult.ContractMetadata;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.utils.AbiUtil;
 import org.tron.studio.walletserver.WalletClient;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
