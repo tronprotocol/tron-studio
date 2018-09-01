@@ -41,7 +41,6 @@ import org.tron.studio.solc.CompilationResult.ContractMetadata;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.utils.AbiUtil;
 import org.tron.studio.walletserver.WalletClient;
-import sun.security.provider.SHA;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,25 +79,28 @@ public class RightTabRunController implements Initializable {
         ));
         environmentComboBox.getSelectionModel().selectFirst();
         environmentComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(StringUtils.equals(newValue, "Local TVM")) {
+            if (StringUtils.equals(newValue, "Local TVM")) {
                 ShareData.currentRpcIp = ShareData.localRpcIp;
                 ShareData.currentRpcPort = ShareData.localRpcPort;
-            } else if(StringUtils.equals(newValue, "Test Net")) {
+            } else if (StringUtils.equals(newValue, "Test Net")) {
                 ShareData.currentRpcIp = ShareData.testNetRpcIp;
                 ShareData.currentRpcPort = ShareData.testNetRpcPort;
-            } else if(StringUtils.equals(newValue, "Main Net")) {
+            } else if (StringUtils.equals(newValue, "Main Net")) {
                 ShareData.currentRpcIp = ShareData.mainNetRpcIp;
                 ShareData.currentRpcPort = ShareData.mainNetRpcPort;
             }
         });
 
-        accountComboBox.setItems(FXCollections.observableArrayList(ShareData.testAccount.keySet()));
-        accountComboBox.valueProperty().addListener((observable, oldValue, address) -> {
-                    String privateKey = ShareData.testAccount.get(address);
-                    ShareData.wallet = new WalletClient(Hex.decode(privateKey));
-                }
-        );
-        accountComboBox.getSelectionModel().selectFirst();
+        ShareData.newAccount.addListener((observable, oldValue, newValue) -> {
+            accountComboBox.getItems().clear();
+            accountComboBox.setItems(FXCollections.observableArrayList(ShareData.testAccount.keySet()));
+            accountComboBox.getSelectionModel().selectFirst();
+        });
+        ShareData.newAccount.set(ShareData.testAccount.keySet().stream().findFirst().get());
+        accountComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            ShareData.wallet = new WalletClient(Hex.decode(ShareData.testAccount.get(newValue)));
+        });
+
 
         feeUnitComboBox.setItems(FXCollections.observableArrayList(
                 "trx",

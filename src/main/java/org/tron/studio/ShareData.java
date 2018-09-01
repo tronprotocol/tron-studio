@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Tab;
 import lombok.Getter;
 import lombok.Setter;
+import org.spongycastle.util.encoders.Hex;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.walletserver.WalletClient;
 
@@ -62,14 +63,12 @@ public class ShareData {
     public static int currentRpcPort = localRpcPort;
 
 
-
-
-
     public static Boolean enableOptimize = false;
     public static long TRX_SUN_UNIT = 1_000_000;
 
+    public static SimpleStringProperty newAccount = new SimpleStringProperty();
     public static final HashMap<String, String> testAccount = new HashMap<>();
-    public static WalletClient wallet;
+    public static WalletClient wallet = new WalletClient(Hex.decode(testAccountPrivateKey[0]));
 
     //合约的编译结果
     public static SimpleObjectProperty<SolidityCompiler.Result> currentSolidityCompilerResult = new SimpleObjectProperty<>();

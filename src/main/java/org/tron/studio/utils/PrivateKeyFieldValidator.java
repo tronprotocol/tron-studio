@@ -3,9 +3,11 @@ package org.tron.studio.utils;
 import com.jfoenix.validation.base.ValidatorBase;
 import javafx.beans.DefaultProperty;
 import javafx.scene.control.TextInputControl;
+import org.spongycastle.util.encoders.Hex;
+import org.tron.common.crypto.ECKey;
 
 @DefaultProperty(value = "icon")
-public class PortFieldValidator extends ValidatorBase {
+public class PrivateKeyFieldValidator extends ValidatorBase {
 
     @Override
     protected void eval() {
@@ -29,10 +31,10 @@ public class PortFieldValidator extends ValidatorBase {
         }
     }
 
-    private boolean isPort(String portStr) {
+    private boolean isPort(String privateKeyStr) {
         try {
-            long port = Long.parseLong(portStr);
-            if (port > 0 && port < 65536) {
+            ECKey ecKey = ECKey.fromPrivate(Hex.decode(privateKeyStr));
+            if (ecKey != null) {
                 return true;
             }
         } catch (Exception e) {
@@ -43,6 +45,6 @@ public class PortFieldValidator extends ValidatorBase {
 
     @Override
     public String getMessage() {
-        return "Invalid Port";
+        return "Invalid Private Key";
     }
 }

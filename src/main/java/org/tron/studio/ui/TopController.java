@@ -1,9 +1,6 @@
 package org.tron.studio.ui;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import com.jfoenix.validation.IntegerValidator;
 import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
@@ -14,10 +11,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import lombok.extern.slf4j.Slf4j;
+import org.spongycastle.util.encoders.Hex;
+import org.tron.common.crypto.ECKey;
+import org.tron.core.Wallet;
 import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
 import org.tron.studio.utils.IPFieldValidator;
 import org.tron.studio.utils.PortFieldValidator;
+import org.tron.studio.utils.PrivateKeyFieldValidator;
 
 @Slf4j(topic = "TopController")
 public class TopController {
@@ -137,15 +138,31 @@ public class TopController {
 
     public void onClickAccount(MouseEvent mouseEvent) {
         JFXDialog dialog = new JFXDialog();
+        dialog.setTransitionType(JFXDialog.DialogTransition.TOP);
         JFXDialogLayout layout = new JFXDialogLayout();
         layout.setPrefWidth(800);
-        layout.setHeading(new Label("Account"));
-        TextArea textArea = new TextArea();
+        layout.setHeading(new Label("Import Account"));
+        JFXTextArea textArea = new JFXTextArea();
+        textArea.setPromptText("Paste your private key in hex format");
+        textArea.setValidators(new PrivateKeyFieldValidator());
         layout.setBody(textArea);
         dialog.setContent(layout);
         JFXButton closeButton = new JFXButton("OK");
         closeButton.getStyleClass().add("dialog-accept");
-        closeButton.setOnAction(event -> dialog.close());
+        closeButton.setOnAction(event -> {
+            try {
+                if (!textArea.validate()) {
+                    return;
+                }
+                ECKey ecKey = ECKey.fromPrivate(Hex.decode(textArea.getText()));
+                ShareData.testAccount.put(Wallet.encode58Check(ecKey.getAddress()), textArea.getText());
+                ShareData.newAccount.set(Wallet.encode58Check(ecKey.getAddress()));
+            } catch (Exception e) {
+                logger.error("Failed: {}", e);
+                return;
+            }
+            dialog.close();
+        });
         layout.setActions(closeButton);
         dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
     }

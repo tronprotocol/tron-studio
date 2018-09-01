@@ -26,22 +26,26 @@ public class BottomController {
     public void initialize() {
 
         syncExecutor.scheduleWithFixedDelay(() -> {
-            if (ShareData.wallet == null || ShareData.wallet.getRpcCli() == null) {
-                return;
-            }
-            Protocol.Account account = ShareData.wallet.queryAccount();
-            String balance = Long.toString(account.getBalance() / 1_000_000);
-            String blockNumber = Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber());
-            Platform.runLater(() -> {
-                try {
-                    nowBlockButton.setText("Now Block:" + blockNumber);
-                    balanceButton.setText("Balance:" + balance);
-                } catch (StatusRuntimeException e) {
-                    logger.info("Connecting {}", counter.incrementAndGet());
-                } catch (Exception t) {
-                    logger.error("Error in getNowBlock {}" + t.getMessage(), t);
+            try {
+                if (ShareData.wallet == null || ShareData.wallet.getRpcCli() == null) {
+                    return;
                 }
-            });
+                Protocol.Account account = ShareData.wallet.queryAccount();
+                String balance = Long.toString(account.getBalance() / 1_000_000);
+                String blockNumber = Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber());
+                Platform.runLater(() -> {
+                    try {
+                        nowBlockButton.setText("Now Block:" + blockNumber);
+                        balanceButton.setText("Balance:" + balance);
+                    } catch (StatusRuntimeException e) {
+                        logger.info("Connecting {}", counter.incrementAndGet());
+                    } catch (Exception t) {
+                        logger.error("Error in getNowBlock {}" + t.getMessage(), t);
+                    }
+                });
+            } catch (Exception e) {
+                logger.error("Error in syncExecutor {}" + e.getMessage(), e);
+            }
         }, 2_000, 500, TimeUnit.MILLISECONDS);
     }
 }
