@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.validation.IntegerValidator;
 import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -15,6 +16,8 @@ import javafx.scene.layout.*;
 import lombok.extern.slf4j.Slf4j;
 import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
+import org.tron.studio.utils.IPFieldValidator;
+import org.tron.studio.utils.PortFieldValidator;
 
 @Slf4j(topic = "TopController")
 public class TopController {
@@ -33,7 +36,7 @@ public class TopController {
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
-        gridPane.setVgap(10);
+        gridPane.setVgap(20);
         ColumnConstraints columnConstraints0 = new ColumnConstraints();
         columnConstraints0.setHgrow(Priority.NEVER);
         ColumnConstraints columnConstraints1 = new ColumnConstraints();
@@ -74,18 +77,57 @@ public class TopController {
         gridPane.add(mainNetIpTextField, 1, 2);
         gridPane.add(mainNetPortTextField, 2, 2);
 
+        testNetIpTextField.setValidators(new IPFieldValidator());
+        testNetPortTextField.setValidators(new PortFieldValidator());
+
+        mainNetIpTextField.setValidators(new IPFieldValidator());
+        mainNetPortTextField.setValidators(new PortFieldValidator());
+        testNetIpTextField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                testNetIpTextField.validate();
+            }
+        });
+        testNetPortTextField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                testNetPortTextField.validate();
+            }
+        });
+        mainNetIpTextField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                mainNetIpTextField.validate();
+            }
+        });
+        mainNetPortTextField.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) {
+                mainNetPortTextField.validate();
+            }
+        });
+
         layout.setBody(gridPane);
         dialog.setContent(layout);
         JFXButton closeButton = new JFXButton("OK");
         closeButton.getStyleClass().add("dialog-accept");
         closeButton.setOnAction(event -> {
             try {
+                if (!testNetIpTextField.validate()) {
+                    return;
+                }
+                if (!testNetPortTextField.validate()) {
+                    return;
+                }
+                if (!mainNetIpTextField.validate()) {
+                    return;
+                }
+                if (!mainNetPortTextField.validate()) {
+                    return;
+                }
                 ShareData.testNetRpcIp = testNetIpTextField.getText();
                 ShareData.testNetRpcPort = Integer.parseInt(testNetPortTextField.getText());
                 ShareData.mainNetRpcIp = mainNetIpTextField.getText();
                 ShareData.mainNetRpcPort = Integer.parseInt(mainNetPortTextField.getText());
             } catch (Exception e) {
                 logger.error("Failed: {}", e);
+                return;
             }
             dialog.close();
         });
