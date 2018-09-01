@@ -71,10 +71,6 @@ public class RightTabDebugController implements Initializable {
             }
 
             transactionIdTextField.setText(transactionId);
-            String[] nodes = {"Instructions", "Solidity Locals",
-                    "Solidity State", "Step detail", "Stack",
-                    "Storage completely loaded", "Memory", "Call Data", "Call Stack",
-                    "Return Value", "Full Storages Changes"};
 
             getTransDetails(transactionId);
 
@@ -93,8 +89,9 @@ public class RightTabDebugController implements Initializable {
 
             debugList.getItems().clear();
 
-            for (String nodename : nodes) {
-                JFXListView<Object> subList = createList(nodename, details.get(nodename));
+            for (Map.Entry<String, Object> entry: details.entrySet())
+            {
+                JFXListView<Object> subList = createList(entry.getKey(), entry.getValue());
                 debugList.getItems().add(subList);
             }
         });
