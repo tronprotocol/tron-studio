@@ -138,24 +138,23 @@ public class TopController {
 
     public void onClickAccount(MouseEvent mouseEvent) {
         JFXDialog dialog = new JFXDialog();
-        dialog.setTransitionType(JFXDialog.DialogTransition.TOP);
         JFXDialogLayout layout = new JFXDialogLayout();
         layout.setPrefWidth(800);
         layout.setHeading(new Label("Import Account"));
-        JFXTextArea textArea = new JFXTextArea();
-        textArea.setPromptText("Paste your private key in hex format");
-        textArea.setValidators(new PrivateKeyFieldValidator());
-        layout.setBody(textArea);
+        JFXTextField privateKeyTextField = new JFXTextField();
+        privateKeyTextField.setPromptText("Paste your private key in hex format");
+        privateKeyTextField.setValidators(new PrivateKeyFieldValidator());
+        layout.setBody(privateKeyTextField);
         dialog.setContent(layout);
         JFXButton closeButton = new JFXButton("OK");
         closeButton.getStyleClass().add("dialog-accept");
         closeButton.setOnAction(event -> {
             try {
-                if (!textArea.validate()) {
+                if (!privateKeyTextField.validate()) {
                     return;
                 }
-                ECKey ecKey = ECKey.fromPrivate(Hex.decode(textArea.getText()));
-                ShareData.testAccount.put(Wallet.encode58Check(ecKey.getAddress()), textArea.getText());
+                ECKey ecKey = ECKey.fromPrivate(Hex.decode(privateKeyTextField.getText()));
+                ShareData.testAccount.put(Wallet.encode58Check(ecKey.getAddress()), privateKeyTextField.getText());
                 ShareData.newAccount.set(Wallet.encode58Check(ecKey.getAddress()));
             } catch (Exception e) {
                 logger.error("Failed: {}", e);
