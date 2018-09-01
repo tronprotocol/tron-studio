@@ -30,11 +30,40 @@ public class ShareData {
 
     @Getter
     @Setter
-    public static String rpcIp = "127.0.0.1";
+    public static String localRpcIp = "127.0.0.1";
 
     @Getter
     @Setter
-    public static int rpcPort = 16669;
+    public static int localRpcPort = 16669;
+
+    @Getter
+    @Setter
+    public static String testNetRpcIp = "47.254.144.25";
+
+    @Getter
+    @Setter
+    public static int testNetRpcPort = 50051;
+
+    @Getter
+    @Setter
+    public static String mainNetRpcIp = "54.236.37.243";
+
+    @Getter
+    @Setter
+    public static int mainNetRpcPort = 50051;
+
+
+    @Getter
+    @Setter
+    public static String currentRpcIp = localRpcIp;
+
+    @Getter
+    @Setter
+    public static int currentRpcPort = localRpcPort;
+
+
+
+
 
     public static Boolean enableOptimize = false;
     public static long TRX_SUN_UNIT = 1_000_000;

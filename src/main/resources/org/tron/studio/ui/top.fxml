@@ -11,18 +11,18 @@
    <JFXToolbar AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
                AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" >
        <leftItems>
-           <JFXButton styleClass="custom-jfx-button-raised"  text="Dump Layout info" onAction="#dumpLayoutInfo"/>
+           <JFXButton styleClass="custom-jfx-button-raised"  text="Dump Layout info" onAction="#dumpLayoutInfo" visible="false"/>
        </leftItems>
        <rightItems>
            <HBox spacing="10">
+               <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickBlockChain" visible="false">
+                   <StackPane style="-fx-padding: 10;">
+                       <MaterialDesignIconView glyphSize="20" glyphName="LINK" styleClass="icon-top2"/>
+                   </StackPane>
+               </JFXRippler>
                <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickAccount">
                    <StackPane style="-fx-padding: 10;">
                        <MaterialDesignIconView glyphSize="20" glyphName="ACCOUNT_MULTIPLE" styleClass="icon-top2"/>
-                   </StackPane>
-               </JFXRippler>
-               <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickBlockChain">
-                   <StackPane style="-fx-padding: 10;">
-                       <MaterialDesignIconView glyphSize="20" glyphName="LINK" styleClass="icon-top2"/>
                    </StackPane>
                </JFXRippler>
                <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickSettings">
