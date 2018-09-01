@@ -104,7 +104,10 @@ public class AutoCompletion {
                 if (subStr.length() != 0)
                 {
                     ObservableList<String> candWords = FXCollections.observableArrayList();
-                    for(String keyword: keywords)
+                    List<String> refWords = new ArrayList<>();
+                    refWords.addAll(keywords);
+                    refWords.addAll(extractRefWords(textArea));
+                    for(String keyword: refWords)
                     {
                         if (keyword.startsWith(subStr) && keyword.length() != subStr.length())
                         {
@@ -119,7 +122,7 @@ public class AutoCompletion {
                     }
                 }
 
-                if (hidePopup && popup.getPopupContent() != null)
+                if (hidePopup && popup.isShowing())
                 {
                     popup.hide();
                 }
@@ -127,45 +130,57 @@ public class AutoCompletion {
         });
     }
 
-    private void extractRefWords(CodeArea textArea, int startPos, int endPos, int currCol, int CurrPara)
+    private List<String> extractRefWords(CodeArea textArea)
     {
         List<String> refWords = new ArrayList<>();
         boolean exitFun = false;
+        boolean enterFun = false;
         boolean exitContract = false;
+        boolean enterContract = false;
 
         for (int i = currentPara; i >= 0; i--)
         {
-            if (exitFun)
-            {
-                continue;
-            }
             String line = textArea.getText(i);
-            line = line.replaceAll("[\t+\n+\\s+{}()]", " ");
-            line = line.replaceAll("\\s+"," ");
+            line = line.trim();
+            line = line.replaceAll("[\t+\n+\\s+{();]", " ");
 
             String[] words = line.split("\\s");
             for(String word: words)
             {
+                if (word.trim().length() == 0) continue;
+                if (!enterFun && exitFun && word.equals("}"))
+                {
+                    enterFun = true;
+                    exitFun = false;
+                }
                 if (word.equals("function"))
                 {
+                    enterFun = false;
                     exitFun = true;
-                    break;
                 }
                 if (word.equals("contract"))
                 {
                     exitContract = true;
                     break;
                 }
-                if (keywords.contains(word))
+                if (keywords.contains(word) || refWords.contains(word))
                 {
-                    exitContract = true;
+                    continue;
+                }
+                if (enterFun)
+                {
                     break;
                 }
                 refWords.add(word);
             }
 
-            if (exitContract) break;
+            if (exitContract)
+            {
+                break;
+            }
         }
+
+        return refWords;
     }
 
     private List<String> readKeywords()
