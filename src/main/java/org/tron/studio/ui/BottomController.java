@@ -1,7 +1,6 @@
 package org.tron.studio.ui;
 
 import com.jfoenix.controls.JFXButton;
-import io.grpc.StatusRuntimeException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import lombok.extern.slf4j.Slf4j;
@@ -26,26 +25,22 @@ public class BottomController {
     public void initialize() {
 
         syncExecutor.scheduleWithFixedDelay(() -> {
+            Protocol.Account account = null;
             try {
                 if (ShareData.wallet == null || ShareData.wallet.getRpcCli() == null) {
                     return;
                 }
-                Protocol.Account account = ShareData.wallet.queryAccount();
-                String balance = Long.toString(account.getBalance() / 1_000_000);
-                String blockNumber = Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber());
-                Platform.runLater(() -> {
-                    try {
-                        nowBlockButton.setText("Now Block:" + blockNumber);
-                        balanceButton.setText("Balance:" + balance);
-                    } catch (StatusRuntimeException e) {
-                        logger.info("Connecting {}", counter.incrementAndGet());
-                    } catch (Exception t) {
-                        logger.error("Error in getNowBlock {}" + t.getMessage(), t);
-                    }
-                });
+                account = ShareData.wallet.queryAccount();
             } catch (Exception e) {
-                logger.error("Error in syncExecutor {}" + e.getMessage(), e);
+                logger.info("Connecting {}", counter.incrementAndGet());
+                return;
             }
+            String balance = Long.toString(account.getBalance() / 1_000_000);
+            String blockNumber = Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber());
+            Platform.runLater(() -> {
+                nowBlockButton.setText("Now Block:" + blockNumber);
+                balanceButton.setText("Balance:" + balance);
+            });
         }, 2_000, 500, TimeUnit.MILLISECONDS);
     }
 }

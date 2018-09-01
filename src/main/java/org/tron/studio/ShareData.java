@@ -10,6 +10,7 @@ import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.walletserver.WalletClient;
 
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class ShareData {
@@ -67,7 +68,7 @@ public class ShareData {
     public static long TRX_SUN_UNIT = 1_000_000;
 
     public static SimpleStringProperty newAccount = new SimpleStringProperty();
-    public static final HashMap<String, String> testAccount = new HashMap<>();
+    public static final TreeMap<String, String> testAccount = new TreeMap<>();
     public static WalletClient wallet = new WalletClient(Hex.decode(testAccountPrivateKey[0]));
 
     //合约的编译结果
