@@ -16,6 +16,7 @@ import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.ui.CodeParserUtil;
 import org.tron.studio.ui.SolidityHighlight;
 import org.tron.studio.ui.AutoCompletion;
+import org.tron.studio.ui.FormatCode;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -71,18 +72,10 @@ public class MainController {
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
-        defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
+        FormatCode formatCode = new FormatCode(defaultCodeArea);
+        formatCode.formatAllCode();
 
-        defaultCodeArea.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent e) {
-                if (e.getCode() == KeyCode.TAB) {
-                    String s = StringUtils.repeat(' ', 2);
-                    defaultCodeArea.insertText(defaultCodeArea.getCaretPosition(), s);
-                    e.consume();
-                }
-            }
-        });
+        defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
 
         ShareData.currentContractTab = defaultCodeAreaTab;
         ShareData.allContractFileName.add(defaultContractFile.getName());
@@ -161,26 +154,19 @@ public class MainController {
 
         AutoCompletion autoCompletion = new AutoCompletion(codeArea);
         autoCompletion.autoComplete(codeArea);
+
         codeTab.setText(file.getName());
         //Just not allow to close the default tab
         codeTab.setClosable(true);
         codeTab.setContent(codeArea);
         codeAreaTabPane.getTabs().add(codeTab);
 
-        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent e) {
-                if (e.getCode() == KeyCode.TAB) {
-                    String s = StringUtils.repeat(' ', 2);
-                    codeArea.insertText(codeArea.getCaretPosition(), s);
-                    e.consume();
-                }
-            }
-        });
-
         new SolidityHighlight(codeArea).highlight();
         codeArea.replaceText(0, 0, builder.toString());
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+
+        FormatCode formatCode = new FormatCode(codeArea);
+        formatCode.formatAllCode();
 
         ShareData.allContractFileName.add(file.getName());
         ShareData.currentContractName.set(file.getName());
@@ -204,25 +190,18 @@ public class MainController {
 
             AutoCompletion autoCompletion = new AutoCompletion(codeArea);
             autoCompletion.autoComplete(codeArea);
+
             codeTab.setContent(codeArea);
             codeAreaTabPane.getTabs().add(codeTab);
-
-            codeArea.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent e) {
-                    if (e.getCode() == KeyCode.TAB) {
-                        String s = StringUtils.repeat(' ', 2);
-                        codeArea.insertText(codeArea.getCaretPosition(), s);
-                        e.consume();
-                    }
-                }
-            });
 
             String sourceCode = SolidityFileUtil.getSourceCode(fileName);
 
             new SolidityHighlight(codeArea).highlight();
             codeArea.insertText(0, sourceCode);
             codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+
+            FormatCode formatCode = new FormatCode(codeArea);
+            formatCode.formatAllCode();
 
             codeAreaTabPane.getSelectionModel().select(codeTab);
             ShareData.currentContractTab = codeTab;
