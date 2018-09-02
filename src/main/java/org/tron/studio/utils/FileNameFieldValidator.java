@@ -2,14 +2,13 @@ package org.tron.studio.utils;
 
 import com.jfoenix.validation.base.ValidatorBase;
 import javafx.beans.DefaultProperty;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.TextInputControl;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @DefaultProperty(value = "icon")
-public class IPFieldValidator extends ValidatorBase {
+public class FileNameFieldValidator extends ValidatorBase {
 
     @Override
     protected void eval() {
@@ -25,7 +24,7 @@ public class IPFieldValidator extends ValidatorBase {
         if (textField.getText() == null || textField.getText().isEmpty()) {
             hasErrors.set(true);
         } else {
-            if(!isIP(textField.getText())) {
+            if (!isFileName(textField.getText())) {
                 hasErrors.set(true);
                 return;
             }
@@ -33,18 +32,21 @@ public class IPFieldValidator extends ValidatorBase {
         }
     }
 
-    private boolean isIP(String addr) {
-        if (addr.length() < 7 || addr.length() > 15 || "".equals(addr)) {
+    private boolean isFileName(String fileName) {
+        if (fileName.length() < 1 || fileName.length() > 16 || "".equals(fileName)) {
             return false;
         }
-        String rexp = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$";
+        if(!fileName.endsWith(".sol")) {
+            return false;
+        }
+        String rexp = "\\w*.sol";
         Pattern pat = Pattern.compile(rexp);
-        Matcher mat = pat.matcher(addr);
+        Matcher mat = pat.matcher(fileName);
         return mat.find();
     }
 
     @Override
     public String getMessage() {
-        return "Invalid IP";
+        return "Invalid contract file name, eg: Example.sol";
     }
 }

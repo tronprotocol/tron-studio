@@ -69,6 +69,7 @@ public class MainApplication extends Application {
         getClass().getResource("/css/jfoenix-main-demo.css").toExternalForm(),
             getClass().getResource("/css/keywords.css").toExternalForm());
     primaryStage.setScene(scene);
+    primaryStage.setMaximized(true);
     primaryStage.show();
   }
 

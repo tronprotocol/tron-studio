@@ -1,7 +1,9 @@
 package org.tron.studio.ui;
 
-import com.jfoenix.controls.*;
-import com.jfoenix.validation.IntegerValidator;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXTextField;
 import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -83,25 +85,17 @@ public class TopController {
 
         mainNetIpTextField.setValidators(new IPFieldValidator());
         mainNetPortTextField.setValidators(new PortFieldValidator());
-        testNetIpTextField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                testNetIpTextField.validate();
-            }
+        testNetIpTextField.textProperty().addListener((o, oldVal, newVal) -> {
+            testNetIpTextField.validate();
         });
-        testNetPortTextField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                testNetPortTextField.validate();
-            }
+        testNetPortTextField.textProperty().addListener((o, oldVal, newVal) -> {
+            testNetPortTextField.validate();
         });
-        mainNetIpTextField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                mainNetIpTextField.validate();
-            }
+        mainNetIpTextField.textProperty().addListener((o, oldVal, newVal) -> {
+            mainNetIpTextField.validate();
         });
-        mainNetPortTextField.focusedProperty().addListener((o, oldVal, newVal) -> {
-            if (!newVal) {
-                mainNetPortTextField.validate();
-            }
+        mainNetPortTextField.textProperty().addListener((o, oldVal, newVal) -> {
+            mainNetPortTextField.validate();
         });
 
         layout.setBody(gridPane);

@@ -42,14 +42,6 @@ public class TransactionHistoryController {
 
             JFXListView<Object> subList = createSubList(newValue);
             transactionHistoryListView.getItems().add(subList);
-
-            /**
-             int transationResCnt = ShareData.currentTransactionExtention.getConstantResultCount();
-
-             if (transationResCnt == 0)
-             {
-             int signatureCount = ShareData.currentTransactionExtention.getTransaction().getSignatureCount();
-             } **/
         });
     }
 

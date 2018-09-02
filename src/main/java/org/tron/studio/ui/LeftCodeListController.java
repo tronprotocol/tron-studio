@@ -1,8 +1,6 @@
 package org.tron.studio.ui;
 
-import com.jfoenix.controls.JFXTreeTableColumn;
-import com.jfoenix.controls.JFXTreeTableView;
-import com.jfoenix.controls.RecursiveTreeItem;
+import com.jfoenix.controls.*;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -12,20 +10,24 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import org.apache.commons.codec.binary.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
+import org.tron.common.crypto.ECKey;
 import org.tron.common.utils.StringUtil;
+import org.tron.core.Wallet;
+import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
 import org.tron.studio.filesystem.SolidityFileUtil;
+import org.tron.studio.utils.FileNameFieldValidator;
+import org.tron.studio.utils.PrivateKeyFieldValidator;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -159,25 +161,39 @@ public class LeftCodeListController {
         ShareData.allContractFileName.add(files.get(0).getName());
     }
 
-    private String showDialog() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Create Smart Contract");
-        dialog.setHeaderText("Please input contract name");
-        dialog.setContentText("Contract Name:");
-
-        Optional<String> result = dialog.showAndWait();
-        return result.orElse(null);
-    }
-
     public void createContract(MouseEvent mouseEvent) {
-        String contractFileName = showDialog();
-        if (contractFileName == null) {
-            return;
-        }
-        contractFileName = SolidityFileUtil.formatFileName(contractFileName);
-        SolidityFileUtil.createNewFile(contractFileName);
-        ShareData.newContractFileName.set(contractFileName);
-        ShareData.allContractFileName.get().add(contractFileName);
+        JFXDialog dialog = new JFXDialog();
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setPrefWidth(800);
+        layout.setHeading(new Label("Create Smart Contract"));
+        JFXTextField contractFileNameTextField = new JFXTextField();
+        contractFileNameTextField.setPromptText("Please input contract name: Example.sol");
+        contractFileNameTextField.setValidators(new FileNameFieldValidator());
+        contractFileNameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            contractFileNameTextField.validate();
+        });
+        layout.setBody(contractFileNameTextField);
+        dialog.setContent(layout);
+        JFXButton closeButton = new JFXButton("OK");
+        closeButton.getStyleClass().add("dialog-accept");
+        closeButton.setOnAction(event -> {
+            try {
+                if (!contractFileNameTextField.validate()) {
+                    return;
+                }
+                String contractFileName = contractFileNameTextField.getText();
+                contractFileName = SolidityFileUtil.formatFileName(contractFileName);
+                SolidityFileUtil.createNewFile(contractFileName);
+                ShareData.newContractFileName.set(contractFileName);
+                ShareData.allContractFileName.get().add(contractFileName);
+            } catch (Exception e) {
+                logger.error("Failed: {}", e);
+                return;
+            }
+            dialog.close();
+        });
+        layout.setActions(closeButton);
+        dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
     }
 
     public void saveContract(MouseEvent mouseEvent) {
