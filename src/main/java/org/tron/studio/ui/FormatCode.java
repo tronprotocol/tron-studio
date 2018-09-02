@@ -28,15 +28,14 @@ public class FormatCode {
             currentPara = codeArea.getCurrentParagraph();
             if (releasedEnterKey)
             {
-                autointent("");
                 releasedEnterKey = false;
+                autoindent();
             }
         });
 
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent e) {
-                System.out.println(e.getCode());
                 if (e.getCode() == KeyCode.TAB) {
                     String s = StringUtils.repeat(' ', tabWidth);
                     codeArea.insertText(codeArea.getCaretPosition(), s);
@@ -44,31 +43,21 @@ public class FormatCode {
                 } else if (e.getCode() == KeyCode.ENTER)
                 {
                     releasedEnterKey = true;
-                } else if (e.getCode() == KeyCode.OPEN_BRACKET)
-                {
-                    // auto complete }
-                    /*
-                    int currentIntentLevel = calIntentLevel(currentPara, false);
-                    String intentStr = StringUtils.repeat(' ',
-                            tabWidth * (currentIntentLevel - 1));
-                    intentStr = "\n" + intentStr + "}";
-                    codeArea.insertText(currentPara,codeArea.getCaretColumn()+1, intentStr);
-                    */
                 }
             }
         });
 
-        correctIntent();
+        correctIndent();
     }
 
-    public void correctIntent()
+    public void correctIndent()
     {
-        calIntentLevel(codeArea.getParagraphs().size(), true);
+        calIndentLevel(codeArea.getParagraphs().size(), true);
     }
 
-    private int calIntentLevel(int endPara, boolean correctIntent)
+    private int calIndentLevel(int endPara, boolean correctIndent)
     {
-        int intentLevel = 0;
+        int indentLevel = 0;
 
         for (int i = 0; i < endPara; i++)
         {
@@ -82,30 +71,44 @@ public class FormatCode {
 
             if (currentLine.endsWith("}"))
             {
-                intentLevel -= 1;
+                indentLevel -= 1;
             }
 
-            if (correctIntent)
+            if (correctIndent)
             {
-                currentLine = StringUtils.repeat(' ', tabWidth*intentLevel) + currentLine;
+                currentLine = StringUtils.repeat(' ', tabWidth*indentLevel) + currentLine;
                 codeArea.replaceText(i,0,i,lineLength,currentLine);
             }
 
             if (currentLine.endsWith("{"))
             {
-                intentLevel += 1;
+                indentLevel += 1;
             }
         }
-        return intentLevel;
+        return indentLevel;
     }
 
-    public void autointent(String str)
+    public void autoindent()
     {
         // auto intent
         // Get last character in previous line
-        int currentIntent = calIntentLevel(currentPara, false);
+        int currentIndent = calIndentLevel(currentPara, false);
+        String currLine = codeArea.getText(currentPara);
+        int currLineLength = currLine.length();
+        currLine = currLine.trim();
 
-        String intentStr = StringUtils.repeat(' ', tabWidth * currentIntent);
-        codeArea.insertText(currentPara,0,intentStr + str);
+        if (currLine.equals("}"))
+        {
+            currentIndent -= 1;
+        }
+
+        if (currLine.length() > 0)
+        {
+            currLine = StringUtils.repeat(' ', tabWidth * currentIndent) + currLine;
+            codeArea.replaceText(currentPara,0, currentPara, currLineLength, currLine);
+        } else {
+            String indentStr = StringUtils.repeat(' ', tabWidth * currentIndent);
+            codeArea.insertText(currentPara,0,indentStr);
+        }
     }
 }
