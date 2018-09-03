@@ -6,13 +6,13 @@ import org.tron.protos.Protocol;
 public class TransactionHistoryItem {
 
     public enum Type {
-        Transaction, TransactionExtension, ERROR
+        Transaction, TransactionExtension, InfoString
     }
 
     private Type type;
     private GrpcAPI.TransactionExtention transactionExtention;
     private Protocol.Transaction transaction;
-    private String errorInfo;
+    private String infoString;
 
     public TransactionHistoryItem(Type type, GrpcAPI.TransactionExtention transactionExtention) {
         this.type = type;
@@ -26,7 +26,7 @@ public class TransactionHistoryItem {
 
     public TransactionHistoryItem(Type type, String errorInfo) {
         this.type = type;
-        this.errorInfo = errorInfo;
+        this.infoString = errorInfo;
     }
 
     public Type getType() {
@@ -53,11 +53,11 @@ public class TransactionHistoryItem {
         this.transaction = transaction;
     }
 
-    public String getErrorInfo() {
-        return errorInfo;
+    public String getInfoString() {
+        return infoString;
     }
 
-    public void setErrorInfo(String errorInfo) {
-        this.errorInfo = errorInfo;
+    public void setInfoString(String infoString) {
+        this.infoString = infoString;
     }
 }

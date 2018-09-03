@@ -7,6 +7,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -235,7 +236,7 @@ public class RightTabRunController implements Initializable {
             } catch (Exception e) {
                 String uuid = UUID.randomUUID().toString();
                 addTransactionHistoryItem(uuid, new TransactionHistoryItem(
-                        TransactionHistoryItem.Type.ERROR, "Failed to deployContract. " + e.getMessage()));
+                        TransactionHistoryItem.Type.InfoString, "Failed to deployContract. " + e.getMessage()));
                 logger.error("Failed to deployContract {}", e);
                 isDeploying = false;
                 return;
@@ -244,7 +245,7 @@ public class RightTabRunController implements Initializable {
 
         if (!deployContractResult[0]) {
             String uuid = UUID.randomUUID().toString();
-            addTransactionHistoryItem(uuid, new TransactionHistoryItem(TransactionHistoryItem.Type.ERROR,
+            addTransactionHistoryItem(uuid, new TransactionHistoryItem(TransactionHistoryItem.Type.InfoString,
                     "Failed to deployContract. Please check tron.log"));
             isDeploying = false;
             return;
@@ -254,7 +255,7 @@ public class RightTabRunController implements Initializable {
         String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
         if (!transactionExtention.getResult().getResult()) {
             addTransactionHistoryItem(transactionId, new TransactionHistoryItem(
-                    TransactionHistoryItem.Type.ERROR,
+                    TransactionHistoryItem.Type.InfoString,
                     String.format("Unable to get last TransactionExtention: %s",
                             transactionExtention.getResult().getMessage().toStringUtf8())));
             isDeploying = false;
@@ -337,8 +338,24 @@ public class RightTabRunController implements Initializable {
     }
 
     private void addTransactionHistoryItem(String id, TransactionHistoryItem item) {
-        ShareData.transactionHistory.put(id, item);
-        ShareData.addTransactionAction.set(id);
+
+        String currentContractName = ShareData.currentContractName.get();
+        String transactionHeadMsg = String.format("creation of %s pending...", currentContractName);
+        UUID uuid = UUID.randomUUID();
+        ShareData.transactionHistory.put(uuid.toString(), new TransactionHistoryItem(TransactionHistoryItem.Type.InfoString, transactionHeadMsg));
+        ShareData.addTransactionAction.set(uuid.toString());
+
+        new Thread(() ->{
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Platform.runLater(()->{
+                ShareData.transactionHistory.put(id, item);
+                ShareData.addTransactionAction.set(id);
+            });
+        }).start();
     }
 
     private boolean hasLibrary(String byteCode) {
@@ -443,7 +460,7 @@ public class RightTabRunController implements Initializable {
             String transactionId = Hex.toHexString(transactionExtention.getTxid().toByteArray());
             if (!transactionExtention.getResult().getResult()) {
                 addTransactionHistoryItem(transactionId, new TransactionHistoryItem(
-                        TransactionHistoryItem.Type.ERROR,
+                        TransactionHistoryItem.Type.InfoString,
                         String.format("Unable to get last TransactionExtention: %s",
                                 transactionExtention.getResult().getMessage().toStringUtf8())));
                 return;

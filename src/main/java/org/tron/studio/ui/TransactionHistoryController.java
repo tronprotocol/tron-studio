@@ -27,6 +27,7 @@ import org.tron.studio.TransactionHistoryItem;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.function.Function;
+import org.tron.studio.TransactionHistoryItem.Type;
 
 public class TransactionHistoryController {
 
@@ -34,17 +35,17 @@ public class TransactionHistoryController {
 
 
     @PostConstruct
-    public void initialize() throws IOException {
+    public void initialize() {
         ShareData.addTransactionAction.addListener((observable, oldValue, newValue) -> {
-            String currentContractName = ShareData.currentContractName.get();
-            String transactionHeadMsg = String.format("creation of %s pending...", currentContractName);
-            transactionHistoryListView.getItems().add(new Label(transactionHeadMsg));
-
-            JFXListView<Object> subList = createSubList(newValue);
-            transactionHistoryListView.getItems().add(subList);
+            TransactionHistoryItem item = ShareData.transactionHistory.get(newValue);
+            if(item.getType() == Type.InfoString) {
+                transactionHistoryListView.getItems().add(new Label(item.getInfoString()));
+            } else {
+                JFXListView<Object> subList = createSubList(newValue);
+                transactionHistoryListView.getItems().add(subList);
+            }
         });
     }
-
 
     private JFXTreeTableView<TransactionDetail> createDetailTable() {
 
@@ -109,8 +110,8 @@ public class TransactionHistoryController {
         TransactionHistoryItem transactionHistoryItem = ShareData.transactionHistory.get(transactionHistoryId);
         JFXListView<Object> subList = new JFXListView<>();
 
-        if (transactionHistoryItem.getType() == TransactionHistoryItem.Type.ERROR) {
-            subList.getItems().add(new Label(transactionHistoryItem.getErrorInfo()));
+        if (transactionHistoryItem.getType() == TransactionHistoryItem.Type.InfoString) {
+            subList.getItems().add(new Label(transactionHistoryItem.getInfoString()));
         } else {
             subList.getItems().add(createDetailTable());
         }
