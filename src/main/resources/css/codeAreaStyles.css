@@ -34,6 +34,10 @@
     -fx-fill: #FF9999;
 }
 
+.spell-error {
+    -fx-effect: dropshadow(gaussian, red, 2, 0, 0, 0);
+}
+
 
 
 

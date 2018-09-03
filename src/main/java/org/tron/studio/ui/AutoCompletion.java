@@ -30,18 +30,12 @@ public class AutoCompletion {
     private CodeArea textArea;
     private static final String PATH_TO_KEYWORDS  = "/keywords/solidity.txt";
 
-    Map dictionary = new HashMap();
-
     private static List<String> keywords = new ArrayList<>();
 
     public AutoCompletion(CodeArea textArea){
         this.textArea = textArea;
 
         keywords = readKeywords();
-
-        dictionary.put("{", "\n}");
-        dictionary.put("(", " )");
-        dictionary.put("\"", "\"");
 
         //extractAllwords(textArea,0,0);
         textArea.setPopupAlignment(PopupAlignment.SELECTION_BOTTOM_RIGHT);
