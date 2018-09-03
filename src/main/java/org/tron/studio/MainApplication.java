@@ -4,8 +4,10 @@ import com.jfoenix.svg.SVGGlyphLoader;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -62,14 +64,15 @@ public class MainApplication extends Application {
     Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
     primaryStage.setTitle("Tron Studio");
 
-    Scene scene = new Scene(root, 1366, 768);
+    Screen screen = Screen.getPrimary();
+    Rectangle2D bounds = screen.getVisualBounds();
+    Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
     final ObservableList<String> stylesheets = scene.getStylesheets();
     stylesheets.addAll(getClass().getResource("/css/jfoenix-fonts.css").toExternalForm(),
         getClass().getResource("/css/jfoenix-design.css").toExternalForm(),
         getClass().getResource("/css/jfoenix-main-demo.css").toExternalForm(),
             getClass().getResource("/css/keywords.css").toExternalForm());
     primaryStage.setScene(scene);
-    primaryStage.setMaximized(true);
     primaryStage.show();
   }
 
