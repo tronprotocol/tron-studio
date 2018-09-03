@@ -74,6 +74,7 @@ public class MainController {
 
         FormatCode formatCode = new FormatCode(defaultCodeArea);
         formatCode.formatAllCode();
+        formatCode.spellCheckerAllContent();
 
         defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
 

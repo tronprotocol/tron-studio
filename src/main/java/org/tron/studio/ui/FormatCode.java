@@ -5,10 +5,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -134,6 +136,7 @@ public class FormatCode {
 
         List<String> globalVariables = new ArrayList<>();
         List<String> localVariables = new ArrayList<>();
+        final StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
 
         for (int i = 0; i < paraSize; i++)
         {
@@ -141,30 +144,25 @@ public class FormatCode {
             String currentLine = codeArea.getText(i);
             String orgLine = currentLine;
 
-            currentLine = currentLine.replaceAll("\\{"," { ");
-            currentLine = currentLine.replaceAll("}"," } ");
-            currentLine = currentLine.replaceAll("\\("," ( ");
-            currentLine = currentLine.replaceAll("\\)"," ) ");
-            currentLine = currentLine.replaceAll(","," , ");
-            currentLine = currentLine.replaceAll(";"," ; ");
-
-            currentLine = currentLine.replaceAll("( +)"," ").trim();
-
             String[] words = currentLine.split(" ");
 
             if ( words.length == 0 ) continue;
+            if(words[0].equals("pragma")) continue;
 
             // check contract
             if (words[0].equals("contract")) inContract = true;
             if (inContract)
             {
                 if (currentLine.contains("{")) bracketsNumContract += 1;
-                if (currentLine.contains("}")) bracketsNumContract -= 1;
-            }
-            if(bracketsNumContract == 0)
-            {
-                inContract = false;
-                globalVariables.clear();
+                if (currentLine.contains("}"))
+                {
+                    bracketsNumContract -= 1;
+                    if (bracketsNumContract == 0)
+                    {
+                        inContract = false;
+                        varContract.clear();
+                    }
+                }
             }
 
             // check function
@@ -172,42 +170,89 @@ public class FormatCode {
             if (inFunc)
             {
                 if (currentLine.contains("{")) bracketsNumFunc += 1;
-                if (currentLine.contains("}")) bracketsNumFunc -= 1;
-            }
-            if (bracketsNumFunc == 0)
-            {
-                inFunc = false;
-                varFunc.clear();
+                if (currentLine.contains("}"))
+                {
+                    bracketsNumFunc -= 1;
+                    if (bracketsNumFunc == 0)
+                    {
+                        inFunc = false;
+                        varFunc.clear();
+                    }
+                }
             }
 
             String preWord = null;
-            String currWord = null;
+            boolean interuptFlg = false;
             for (String word: words)
             {
+                if (!word.matches("[A-Za-z0-9]+"))
+                {
+                    interuptFlg = true;
+                    continue;
+                }
+
                 if (preWord == null) {
-                    preWord = word;
+
+                    if (!keywords.contains(word)
+                            && (inContract && !inFunc && !varContract.contains(word)
+                            || inFunc && !varContract.contains(word)))
+                    {
+                        // spell error
+                        int startIndex = currentLine.indexOf(word);
+                        setErrorStyle(i, startIndex, startIndex+word.length());
+                    } else
+                    {
+                        preWord = word;
+                    }
                     continue;
                 }
 
                 if (keywords.contains(preWord) && !keywords.contains(word))
                 {
-                    if (inContract && !inFunc)
+                    if (inContract && !inFunc && varContract.contains(word)
+                            || inFunc && varFunc.contains(word))
+                    {
+                        // spell error
+                        int startIndex = currentLine.indexOf(word);
+                        setErrorStyle(i, startIndex, startIndex+word.length());
+                    } else if (inContract && !inFunc || preWord.equals("function"))
                         varContract.add(word);
                     else
                         varFunc.add(word);
-                    continue;
                 }
 
                 if (!keywords.contains(preWord) && !varContract.contains(word)
-                        && !varFunc.contains(word))
+                        && !varFunc.contains(word) && !interuptFlg)
                 {
                     // spell error
-                    int startIndex = orgLine.indexOf(word);
-                    codeArea.setStyleClass(startIndex, startIndex+word.length(),
-                            "spell-error");
+                    int startIndex = currentLine.indexOf(word);
+                    setErrorStyle(i, startIndex, startIndex+word.length());
                 }
+
+                if (interuptFlg) interuptFlg = false;
+
+                preWord = word;
             }
         }
+    }
+
+    private String regulizeLine(String str)
+    {
+        str = str.replaceAll("\\{"," { ");
+        str = str.replaceAll("}"," } ");
+        str = str.replaceAll("\\("," ( ");
+        str = str.replaceAll("\\)"," ) ");
+        str = str.replaceAll(","," , ");
+        str = str.replaceAll(";"," ; ");
+
+        return str.replaceAll("( +)"," ").trim();
+    }
+
+    private void setErrorStyle(int paraNo, int startNo, int endNo)
+    {
+        List<String> styles = new ArrayList<>();
+        styles.add("spell-error");
+        codeArea.setStyle(paraNo, startNo, endNo, styles);
     }
 
     private List<String> readKeywords()
