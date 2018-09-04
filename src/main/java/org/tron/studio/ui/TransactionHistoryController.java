@@ -8,12 +8,12 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.abi.FunctionReturnDecoder;
@@ -148,23 +148,13 @@ public class TransactionHistoryController {
             subList.getItems().add(createDetailTable(transactionHistoryId));
         }
 
-        HBox node = new HBox();
-
-        JFXRippler ripper = new JFXRippler();
-        ripper.setStyle(":cons-rippler1");
-        ripper.setPosition(JFXRippler.RipplerPos.FRONT);
-
-        StackPane pane = new StackPane();
-        pane.setStyle(":-fx-padding: 2;");
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_LEFT);
 
         MaterialDesignIconView copyIcon = new MaterialDesignIconView();
         copyIcon.setGlyphName("BUG");
         copyIcon.setStyleClass("icon");
-        pane.getChildren().add(copyIcon);
-
-        ripper.getChildren().add(pane);
-
-        node.getChildren().add(ripper);
+        hBox.getChildren().add(copyIcon);
 
         String acountAddr = ShareData.currentAccount;
         acountAddr = StringUtils.left(acountAddr, 10) + "...";
@@ -172,26 +162,31 @@ public class TransactionHistoryController {
         String currentContract = ShareData.currentContractName.get();
         String currentValue = ShareData.currentValue;
 
-        String debugInfo = "[vm] from: %s to: %s.(consructor)\n value:%s data: xxxxx. logs:0 hash:%s";
-        debugInfo = String.format(debugInfo, acountAddr, currentContract, currentValue, StringUtils.left(transactionHistoryId, 10) + "...");
+        Function function = transactionHistoryItem.getFunction();
+        String debugInfo = "[vm] from: %s to: %s.%s value:%s hash:%s";
+        debugInfo = String.format(debugInfo,
+                acountAddr,
+                currentContract, function == null ? "" : function.getName(),
+                currentValue,
+                StringUtils.left(transactionHistoryId, 10) + "...");
         Label debugInfoLabel = new Label(debugInfo);
-        ((HBox) node).getChildren().add(debugInfoLabel);
+        hBox.getChildren().add(debugInfoLabel);
 
         Region region1 = new Region();
-        node.getChildren().add(region1);
+        hBox.getChildren().add(region1);
         HBox.setHgrow(region1, Priority.ALWAYS);
         JFXButton debugBtn = new JFXButton("Debug");
         debugBtn.getStyleClass().add("custom-jfx-button-raised-fix-width");
-        node.getChildren().add(debugBtn);
+        hBox.getChildren().add(debugBtn);
         Region region2 = new Region();
         region2.setPrefWidth(30);
-        node.getChildren().add(region2);
+        hBox.getChildren().add(region2);
 
         debugBtn.setOnAction(event -> {
             ShareData.debugTransactionAction.set(transactionHistoryId);
         });
 
-        subList.setGroupnode(node);
+        subList.setGroupnode(hBox);
 
         return subList;
     }
