@@ -3,10 +3,13 @@ package org.tron.studio.ui;
 import javafx.concurrent.Task;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
+import org.tron.studio.ShareData;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,7 +80,15 @@ public abstract class Highlight {
      * @param highlighting
      */
     private void applyHighlighting(final StyleSpans<Collection<String>> highlighting) {
+        //System.out.println("highlight");
         codeArea.setStyleSpans(0, highlighting);
+        for(FormatCode.MissInfo missInfo: ShareData.missInfoList)
+        {
+            StyleSpansBuilder<Collection<String>> spansBuilder
+                    = new StyleSpansBuilder<>();
+            spansBuilder.add(Collections.singleton("spell-error"), missInfo.missWord.length());
+            codeArea.setStyleSpans(missInfo.paraNo, missInfo.startNo, spansBuilder.create());
+        }
     }
 
     /**

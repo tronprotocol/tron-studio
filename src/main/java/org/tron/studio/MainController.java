@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.model.StyleSpan;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
@@ -44,6 +45,11 @@ public class MainController {
 
     @PostConstruct
     public void initialize() throws IOException {
+
+        dictionary.add("test");
+        dictionary.add("var");
+        dictionary.add("aa");
+
         List<File> files = SolidityFileUtil.getFileNameList();
         File defaultContractFile = files.get(0);
         ShareData.currentContractFileName.set(defaultContractFile.getName());
@@ -66,9 +72,9 @@ public class MainController {
 
         defaultCodeArea = (CodeArea) defaultCodeAreaTab.getContent();
         new SolidityHighlight(defaultCodeArea).highlight();
-        //spellChecking(defaultCodeArea);
         AutoCompletion autocomp = new AutoCompletion(defaultCodeArea);
         autocomp.autoComplete(defaultCodeArea);
+
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
@@ -250,56 +256,4 @@ public class MainController {
         ShareData.currentContractTab = preTab;
     }
 
-    private void spellChecking(CodeArea textArea)
-    {
-        Subscription cleanupWhenFinished = textArea.plainTextChanges()
-                .successionEnds(Duration.ofMillis(500))
-                .subscribe(change -> {
-                    textArea.setStyleSpans(0, computeHighlighting(textArea.getText()));
-                    CodeParserUtil.checkInvalidWords(textArea);
-                });
-
-        // call when no longer need it: `cleanupWhenFinished.unsubscribe();`
-
-        // load the dictionary
-        try (InputStream input = getClass().getResourceAsStream("/keywords/solidity.txt");
-             BufferedReader br = new BufferedReader(new InputStreamReader(input))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                dictionary.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static StyleSpans<Collection<String>> computeHighlighting(String text) {
-        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-        BreakIterator wb = BreakIterator.getWordInstance();
-        wb.setText(text);
-
-        int lastIndex = wb.first();
-        int lastKwEnd = 0;
-        String previousWord = null;
-        while(lastIndex != BreakIterator.DONE) {
-            int firstIndex = lastIndex;
-            lastIndex = wb.next();
-
-            if (lastIndex != BreakIterator.DONE
-                    && Character.isLetterOrDigit(text.charAt(firstIndex))) {
-                String word = text.substring(firstIndex, lastIndex).toLowerCase();
-
-                if (!dictionary.contains(word) && (previousWord == null
-                        || !dictionary.contains(previousWord))) {
-                    spansBuilder.add(Collections.emptyList(), firstIndex - lastKwEnd);
-                    spansBuilder.add(Collections.singleton("underlined"), lastIndex - firstIndex);
-                    lastKwEnd = lastIndex;
-                }
-                previousWord = word;
-            }
-        }
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-
-        return spansBuilder.create();
-    }
 }

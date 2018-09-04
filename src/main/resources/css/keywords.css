@@ -29,8 +29,8 @@
     -fx-background-color: #f2f9fc;
 }
 
-.underlined {
-    -rtfx-background-color: #EE3B3B;
+.spell-error {
+    -rtfx-background-color: red;
     -rtfx-underline-color: red;
     -rtfx-underline-dash-array: 2 2;
     -rtfx-underline-width: 1;

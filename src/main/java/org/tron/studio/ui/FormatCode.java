@@ -6,12 +6,12 @@ import javafx.scene.input.KeyEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.tron.studio.ShareData;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.time.Duration;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,10 +27,30 @@ public class FormatCode {
 
     private static List<String> keywords = new ArrayList<>();
 
+    //private List<MissInfo> missInfos = new ArrayList<>();
+
+    public class MissInfo {
+        public String missWord;
+        public int paraNo;
+        public int startNo;
+    }
+
     public FormatCode(CodeArea codeArea)
     {
         this.codeArea = codeArea;
         keywords = readKeywords();
+
+        codeArea.richChanges()
+                .successionEnds(Duration.ofMillis(100))
+                .subscribe(change -> {
+            for(MissInfo missInfo: ShareData.missInfoList)
+            {
+                StyleSpansBuilder<Collection<String>> spansBuilder
+                        = new StyleSpansBuilder<>();
+                spansBuilder.add(Collections.singleton("spell-error"), missInfo.missWord.length());
+                //codeArea.setStyleSpans(missInfo.paraNo, missInfo.startNo, spansBuilder.create());
+            }
+        });
     }
 
     public void formatAllCode()
@@ -134,17 +154,11 @@ public class FormatCode {
         boolean inContract = false;
         boolean inFunc = false;
 
-        List<String> globalVariables = new ArrayList<>();
-        List<String> localVariables = new ArrayList<>();
-        final StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-
         for (int i = 0; i < paraSize; i++)
         {
             // check each line
             String currentLine = codeArea.getText(i);
-            String orgLine = currentLine;
-
-            String[] words = currentLine.split(" ");
+            String[] words = regulizeLine(currentLine).split(" ");
 
             if ( words.length == 0 ) continue;
             if(words[0].equals("pragma")) continue;
@@ -185,6 +199,8 @@ public class FormatCode {
             boolean interuptFlg = false;
             for (String word: words)
             {
+                if (StringUtils.isNumeric(word)) continue;
+
                 if (!word.matches("[A-Za-z0-9]+"))
                 {
                     interuptFlg = true;
@@ -199,7 +215,7 @@ public class FormatCode {
                     {
                         // spell error
                         int startIndex = currentLine.indexOf(word);
-                        setErrorStyle(i, startIndex, startIndex+word.length());
+                        setErrorStyle(word, i, startIndex);
                     } else
                     {
                         preWord = word;
@@ -214,7 +230,7 @@ public class FormatCode {
                     {
                         // spell error
                         int startIndex = currentLine.indexOf(word);
-                        setErrorStyle(i, startIndex, startIndex+word.length());
+                        setErrorStyle(word, i, startIndex);
                     } else if (inContract && !inFunc || preWord.equals("function"))
                         varContract.add(word);
                     else
@@ -226,7 +242,7 @@ public class FormatCode {
                 {
                     // spell error
                     int startIndex = currentLine.indexOf(word);
-                    setErrorStyle(i, startIndex, startIndex+word.length());
+                    setErrorStyle(word, i, startIndex);
                 }
 
                 if (interuptFlg) interuptFlg = false;
@@ -238,6 +254,7 @@ public class FormatCode {
 
     private String regulizeLine(String str)
     {
+        str = str.replaceAll("\\+|-|\\*|/|=|&|\\|"," ");
         str = str.replaceAll("\\{"," { ");
         str = str.replaceAll("}"," } ");
         str = str.replaceAll("\\("," ( ");
@@ -248,11 +265,14 @@ public class FormatCode {
         return str.replaceAll("( +)"," ").trim();
     }
 
-    private void setErrorStyle(int paraNo, int startNo, int endNo)
+    private void setErrorStyle(String missWord, int paraNo, int startNo)
     {
-        List<String> styles = new ArrayList<>();
-        styles.add("spell-error");
-        codeArea.setStyle(paraNo, startNo, endNo, styles);
+        MissInfo missInfo = new MissInfo();
+        missInfo.missWord = missWord;
+        missInfo.paraNo = paraNo;
+        missInfo.startNo = startNo;
+
+        ShareData.missInfoList.add(missInfo);
     }
 
     private List<String> readKeywords()

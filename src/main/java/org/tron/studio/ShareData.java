@@ -10,11 +10,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.studio.solc.SolidityCompiler;
+import org.tron.studio.ui.FormatCode;
 import org.tron.studio.walletserver.WalletClient;
 
-import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 public class ShareData {
 
@@ -109,6 +108,10 @@ public class ShareData {
     public static SimpleBooleanProperty isAutoCompile = new SimpleBooleanProperty();
     //当前合约文件源代码
     public static SimpleStringProperty currentContractSourceCode = new SimpleStringProperty();
+
+
+    // 文本错误信息
+    public static List<FormatCode.MissInfo> missInfoList = new ArrayList<>();
 
     private ShareData() {
 
