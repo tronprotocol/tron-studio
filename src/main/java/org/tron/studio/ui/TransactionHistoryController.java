@@ -9,6 +9,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -52,6 +53,9 @@ public class TransactionHistoryController {
         JFXTreeTableView<TransactionDetail> detailTable = new JFXTreeTableView<>();
         JFXTreeTableColumn<TransactionDetail, String> keyCol = new JFXTreeTableColumn<>("Item");
         JFXTreeTableColumn<TransactionDetail, String> valueCol = new JFXTreeTableColumn<>("Value");
+
+        detailTable.setColumnResizePolicy(JFXTreeTableView.CONSTRAINED_RESIZE_POLICY);
+
         detailTable.getColumns().add(keyCol);
         detailTable.getColumns().add(valueCol);
 
@@ -99,7 +103,7 @@ public class TransactionHistoryController {
             );
         }
 
-
+        detailTable.setMaxHeight(120);
         detailTable.setRoot(new RecursiveTreeItem<>(detailTableData, RecursiveTreeObject::getChildren));
         detailTable.setShowRoot(false);
 
@@ -123,7 +127,7 @@ public class TransactionHistoryController {
         ripper.setPosition(JFXRippler.RipplerPos.FRONT);
 
         StackPane pane = new StackPane();
-        pane.setStyle(":-fx-padding: 2;");
+//        pane.setStyle(":-fx-padding: 2;");
 
         MaterialDesignIconView copyIcon = new MaterialDesignIconView();
         copyIcon.setGlyphName("BUG");
