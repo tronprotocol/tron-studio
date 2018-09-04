@@ -66,7 +66,7 @@ public class ShareData {
     public static int currentRpcPort = localRpcPort;
 
 
-    public static Boolean enableOptimize = false;
+    public static Boolean enableOptimize = true;
     public static long TRX_SUN_UNIT = 1_000_000;
 
     public static SimpleStringProperty newAccount = new SimpleStringProperty();

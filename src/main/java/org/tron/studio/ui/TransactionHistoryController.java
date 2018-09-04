@@ -127,7 +127,7 @@ public class TransactionHistoryController {
         ripper.setPosition(JFXRippler.RipplerPos.FRONT);
 
         StackPane pane = new StackPane();
-//        pane.setStyle(":-fx-padding: 2;");
+        pane.setStyle(":-fx-padding: 2;");
 
         MaterialDesignIconView copyIcon = new MaterialDesignIconView();
         copyIcon.setGlyphName("BUG");

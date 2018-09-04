@@ -83,7 +83,7 @@ public class RightTabCompileController implements Initializable {
                             text.getStyleClass().add("compile-error-label");
                             String[] infos = infoList.split("\n");
                             int lines = infos.length;
-                            text.setPrefHeight(lines * 30);
+                            text.setPrefHeight(lines * 40);
                             compileResultInfoListView.getItems().add(text);
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
@@ -92,7 +92,7 @@ public class RightTabCompileController implements Initializable {
                             text.getStyleClass().add("compile-warn-label");
                             String[] infos = infoList.split("\n");
                             int lines = infos.length;
-                            text.setPrefHeight(lines * 30);
+                            text.setPrefHeight(lines * 40);
                             compileResultInfoListView.getItems().add(text);
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
@@ -126,7 +126,7 @@ public class RightTabCompileController implements Initializable {
                             text.getStyleClass().add("compile-warn-label");
                             String[] infos = infoList.split("\n");
                             int lines = infos.length;
-                            text.setPrefHeight(lines * 30);
+                            text.setPrefHeight(lines * 40);
                             compileResultInfoListView.getItems().add(text);
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
