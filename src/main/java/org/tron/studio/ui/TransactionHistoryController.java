@@ -120,7 +120,7 @@ public class TransactionHistoryController {
                     new TransactionDetail("time_stamp", Long.toString(transactionInfo.getBlockTimeStamp())),
                     new TransactionDetail("result", transactionInfo.getResult().equals(Protocol.TransactionInfo.code.SUCESS) ? "success" : "fail"),
                     new TransactionDetail("result_message", ByteArray.toStr(transactionInfo.getResMessage().toByteArray())),
-                    new TransactionDetail("contract_result", function == null ? rawBuilder.toString() : outputBuilder.toString())
+                    new TransactionDetail("contract_result", function == null ? rawBuilder.toString() : outputBuilder.toString()),
                     new TransactionDetail("contract_address", Wallet.encode58Check(transactionInfo.getContractAddress().toByteArray())),
                     new TransactionDetail("energy_usage", Long.toString(transactionInfo.getReceipt().getEnergyUsage())),
                     new TransactionDetail("energy_fee(sun)", Long.toString(transactionInfo.getReceipt().getEnergyFee())),
