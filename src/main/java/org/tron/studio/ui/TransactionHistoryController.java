@@ -89,7 +89,7 @@ public class TransactionHistoryController {
 
             detailTableData = FXCollections.observableArrayList(
                     new TransactionDetail("transaction_id", transactionId),
-                    new TransactionDetail("function_return", function == null ? rawBuilder.toString() : outputBuilder.toString())
+                    new TransactionDetail("contract_result", function == null ? rawBuilder.toString() : outputBuilder.toString())
             );
         } else {
             transactionId = Hex.toHexString(new TransactionCapsule(lastTransaction).getTransactionId().getBytes());
@@ -120,15 +120,14 @@ public class TransactionHistoryController {
                     new TransactionDetail("time_stamp", Long.toString(transactionInfo.getBlockTimeStamp())),
                     new TransactionDetail("result", transactionInfo.getResult().equals(Protocol.TransactionInfo.code.SUCESS) ? "success" : "fail"),
                     new TransactionDetail("result_message", ByteArray.toStr(transactionInfo.getResMessage().toByteArray())),
-                    new TransactionDetail("contract_result", ByteArray.toHexString(transactionInfo.getContractResult(0).toByteArray())),
+                    new TransactionDetail("contract_result", function == null ? rawBuilder.toString() : outputBuilder.toString())
                     new TransactionDetail("contract_address", Wallet.encode58Check(transactionInfo.getContractAddress().toByteArray())),
                     new TransactionDetail("energy_usage", Long.toString(transactionInfo.getReceipt().getEnergyUsage())),
                     new TransactionDetail("energy_fee(sun)", Long.toString(transactionInfo.getReceipt().getEnergyFee())),
                     new TransactionDetail("origin_energy_usage", Long.toString(transactionInfo.getReceipt().getOriginEnergyUsage())),
                     new TransactionDetail("energy_usage_total", Long.toString(transactionInfo.getReceipt().getEnergyUsageTotal())),
                     new TransactionDetail("net_usage", Long.toString(transactionInfo.getReceipt().getNetUsage())),
-                    new TransactionDetail("net_fee", Long.toString(transactionInfo.getReceipt().getNetFee())),
-                    new TransactionDetail("function_return", function == null ? rawBuilder.toString() : outputBuilder.toString())
+                    new TransactionDetail("net_fee", Long.toString(transactionInfo.getReceipt().getNetFee()))
             );
         }
 
