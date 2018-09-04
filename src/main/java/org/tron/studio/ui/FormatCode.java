@@ -40,17 +40,8 @@ public class FormatCode {
         this.codeArea = codeArea;
         keywords = readKeywords();
 
-        codeArea.richChanges()
-                .successionEnds(Duration.ofMillis(100))
-                .subscribe(change -> {
-            for(MissInfo missInfo: ShareData.missInfoList)
-            {
-                StyleSpansBuilder<Collection<String>> spansBuilder
-                        = new StyleSpansBuilder<>();
-                spansBuilder.add(Collections.singleton("spell-error"), missInfo.missWord.length());
-                //codeArea.setStyleSpans(missInfo.paraNo, missInfo.startNo, spansBuilder.create());
-            }
-        });
+        formatAllCode();
+        spellCheckerAllContent(codeArea.getParagraphs().size());
     }
 
     public void formatAllCode()
@@ -76,6 +67,9 @@ public class FormatCode {
                 {
                     releasedEnterKey = true;
                 }
+
+                // Check spell
+                spellCheckerAllContent(codeArea.getParagraphs().size());
             }
         });
 
@@ -144,9 +138,13 @@ public class FormatCode {
         }
     }
 
-    public  void spellCheckerAllContent()
+    public  void spellCheckerAllContent(int endParaNo)
     {
-        int paraSize = codeArea.getParagraphs().size();
+        //int paraSize = codeArea.getParagraphs().size();
+
+        // Clear error list
+        ShareData.missInfoList.clear();
+
         List<String> varContract = new ArrayList<>();
         List<String> varFunc = new ArrayList<>();
         int bracketsNumContract = 0;
@@ -154,7 +152,7 @@ public class FormatCode {
         boolean inContract = false;
         boolean inFunc = false;
 
-        for (int i = 0; i < paraSize; i++)
+        for (int i = 0; i < endParaNo; i++)
         {
             // check each line
             String currentLine = codeArea.getText(i);
@@ -211,7 +209,7 @@ public class FormatCode {
 
                     if (!keywords.contains(word)
                             && (inContract && !inFunc && !varContract.contains(word)
-                            || inFunc && !varContract.contains(word)))
+                            || inFunc && !varFunc.contains(word) && !varContract.contains(word)))
                     {
                         // spell error
                         int startIndex = currentLine.indexOf(word);
@@ -236,7 +234,7 @@ public class FormatCode {
                     else
                         varFunc.add(word);
                 }
-
+;
                 if (!keywords.contains(preWord) && !varContract.contains(word)
                         && !varFunc.contains(word) && !interuptFlg)
                 {

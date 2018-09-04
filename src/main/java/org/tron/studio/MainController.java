@@ -1,20 +1,14 @@
 package org.tron.studio;
 
-import com.google.rpc.Code;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.richtext.model.StyleSpan;
-import org.fxmisc.richtext.model.StyleSpans;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
-import org.reactfx.Subscription;
+
 import org.tron.studio.filesystem.SolidityFileUtil;
-import org.tron.studio.ui.CodeParserUtil;
 import org.tron.studio.ui.SolidityHighlight;
 import org.tron.studio.ui.AutoCompletion;
 import org.tron.studio.ui.FormatCode;
@@ -23,13 +17,8 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.BreakIterator;
-import java.time.Duration;
 import java.util.*;
 
-import javafx.event.EventHandler;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.KeyCode;
 
 @Slf4j
 public class MainController {
@@ -71,9 +60,7 @@ public class MainController {
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
-        FormatCode formatCode = new FormatCode(defaultCodeArea);
-        formatCode.formatAllCode();
-        formatCode.spellCheckerAllContent();
+        new FormatCode(defaultCodeArea);
 
         defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
 
@@ -165,8 +152,7 @@ public class MainController {
         codeArea.replaceText(0, 0, builder.toString());
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
-        FormatCode formatCode = new FormatCode(codeArea);
-        formatCode.formatAllCode();
+        new FormatCode(codeArea);
 
         ShareData.allContractFileName.add(file.getName());
         ShareData.currentContractName.set(file.getName());
@@ -200,8 +186,7 @@ public class MainController {
             codeArea.insertText(0, sourceCode);
             codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
-            FormatCode formatCode = new FormatCode(codeArea);
-            formatCode.formatAllCode();
+            new FormatCode(codeArea);
 
             codeAreaTabPane.getSelectionModel().select(codeTab);
             ShareData.currentContractTab = codeTab;

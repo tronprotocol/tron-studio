@@ -30,9 +30,17 @@
 }
 
 .spell-error {
-    -rtfx-background-color: red;
+    -rtfx-font-color: red;
     -rtfx-underline-color: red;
     -rtfx-underline-dash-array: 2 2;
-    -rtfx-underline-width: 1;
+    -rtfx-underline-width: 2;
     -rtfx-underline-cap: butt;
+    -rtfx-underline: true;
+}
+
+.spell-error1 {
+    -fx-border-insets: 0;
+    -fx-border-width: 2px;
+    -fx-border-color: red;
+    -fx-border-style: hidden hidden solid hidden;
 }
