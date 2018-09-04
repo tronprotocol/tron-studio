@@ -10,6 +10,7 @@
     </padding>
     <JFXButton fx:id="nowBlockButton" text="Now Block"/>
     <JFXButton fx:id="balanceButton" text="Balance"/>
+    <JFXButton fx:id="energyButton" text="Energy"/>
     <Region HBox.hgrow="ALWAYS"/>
     <JFXButton fx:id="rpcRestartButton" text="Restart" visible="false"/>
 </HBox>
