@@ -3,25 +3,23 @@
  */
 
 .root {
-    -fx-font-family: "Courier";
+    /*-fx-font-family: "monospace";*/
+    -fx-font-size: 14px;
     -fx-font-smoothing-type: gray;
 }
 
 .side-menu {
     -fx-padding: 20.0, 10.0;
-    -fx-font-size: 15.0;
     -fx-font-weight: NORMAL;
     -fx-text-fill: #444;
 }
 
 .title-label {
-    -fx-font-size: 16.0px;
     -fx-padding: 14.0px;
     -fx-text-fill: rgba(0.0, 0.0, 0.0, 0.87);
 }
 
 .radio-button-title-label {
-    -fx-font-size: 16.0px;
     -fx-padding: 14.0 0.0 -20.0 0.0;
     -fx-text-fill: rgba(0.0, 0.0, 0.0, 0.87);
 }
@@ -54,12 +52,8 @@
 .dialog-trigger {
     -fx-background-color: WHITE;
     -jfx-button-type: RAISED;
-    -fx-font-size: 14.0px;
 }
 
-.jfx-layout-heading .label {
-    -fx-font-size: 20.0px;
-}
 
 .dialog-accept {
     -fx-text-fill: #03A9F4;
@@ -153,7 +147,6 @@
 
 .icons-badge Label {
     -fx-font-weight: BOLD;
-    -fx-font-size: 14.0px;
     -fx-text-fill: WHITE;
 }
 
@@ -238,10 +231,6 @@
     -fx-fill: #0F9D58;
 }
 
-.custom-jfx-radio-button {
-    -fx-font-size: 16.0px;
-}
-
 .custom-jfx-radio-button .radio {
     -fx-stroke-width: 2.0px;
     -fx-fill: transparent;
@@ -307,7 +296,6 @@
 
 .jfx-slider-style .sliderValue {
     -fx-stroke: WHITE;
-    -fx-font-size: 10.0;
 }
 
 /******************************************************/
@@ -341,7 +329,6 @@
     -fx-background-color: #5264AE;
     -fx-text-fill: WHITE;
     -fx-min-width: 75;
-    -fx-font-family:  "Courier";
 }
 
 .custom-jfx-button-raised-fix-width {
@@ -351,7 +338,6 @@
     -fx-min-width: 100;
     -fx-max-width: 100;
     -fx-wrap-text: true;
-    -fx-font-family: "Courier";
     -fx-text-alignment: center;
 }
 /*******************************************************************************
@@ -612,10 +598,6 @@
     -jfx-toggle-line-color: #ff8782;
 }
 
-.toggle-label {
-    -fx-font-size: 14.0px;
-}
-
 .toggle-icon1 .icon {
     -fx-fill: #4285F4;
 }
@@ -834,7 +816,6 @@
 
 .jfx-decorator .jfx-decorator-title-container .jfx-decorator-text {
     -fx-fill: WHITE;
-    -fx-font-size: 16;
 }
 
 .jfx-decorator .jfx-decorator-title-container .jfx-svg-glyph {
@@ -893,7 +874,7 @@
 }
 
 .tree-table-view .column-header-background {
-    -fx-border-width: 0 0.0 1 0;
+    -fx-border-width: 0 0 0 0;
     -fx-border-color: #F3F3F3;
 }
 
@@ -936,12 +917,10 @@
 
 .tree-table-row-cell .jfx-text-field .error-label {
     -fx-text-fill: #D34336;
-    -fx-font-size: 0.75em;
 }
 
 .tree-table-row-cell .jfx-text-field .error-icon {
     -fx-fill: #D34336;
-    -fx-font-size: 1.0em;
 }
 
 .tree-table-row-cell:grouped {
@@ -1041,13 +1020,11 @@
 
 .error-label {
     -fx-text-fill: #D34336;
-    -fx-font-size: 0.75em;
     -fx-font-weight: bold;
 }
 
 .error-icon {
     -fx-fill: #D34336;
-    -fx-font-size: 1.0em;
 }
 
 .jfx-text-field:error, .jfx-password-field:error, .jfx-text-area:error, .jfx-combo-box:error {
@@ -1057,12 +1034,10 @@
 
 .jfx-text-field .error-label, .jfx-password-field .error-label, .jfx-text-area .error-label {
     -fx-text-fill: #D34336;
-    -fx-font-size: 0.75em;
 }
 
 .jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .error-icon {
     -fx-fill: #D34336;
-    -fx-font-size: 1.0em;
 }
 
 .jfx-scroll-pane .main-header {
