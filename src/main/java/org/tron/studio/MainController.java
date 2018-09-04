@@ -41,15 +41,8 @@ public class MainController {
 
     private static List<Tab> allTabs = new ArrayList<>();
 
-    private static final Set<String> dictionary = new HashSet<String>();
-
     @PostConstruct
     public void initialize() throws IOException {
-
-        dictionary.add("test");
-        dictionary.add("var");
-        dictionary.add("aa");
-
         List<File> files = SolidityFileUtil.getFileNameList();
         File defaultContractFile = files.get(0);
         ShareData.currentContractFileName.set(defaultContractFile.getName());
