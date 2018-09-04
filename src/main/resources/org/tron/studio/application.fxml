@@ -20,7 +20,7 @@
             <fx:include source="ui/top.fxml"
                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
                         AnchorPane.topAnchor="0"/>
-            <SplitPane dividerPositions="0.15, 0.7"
+            <SplitPane dividerPositions="0.15, 0.65"
                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
                   AnchorPane.topAnchor="64" AnchorPane.bottomAnchor="50">
                     <fx:include source="ui/left_code_list.fxml"/>

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.tron.common.runtime.vm.DataWord;
@@ -15,10 +16,7 @@ import org.tron.studio.filesystem.VmTraceFileUtil;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,6 +25,7 @@ public class RightTabDebugController implements Initializable {
     public JFXListView debugInstructionsList;
     public JFXListView debugStackList;
     public JFXTextField transactionIdTextField;
+    public Label energyLimitLeftLabel;
 
     private List<String> instructionsInfo = new ArrayList<>();
 
@@ -36,7 +35,10 @@ public class RightTabDebugController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         ShareData.debugTransactionAction.addListener((observable, oldValue, transactionId) -> {
             List<File> traceFileList = VmTraceFileUtil.getFileNameList();
-            Optional<File> traceFile = traceFileList.stream().filter(file -> file.getName().startsWith(transactionId)).findFirst();
+            Optional<File> traceFile = traceFileList.stream()
+                    .filter(file -> file.getName().startsWith(transactionId))
+                    .sorted((o1, o2) -> Long.compare(o2.lastModified(), o1.lastModified()))
+                    .findFirst();
             if (!traceFile.isPresent()) {
                 return;
             }
@@ -70,7 +72,9 @@ public class RightTabDebugController implements Initializable {
         debugStackList.getItems().addAll(stacks);
         debugStackList.setPrefHeight(stacks.size() * 40);
 
-        debugInstructionsList.scrollTo("" + statusItem.pc + ": " + statusItem.code.name());
+        String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
+        debugInstructionsList.scrollTo(currentItem);
+        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
     }
 
     public void onClickStop(MouseEvent mouseEvent) {
@@ -93,7 +97,9 @@ public class RightTabDebugController implements Initializable {
         debugStackList.getItems().addAll(stacks);
         debugStackList.setPrefHeight(stacks.size() * 40);
 
-        debugInstructionsList.scrollTo("" + statusItem.pc + ": " + statusItem.code.name());
+        String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
+        debugInstructionsList.scrollTo(currentItem);
+        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
     }
 
     public void onClickForward(MouseEvent mouseEvent) {
@@ -111,6 +117,9 @@ public class RightTabDebugController implements Initializable {
         debugStackList.getItems().addAll(stacks);
         debugStackList.setPrefHeight(stacks.size() * 40);
 
-        debugInstructionsList.scrollTo("" + statusItem.pc + ": " + statusItem.code.name());
+        String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
+        debugInstructionsList.scrollTo(currentItem);
+
+        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
     }
 }

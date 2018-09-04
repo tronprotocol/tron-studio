@@ -347,7 +347,9 @@ public class RightTabRunController implements Initializable {
 
         new Thread(() ->{
             try {
-                Thread.sleep(2000);
+                if(item.getType() == TransactionHistoryItem.Type.Transaction) {
+                    Thread.sleep(2000);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -466,6 +468,10 @@ public class RightTabRunController implements Initializable {
                 return;
             }
 
+            if(transactionExtention.getConstantResultCount() > 0) {
+                addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.TransactionExtension, transactionExtention));
+                return;
+            }
             Transaction transaction = ShareData.wallet.getLastTransaction();
             transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
             addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction));

@@ -38,6 +38,7 @@
             <Region HBox.hgrow="ALWAYS" />
         </HBox>
 
+        <Label text="Energy Limit Left" fx:id="energyLimitLeftLabel"/>
         <Label text="Instructions"/>
         <JFXListView prefHeight="120" fx:id="debugInstructionsList" styleClass="sublist"/>
         <Label text="Stack"/>
