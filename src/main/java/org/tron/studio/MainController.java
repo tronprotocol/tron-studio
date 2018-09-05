@@ -1,8 +1,10 @@
 package org.tron.studio;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
@@ -19,6 +21,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Alert;
+import javafx.scene.input.KeyCombination;
 
 @Slf4j
 public class MainController {
@@ -56,7 +63,6 @@ public class MainController {
         new SolidityHighlight(defaultCodeArea).highlight();
         AutoCompletion autocomp = new AutoCompletion(defaultCodeArea);
         autocomp.autoComplete(defaultCodeArea);
-
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
