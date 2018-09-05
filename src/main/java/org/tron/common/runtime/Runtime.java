@@ -604,7 +604,7 @@ public class Runtime {
         trace = zipAndEncode(trace);
       }
 
-      saveProgramTraceFile(config, new InternalTransaction(trx), trace);
+      saveProgramTraceFile(config, trx, trace);
     }
 
   }

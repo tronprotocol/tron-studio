@@ -19,12 +19,17 @@ package org.tron.common.runtime.vm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
 import org.tron.common.runtime.config.VMConfig;
 import java.io.*;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
+import org.tron.common.runtime.vm.program.InternalTransaction;
+import org.tron.core.capsule.TransactionCapsule;
+import org.tron.protos.Protocol.Transaction;
+import org.tron.studio.filesystem.VmTraceFileUtil;
 
 import static java.lang.String.format;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
@@ -47,13 +52,13 @@ public final class VMUtils {
         }
     }
 
-    private static File createProgramTraceFile(VMConfig config, String txHash) {
+    private static File createProgramTraceFile(VMConfig config, Transaction transaction) {
         File result = null;
 
         if (config.vmTrace()) {
 
-            String transactionHash = new TransactionCapsule(internalTransaction.getTransaction()).getTransactionId().toString();
-            String internalTransactionHash = Hex.toHexString(internalTransaction.getHash());
+            String transactionHash = new TransactionCapsule(transaction).getTransactionId().toString();
+            String internalTransactionHash = Hex.toHexString(new InternalTransaction(transaction).getHash());
 
 
             File file = new File(new File(VmTraceFileUtil.getTracePath()), transactionHash + "_" + internalTransactionHash + ".json");
@@ -90,8 +95,8 @@ public final class VMUtils {
         }
     }
 
-    public static void saveProgramTraceFile(VMConfig config, String txHash, String content) {
-        File file = createProgramTraceFile(config, txHash);
+    public static void saveProgramTraceFile(VMConfig config, Transaction transaction, String content) {
+        File file = createProgramTraceFile(config, transaction);
         if (file != null) {
             writeStringToFile(file, content);
         }
