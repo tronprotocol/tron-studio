@@ -1,5 +1,6 @@
 package org.tron.studio;
 
+import org.tron.abi.datatypes.Function;
 import org.tron.api.GrpcAPI;
 import org.tron.protos.Protocol;
 
@@ -13,21 +14,7 @@ public class TransactionHistoryItem {
     private GrpcAPI.TransactionExtention transactionExtention;
     private Protocol.Transaction transaction;
     private String infoString;
-
-    public TransactionHistoryItem(Type type, GrpcAPI.TransactionExtention transactionExtention) {
-        this.type = type;
-        this.transactionExtention = transactionExtention;
-    }
-
-    public TransactionHistoryItem(Type type, Protocol.Transaction transaction) {
-        this.type = type;
-        this.transaction = transaction;
-    }
-
-    public TransactionHistoryItem(Type type, String errorInfo) {
-        this.type = type;
-        this.infoString = errorInfo;
-    }
+    private Function function;
 
     public Type getType() {
         return type;
@@ -59,5 +46,31 @@ public class TransactionHistoryItem {
 
     public void setInfoString(String infoString) {
         this.infoString = infoString;
+    }
+
+    public Function getFunction() {
+        return function;
+    }
+
+    public void setFunction(Function function) {
+        this.function = function;
+    }
+
+    public TransactionHistoryItem(Type type, GrpcAPI.TransactionExtention transactionExtention, Function function) {
+        this.type = type;
+        this.transactionExtention = transactionExtention;
+        this.function = function;
+    }
+
+    public TransactionHistoryItem(Type type, Protocol.Transaction transaction, Function function) {
+        this.type = type;
+        this.transaction = transaction;
+        this.function = function;
+    }
+
+    public TransactionHistoryItem(Type type, String infoString, Function function) {
+        this.type = type;
+        this.infoString = infoString;
+        this.function = function;
     }
 }

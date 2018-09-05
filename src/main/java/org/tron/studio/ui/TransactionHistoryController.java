@@ -8,15 +8,16 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
+import org.tron.abi.FunctionReturnDecoder;
+import org.tron.abi.datatypes.Function;
 import org.tron.api.GrpcAPI;
 import org.tron.common.utils.ByteArray;
 import org.tron.core.Wallet;
@@ -24,11 +25,10 @@ import org.tron.core.capsule.TransactionCapsule;
 import org.tron.protos.Protocol;
 import org.tron.studio.ShareData;
 import org.tron.studio.TransactionHistoryItem;
+import org.tron.studio.TransactionHistoryItem.Type;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.function.Function;
-import org.tron.studio.TransactionHistoryItem.Type;
+import java.util.List;
 
 public class TransactionHistoryController {
 
@@ -39,7 +39,7 @@ public class TransactionHistoryController {
     public void initialize() {
         ShareData.addTransactionAction.addListener((observable, oldValue, newValue) -> {
             TransactionHistoryItem item = ShareData.transactionHistory.get(newValue);
-            if(item.getType() == Type.InfoString) {
+            if (item.getType() == Type.InfoString) {
                 transactionHistoryListView.getItems().add(new Label(item.getInfoString()));
             } else {
                 JFXListView<Object> subList = createSubList(newValue);
@@ -48,8 +48,8 @@ public class TransactionHistoryController {
         });
     }
 
-    private JFXTreeTableView<TransactionDetail> createDetailTable() {
-
+    private JFXTreeTableView<TransactionDetail> createDetailTable(String transactionHistoryId) {
+        TransactionHistoryItem item = ShareData.transactionHistory.get(transactionHistoryId);
         JFXTreeTableView<TransactionDetail> detailTable = new JFXTreeTableView<>();
         JFXTreeTableColumn<TransactionDetail, String> keyCol = new JFXTreeTableColumn<>("Item");
         JFXTreeTableColumn<TransactionDetail, String> valueCol = new JFXTreeTableColumn<>("Value");
@@ -69,20 +69,49 @@ public class TransactionHistoryController {
         if (lastTransactionExtention.getConstantResultCount() > 0) {
             transactionId = Hex.toHexString(lastTransactionExtention.getTxid().toByteArray());
 
-            StringBuilder builder = new StringBuilder();
+            StringBuilder rawBuilder = new StringBuilder();
             lastTransactionExtention.getConstantResultList().forEach(result -> {
-                builder.append(result.toStringUtf8()).append("\n");
+                rawBuilder.append(Hex.toHexString(result.toByteArray()));
             });
+
+            Function function = item.getFunction();
+            List<org.tron.abi.datatypes.Type> output = null;
+            StringBuilder outputBuilder = new StringBuilder();
+            if (function != null) {
+                output = FunctionReturnDecoder.decode(rawBuilder.toString(), function.getOutputParameters());
+                for (int i = 0; i < output.size(); i++) {
+                    outputBuilder.append(output.get(i).getValue());
+                    if (i != output.size() - 1) {
+                        outputBuilder.append(",");
+                    }
+                }
+            }
 
             detailTableData = FXCollections.observableArrayList(
                     new TransactionDetail("transaction_id", transactionId),
-                    new TransactionDetail("log", builder.toString())
+                    new TransactionDetail("contract_result", function == null ? rawBuilder.toString() : outputBuilder.toString())
             );
         } else {
             transactionId = Hex.toHexString(new TransactionCapsule(lastTransaction).getTransactionId().getBytes());
 
             Protocol.TransactionInfo transactionInfo = ShareData.wallet.getTransactionInfoById(transactionId).get();
-            StringBuilder builder = new StringBuilder();
+            StringBuilder rawBuilder = new StringBuilder();
+            transactionInfo.getContractResultList().forEach(result -> {
+                rawBuilder.append(Hex.toHexString(result.toByteArray()));
+            });
+
+            Function function = item.getFunction();
+            List<org.tron.abi.datatypes.Type> output = null;
+            StringBuilder outputBuilder = new StringBuilder();
+            if (function != null) {
+                output = FunctionReturnDecoder.decode(rawBuilder.toString(), function.getOutputParameters());
+                for (int i = 0; i < output.size(); i++) {
+                    outputBuilder.append(output.get(i).getValue());
+                    if (i != output.size() - 1) {
+                        outputBuilder.append(",");
+                    }
+                }
+            }
 
             detailTableData = FXCollections.observableArrayList(
                     new TransactionDetail("transaction_id", transactionId),
@@ -91,15 +120,14 @@ public class TransactionHistoryController {
                     new TransactionDetail("time_stamp", Long.toString(transactionInfo.getBlockTimeStamp())),
                     new TransactionDetail("result", transactionInfo.getResult().equals(Protocol.TransactionInfo.code.SUCESS) ? "success" : "fail"),
                     new TransactionDetail("result_message", ByteArray.toStr(transactionInfo.getResMessage().toByteArray())),
-                    new TransactionDetail("contract_result", ByteArray.toHexString(transactionInfo.getContractResult(0).toByteArray())),
+                    new TransactionDetail("contract_result", function == null ? rawBuilder.toString() : outputBuilder.toString()),
                     new TransactionDetail("contract_address", Wallet.encode58Check(transactionInfo.getContractAddress().toByteArray())),
                     new TransactionDetail("energy_usage", Long.toString(transactionInfo.getReceipt().getEnergyUsage())),
                     new TransactionDetail("energy_fee(sun)", Long.toString(transactionInfo.getReceipt().getEnergyFee())),
                     new TransactionDetail("origin_energy_usage", Long.toString(transactionInfo.getReceipt().getOriginEnergyUsage())),
                     new TransactionDetail("energy_usage_total", Long.toString(transactionInfo.getReceipt().getEnergyUsageTotal())),
                     new TransactionDetail("net_usage", Long.toString(transactionInfo.getReceipt().getNetUsage())),
-                    new TransactionDetail("net_fee", Long.toString(transactionInfo.getReceipt().getNetFee())),
-                    new TransactionDetail("log", builder.toString())
+                    new TransactionDetail("net_fee", Long.toString(transactionInfo.getReceipt().getNetFee()))
             );
         }
 
@@ -117,26 +145,16 @@ public class TransactionHistoryController {
         if (transactionHistoryItem.getType() == TransactionHistoryItem.Type.InfoString) {
             subList.getItems().add(new Label(transactionHistoryItem.getInfoString()));
         } else {
-            subList.getItems().add(createDetailTable());
+            subList.getItems().add(createDetailTable(transactionHistoryId));
         }
 
-        HBox node = new HBox();
-
-        JFXRippler ripper = new JFXRippler();
-        ripper.setStyle(":cons-rippler1");
-        ripper.setPosition(JFXRippler.RipplerPos.FRONT);
-
-        StackPane pane = new StackPane();
-//        pane.setStyle(":-fx-padding: 2;");
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_LEFT);
 
         MaterialDesignIconView copyIcon = new MaterialDesignIconView();
         copyIcon.setGlyphName("BUG");
         copyIcon.setStyleClass("icon");
-        pane.getChildren().add(copyIcon);
-
-        ripper.getChildren().add(pane);
-
-        node.getChildren().add(ripper);
+        hBox.getChildren().add(copyIcon);
 
         String acountAddr = ShareData.currentAccount;
         acountAddr = StringUtils.left(acountAddr, 10) + "...";
@@ -144,26 +162,31 @@ public class TransactionHistoryController {
         String currentContract = ShareData.currentContractName.get();
         String currentValue = ShareData.currentValue;
 
-        String debugInfo = "[vm] from: %s to: %s.(consructor)\n value:%s data: xxxxx. logs:0 hash:%s";
-        debugInfo = String.format(debugInfo, acountAddr, currentContract, currentValue, StringUtils.left(transactionHistoryId, 10) + "...");
+        Function function = transactionHistoryItem.getFunction();
+        String debugInfo = "[vm] from: %s to: %s.%s value:%s hash:%s";
+        debugInfo = String.format(debugInfo,
+                acountAddr,
+                currentContract, function == null ? "" : function.getName(),
+                currentValue,
+                StringUtils.left(transactionHistoryId, 10) + "...");
         Label debugInfoLabel = new Label(debugInfo);
-        ((HBox) node).getChildren().add(debugInfoLabel);
+        hBox.getChildren().add(debugInfoLabel);
 
         Region region1 = new Region();
-        node.getChildren().add(region1);
+        hBox.getChildren().add(region1);
         HBox.setHgrow(region1, Priority.ALWAYS);
         JFXButton debugBtn = new JFXButton("Debug");
         debugBtn.getStyleClass().add("custom-jfx-button-raised-fix-width");
-        node.getChildren().add(debugBtn);
+        hBox.getChildren().add(debugBtn);
         Region region2 = new Region();
         region2.setPrefWidth(30);
-        node.getChildren().add(region2);
+        hBox.getChildren().add(region2);
 
         debugBtn.setOnAction(event -> {
             ShareData.debugTransactionAction.set(transactionHistoryId);
         });
 
-        subList.setGroupnode(node);
+        subList.setGroupnode(hBox);
 
         return subList;
     }
@@ -187,7 +210,7 @@ public class TransactionHistoryController {
         }
     }
 
-    private <T> void setupCellValueFactory(JFXTreeTableColumn<TransactionDetail, T> column, Function<TransactionDetail, ObservableValue<T>> mapper) {
+    private <T> void setupCellValueFactory(JFXTreeTableColumn<TransactionDetail, T> column, java.util.function.Function<TransactionDetail, ObservableValue<T>> mapper) {
         column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TransactionDetail, T> param) -> {
             if (column.validateValue(param)) {
                 return mapper.apply(param.getValue().getValue());

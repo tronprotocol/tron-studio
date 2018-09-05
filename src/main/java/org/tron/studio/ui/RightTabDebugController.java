@@ -2,20 +2,12 @@ package org.tron.studio.ui;
 
 import com.alibaba.fastjson.JSON;
 import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXRippler;
 import com.jfoenix.controls.JFXTextField;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.tron.common.runtime.vm.DataWord;
 import org.tron.common.runtime.vm.trace.Op;
 import org.tron.common.runtime.vm.trace.ProgramTrace;
 import org.tron.studio.ShareData;
@@ -25,230 +17,109 @@ import org.tron.studio.filesystem.VmTraceFileUtil;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
-
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.Files;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class RightTabDebugController implements Initializable {
 
-    public JFXListView debugList;
+    public JFXListView debugInstructionsList;
+    public JFXListView debugStackList;
     public JFXTextField transactionIdTextField;
+    public Label energyLimitLeftLabel;
 
     private List<String> instructionsInfo = new ArrayList<>();
-    private List<String> solidityLocals = new ArrayList<>();
-    private List<Node> solidityState = new ArrayList<>();
-    private List<String> stepDetails = new ArrayList<>();
-    private List<String> stacks = new ArrayList<>();
-    private List<String> storageLoaded = new ArrayList<>();
-    private List<String> memory = new ArrayList<>();
-    private List<String> callData = new ArrayList<>();
-    private List<String> callStack = new ArrayList<>();
-    private List<String> returnValue = new ArrayList<>();
-    private List<String> fullStorageChanges = new ArrayList<>();
 
-    public RightTabDebugController() {
-
-    }
+    private int currentIndex = 0;
+    private VMStatus vmStatus;
 
     public void initialize(URL location, ResourceBundle resources) {
         ShareData.debugTransactionAction.addListener((observable, oldValue, transactionId) -> {
-
             List<File> traceFileList = VmTraceFileUtil.getFileNameList();
-            Optional<File> traceFile = traceFileList.stream().filter(file -> file.getName().startsWith(transactionId)).findFirst();
+            Optional<File> traceFile = traceFileList.stream()
+                    .filter(file -> file.getName().startsWith(transactionId))
+                    .sorted((o1, o2) -> Long.compare(o2.lastModified(), o1.lastModified()))
+                    .findFirst();
             if (!traceFile.isPresent()) {
-               return;
+                return;
             }
             String traceContent = VmTraceFileUtil.getTraceContent(traceFile.get().getName());
             ProgramTrace programTrace = JSON.parseObject(traceContent, ProgramTrace.class);
-            VMStatus vmStatus = new VMStatus();
+            String contractAddress = programTrace.getContractAddress();
+            vmStatus = new VMStatus();
             for (Op op : programTrace.getOps()) {
-                vmStatus.addStatus(new VMStatus.StatusItem(op.getCode(), op.getDeep(), op.getPc(), op.getEnergy(), op.getActions()));
+                vmStatus.addStatus(new VMStatus.StatusItem(contractAddress, op.getCode(), op.getDeep(), op.getPc(), op.getEnergy(), op.getActions()));
                 logger.error(op.toString());
+                instructionsInfo.add("" + op.getPc() + ": " + op.getCode().name());
             }
 
+            currentIndex = 0;
             transactionIdTextField.setText(transactionId);
-
-            getTransDetails(transactionId);
-
-            Map<String, Object> details = new HashMap<>();
-            details.put("Instructions", instructionsInfo);
-            details.put("Solidity Locals", solidityLocals);
-            details.put("Solidity State", solidityState);
-            details.put("Step detail", stepDetails);
-            details.put("Stack", stacks);
-            details.put("Storage completely loaded", storageLoaded);
-            details.put("Memory", memory);
-            details.put("Call Data", callData);
-            details.put("Call Stack", callStack);
-            details.put("Return Value", returnValue);
-            details.put("Full Storages Changes", fullStorageChanges);
-
-            debugList.getItems().clear();
-
-            for (Map.Entry<String, Object> entry: details.entrySet())
-            {
-                JFXListView<Object> subList = createList(entry.getKey(), entry.getValue());
-                debugList.getItems().add(subList);
-            }
+            debugStackList.getItems().clear();
+            debugInstructionsList.getItems().clear();
+            debugInstructionsList.getItems().addAll(instructionsInfo);
         });
     }
 
-    private void getTransDetails(String transId)
-    {
-        List<File> files = new ArrayList<>();
-        for (File file: VmTraceFileUtil.getFileNameList())
-        {
-            if (file.getName().contains(transId))
-                files.add(file);
-        }
-
-        Long lastestTime = (long)0;
-        File lastestFile = null;
-        try {
-
-            for (File file: files)
-            {
-                BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                Long fileTime = attr.creationTime().toMillis();
-                if (fileTime > lastestTime)
-                {
-                    lastestTime = fileTime;
-                    lastestFile = file;
-                }
-            }
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        if (lastestFile == null) return;
-
-        try {
-            String transContenxt = VmTraceFileUtil.getTraceContent(lastestFile.getName());
-            JSONParser  parser = new JSONParser();
-            JSONObject jsonObject = (JSONObject)parser.parse(transContenxt);
-            JSONArray opsArray = (JSONArray)jsonObject.get("ops");
-
-            for (Object ops: opsArray)
-            {
-                JSONObject opsJson = (JSONObject)ops;
-                instructionsInfo.add(String.format("%04d %s", opsJson.get("pc"), opsJson.get("code")));
-            }
-
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        solidityState = createSolidityStateNode();
-
-    }
-
-    private List<Node> createSolidityStateNode()
-    {
-        List<Node> details = new ArrayList<>();
-        details.add(new Label("chairperson:"));
-        details.add(new Label("0x0000000000000000000"));
-
-        String voterStr = "voters: mapping(address => struct Ballot.Voter)";
-        List<Object> voterDetail = new ArrayList<>();
-        voterDetail.add("nothing");
-        JFXListView<Object> voter = createSolidityStateSubNode(voterStr, voterDetail);
-
-        details.add(voter);
-
-        String proposalStr = "proposals: struct Ballot.Proposal[]";
-        List<Object> proposalDetail = new ArrayList<>();
-        voterDetail.add("length: 0");
-        JFXListView<Object> proposals = createSolidityStateSubNode(proposalStr, proposalDetail);
-
-        details.add(proposals);
-
-        return details;
-    }
-
-    private JFXListView<Object> createSolidityStateSubNode(String nodename, List<Object> details)
-    {
-        JFXListView<Object> subList = new JFXListView<>();
-
-        for(Object detail: details)
-        {
-            subList.getItems().add(detail);
-        }
-
-        Node node = new HBox();
-        ((HBox) node).getChildren().add(new Label(nodename));
-        JFXRippler ripper = new JFXRippler();
-        ripper.setStyle(":cons-rippler1");
-        ripper.setPosition(JFXRippler.RipplerPos.BACK);
-
-        ((HBox) node).getChildren().add(ripper);
-        subList.setGroupnode(node);
-
-        return subList;
-    }
-
-    public void onClickDebug(ActionEvent actionEvent) {
-    }
-
-    private JFXListView<Object> createList(String groundName, Object detail) {
-
-        List<Object> nodeDetails = (List<Object>)detail;
-
-        if (nodeDetails.size() == 0)
-        {
-            nodeDetails.add("nothing");
-        }
-
-        JFXListView<Object> subList = new JFXListView<>();
-
-        for (Object labelText :
-                nodeDetails) {
-            if (labelText instanceof String)
-                subList.getItems().add(new Label((String) labelText));
-            else if(labelText instanceof Node)
-                subList.getItems().add(labelText);
-        }
-
-        Node node = new HBox();
-        ((HBox) node).getChildren().add(new Label(groundName));
-        JFXRippler ripper = new JFXRippler();
-        ripper.setStyle(":cons-rippler1");
-        ripper.setPosition(JFXRippler.RipplerPos.BACK);
-
-        StackPane pane = new StackPane();
-        pane.setStyle(":-fx-padding: 2;");
-
-        MaterialDesignIconView copyIcon = new MaterialDesignIconView();
-        copyIcon.setGlyphName("CONTENT_COPY");
-        copyIcon.setStyleClass("icon");
-        pane.getChildren().add(copyIcon);
-
-        ripper.getChildren().add(pane);
-
-        ((HBox) node).getChildren().add(ripper);
-        subList.setGroupnode(node);
-
-        return subList;
-    }
-
     public void onClickPlay(MouseEvent mouseEvent) {
+        currentIndex = 0;
+        List<String> stacks = new ArrayList<>();
+        VMStatus.StatusItem statusItem = vmStatus.getStatusItem(currentIndex);
+        List<DataWord> items = statusItem.stack.stream().collect(Collectors.toList());
+        for (int i = items.size() - 1; i >= 0; i--) {
+            stacks.add("" + i + ": " + items.get(i).toString());
+        }
+        debugStackList.getItems().clear();
+        debugStackList.getItems().addAll(stacks);
+        debugStackList.setPrefHeight(stacks.size() * 40);
 
+        String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
+        debugInstructionsList.scrollTo(currentItem);
+        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
     }
 
     public void onClickStop(MouseEvent mouseEvent) {
+        currentIndex = 0;
+        debugStackList.getItems().clear();
     }
 
-    public void onClickStepOverBack(MouseEvent mouseEvent) {
+    public void onClickBackward(MouseEvent mouseEvent) {
+        List<String> stacks = new ArrayList<>();
+        currentIndex--;
+        if (currentIndex < 0) {
+            currentIndex = 0;
+        }
+        VMStatus.StatusItem statusItem = vmStatus.getStatusItem(currentIndex);
+        List<DataWord> items = statusItem.stack.stream().collect(Collectors.toList());
+        for (int i = items.size() - 1; i >= 0; i--) {
+            stacks.add("" + i + ": " + items.get(i).toString());
+        }
+        debugStackList.getItems().clear();
+        debugStackList.getItems().addAll(stacks);
+        debugStackList.setPrefHeight(stacks.size() * 40);
+
+        String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
+        debugInstructionsList.scrollTo(currentItem);
+        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
     }
 
-    public void onClickStepBack(MouseEvent mouseEvent) {
-    }
+    public void onClickForward(MouseEvent mouseEvent) {
+        List<String> stacks = new ArrayList<>();
+        currentIndex++;
+        if (currentIndex >= vmStatus.getStatusItemSize()) {
+            currentIndex = vmStatus.getStatusItemSize() - 1;
+        }
+        VMStatus.StatusItem statusItem = vmStatus.getStatusItem(currentIndex);
+        List<DataWord> items = statusItem.stack.stream().collect(Collectors.toList());
+        for (int i = items.size() - 1; i >= 0; i--) {
+            stacks.add("" + i + ": " + items.get(i).toString());
+        }
+        debugStackList.getItems().clear();
+        debugStackList.getItems().addAll(stacks);
+        debugStackList.setPrefHeight(stacks.size() * 40);
 
-    public void onClickStepInto(MouseEvent mouseEvent) {
-    }
+        String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
+        debugInstructionsList.scrollTo(currentItem);
 
-    public void onClickOverForward(MouseEvent mouseEvent) {
+        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
     }
 }

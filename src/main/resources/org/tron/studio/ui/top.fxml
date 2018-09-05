@@ -12,7 +12,7 @@
                AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" >
        <leftItems>
            <Label text="Tron Studio"/>
-           <JFXButton styleClass="custom-jfx-button-raised"  text="Dump Layout info" onAction="#dumpLayoutInfo" visible="false"/>
+           <JFXButton styleClass="custom-jfx-button-raised"  text="Dump Layout info" onAction="#dumpLayoutInfo" visible="true"/>
        </leftItems>
        <rightItems>
            <HBox spacing="10">

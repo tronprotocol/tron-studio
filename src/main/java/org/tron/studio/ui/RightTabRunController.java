@@ -25,8 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.abi.FunctionEncoder;
+import org.tron.abi.TypeReference;
+import org.tron.abi.datatypes.Function;
 import org.tron.abi.datatypes.Type;
 import org.tron.abi.datatypes.generated.AbiTypes;
+import org.tron.abi.datatypes.generated.Uint256;
 import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.TransactionCapsule;
@@ -236,7 +239,9 @@ public class RightTabRunController implements Initializable {
             } catch (Exception e) {
                 String uuid = UUID.randomUUID().toString();
                 addTransactionHistoryItem(uuid, new TransactionHistoryItem(
-                        TransactionHistoryItem.Type.InfoString, "Failed to deployContract. " + e.getMessage()));
+                        TransactionHistoryItem.Type.InfoString,
+                        "Failed to deployContract. " + e.getMessage(),
+                        null));
                 logger.error("Failed to deployContract {}", e);
                 isDeploying = false;
                 return;
@@ -245,8 +250,10 @@ public class RightTabRunController implements Initializable {
 
         if (!deployContractResult[0]) {
             String uuid = UUID.randomUUID().toString();
-            addTransactionHistoryItem(uuid, new TransactionHistoryItem(TransactionHistoryItem.Type.InfoString,
-                    "Failed to deployContract. Please check tron.log"));
+            addTransactionHistoryItem(uuid, new TransactionHistoryItem(
+                    TransactionHistoryItem.Type.InfoString,
+                    "Failed to deployContract. Please check tron.log",
+                    null));
             isDeploying = false;
             return;
         }
@@ -257,14 +264,15 @@ public class RightTabRunController implements Initializable {
             addTransactionHistoryItem(transactionId, new TransactionHistoryItem(
                     TransactionHistoryItem.Type.InfoString,
                     String.format("Unable to get last TransactionExtention: %s",
-                            transactionExtention.getResult().getMessage().toStringUtf8())));
+                            transactionExtention.getResult().getMessage().toStringUtf8()),
+                    null));
             isDeploying = false;
             return;
         }
 
         Transaction transaction = ShareData.wallet.getLastTransaction();
         transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
-        addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction));
+        addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction, null));
 
         ShareData.currentContractName.set(currentContractName);
 
@@ -308,6 +316,7 @@ public class RightTabRunController implements Initializable {
                 gridPane.add(parameterText, 1, index);
 
                 JSONArray inputsJsonArray = entryJson.getJSONArray("inputs");
+                JSONArray outputsJsonArray = entryJson.getJSONArray("outputs");
                 StringBuilder parameterPromot = new StringBuilder();
 
                 StringBuilder methodStr = new StringBuilder(entryJson.getString("name"));
@@ -327,9 +336,20 @@ public class RightTabRunController implements Initializable {
                 } else {
                     parameterText.setVisible(false);
                 }
+
+                List<TypeReference<?>> outputParaList = new ArrayList<>();
+                if (outputsJsonArray != null && outputsJsonArray.size() > 0) {
+                    for (int j = 0; j < outputsJsonArray.size(); j++) {
+                        JSONObject outputItem = outputsJsonArray.getJSONObject(j);
+                        String type = outputItem.getString("type");
+                        outputParaList.add(AbiTypes.getTypeReference(type));
+                    }
+                }
+                Function functionForReturn = new Function(entryJson.getString("name"),
+                        Collections.emptyList(), outputParaList);
                 methodStr.append(")");
                 parameterText.setPromptText(parameterPromot.toString());
-                functionButton.setOnAction(new ClickTriggerAction(contractAddress, methodStr.toString(), parameterText));
+                functionButton.setOnAction(new ClickTriggerAction(contractAddress, methodStr.toString(), functionForReturn, parameterText));
             }
             index++;
         }
@@ -342,12 +362,14 @@ public class RightTabRunController implements Initializable {
         String currentContractName = ShareData.currentContractName.get();
         String transactionHeadMsg = String.format("creation of %s pending...", currentContractName);
         UUID uuid = UUID.randomUUID();
-        ShareData.transactionHistory.put(uuid.toString(), new TransactionHistoryItem(TransactionHistoryItem.Type.InfoString, transactionHeadMsg));
+        ShareData.transactionHistory.put(uuid.toString(), new TransactionHistoryItem(TransactionHistoryItem.Type.InfoString, transactionHeadMsg, null));
         ShareData.addTransactionAction.set(uuid.toString());
 
         new Thread(() ->{
             try {
-                Thread.sleep(2000);
+                if(item.getType() == TransactionHistoryItem.Type.Transaction) {
+                    Thread.sleep(2000);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -427,11 +449,13 @@ public class RightTabRunController implements Initializable {
         byte[] contractAddress;
         String methodStr;
         JFXTextField parameterText;
+        Function function;
 
-        public ClickTriggerAction(byte[] contractAddress, String methodStr, JFXTextField parameterText) {
+        public ClickTriggerAction(byte[] contractAddress, String methodStr, Function function, JFXTextField parameterText) {
             this.contractAddress = contractAddress;
             this.methodStr = methodStr;
             this.parameterText = parameterText;
+            this.function = function;
         }
 
         @Override
@@ -462,13 +486,19 @@ public class RightTabRunController implements Initializable {
                 addTransactionHistoryItem(transactionId, new TransactionHistoryItem(
                         TransactionHistoryItem.Type.InfoString,
                         String.format("Unable to get last TransactionExtention: %s",
-                                transactionExtention.getResult().getMessage().toStringUtf8())));
+                                transactionExtention.getResult().getMessage().toStringUtf8()),
+                        null
+                        ));
                 return;
             }
 
+            if(transactionExtention.getConstantResultCount() > 0) {
+                addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.TransactionExtension, transactionExtention, function));
+                return;
+            }
             Transaction transaction = ShareData.wallet.getLastTransaction();
             transactionId = Hex.toHexString(new TransactionCapsule(transaction).getTransactionId().getBytes());
-            addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction));
+            addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.Transaction, transaction, function));
         }
     }
 
