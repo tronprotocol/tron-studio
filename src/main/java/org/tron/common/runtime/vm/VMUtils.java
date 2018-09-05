@@ -19,12 +19,7 @@ package org.tron.common.runtime.vm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
-import org.tron.common.runtime.config.SystemProperties;
-import org.tron.common.runtime.vm.program.InternalTransaction;
-import org.tron.core.capsule.TransactionCapsule;
-import org.tron.studio.filesystem.VmTraceFileUtil;
-
+import org.tron.common.runtime.config.VMConfig;
 import java.io.*;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -52,7 +47,7 @@ public final class VMUtils {
         }
     }
 
-    private static File createProgramTraceFile(SystemProperties config, InternalTransaction internalTransaction) {
+    private static File createProgramTraceFile(VMConfig config, String txHash) {
         File result = null;
 
         if (config.vmTrace()) {
@@ -95,8 +90,8 @@ public final class VMUtils {
         }
     }
 
-    public static void saveProgramTraceFile(SystemProperties config, InternalTransaction internalTransaction, String content) {
-        File file = createProgramTraceFile(config, internalTransaction);
+    public static void saveProgramTraceFile(VMConfig config, String txHash, String content) {
+        File file = createProgramTraceFile(config, txHash);
         if (file != null) {
             writeStringToFile(file, content);
         }
