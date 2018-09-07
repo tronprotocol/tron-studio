@@ -13,6 +13,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -88,6 +89,7 @@ public class MainApplication extends Application {
 
     Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
     primaryStage.setTitle("Tron Studio");
+    primaryStage.getIcons().add(new Image(MainApplication.class.getResourceAsStream("/images/icon.png")));
 
     Screen screen = Screen.getPrimary();
     Rectangle2D bounds = screen.getVisualBounds();
