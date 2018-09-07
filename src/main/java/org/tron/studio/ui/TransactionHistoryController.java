@@ -1,5 +1,6 @@
 package org.tron.studio.ui;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jfoenix.controls.*;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
@@ -10,7 +11,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -143,14 +147,12 @@ public class TransactionHistoryController {
         TransactionHistoryItem transactionHistoryItem = ShareData.transactionHistory.get(transactionHistoryId);
         JFXListView<Object> subList = new JFXListView<>();
 
-        if (transactionHistoryItem.getType() == TransactionHistoryItem.Type.InfoString) {
-            subList.getItems().add(new Label(transactionHistoryItem.getInfoString()));
-        } else {
-            subList.getItems().add(createDetailTable(transactionHistoryId));
-        }
+        JFXTreeTableView<TransactionDetail> detailTable = createDetailTable(transactionHistoryId);
+        subList.getItems().add(detailTable);
 
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.setSpacing(5);
 
         MaterialDesignIconView copyIcon = new MaterialDesignIconView();
         copyIcon.setGlyphName("BUG");
@@ -178,6 +180,9 @@ public class TransactionHistoryController {
         HBox.setHgrow(region1, Priority.ALWAYS);
         JFXButton debugBtn = new JFXButton("Debug");
         debugBtn.getStyleClass().add("custom-jfx-button-raised-fix-width");
+        JFXButton copyBtn = new JFXButton("Copy Info");
+        copyBtn.getStyleClass().add("custom-jfx-button-raised-fix-width");
+        hBox.getChildren().add(copyBtn);
         hBox.getChildren().add(debugBtn);
         Region region2 = new Region();
         region2.setPrefWidth(30);
@@ -185,6 +190,16 @@ public class TransactionHistoryController {
 
         debugBtn.setOnAction(event -> {
             ShareData.debugTransactionAction.set(transactionHistoryId);
+        });
+        copyBtn.setOnAction(event -> {
+            JSONObject result = new JSONObject();
+            for (TreeItem<TransactionDetail> transactionDetailTreeItem : detailTable.getRoot().getChildren()) {
+                result.put(transactionDetailTreeItem.getValue().keyProperty.get(), transactionDetailTreeItem.getValue().valueProperty.get());
+            }
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent clipboardContent = new ClipboardContent();
+            clipboardContent.putString(result.toJSONString());
+            clipboard.setContent(clipboardContent);
         });
 
         subList.setGroupnode(hBox);

@@ -19,8 +19,8 @@
     </padding>
     <GridPane hgap="5" vgap="5" styleClass="jfx-drawer-overlay-pane">
         <columnConstraints>
-            <ColumnConstraints hgrow="NEVER" prefWidth="90.0"/>
-            <ColumnConstraints hgrow="ALWAYS" prefWidth="110.0"/>
+            <ColumnConstraints hgrow="NEVER" prefWidth="120.0"/>
+            <ColumnConstraints hgrow="ALWAYS" prefWidth="80.0"/>
         </columnConstraints>
         <Label text="Environment"     GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <Label text="Account"         GridPane.rowIndex="1" GridPane.columnIndex="0"/>
