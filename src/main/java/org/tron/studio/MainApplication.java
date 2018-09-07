@@ -1,26 +1,29 @@
 package org.tron.studio;
 
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import com.jfoenix.svg.SVGGlyphLoader;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.StackPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.fxmisc.richtext.CodeArea;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.tron.common.application.ApplicationFactory;
 import org.tron.common.application.TronApplicationContext;
-import org.tron.common.net.udp.handler.EventHandler;
 import org.tron.core.Constant;
 import org.tron.core.config.DefaultConfig;
 import org.tron.core.config.args.Args;
@@ -30,12 +33,15 @@ import org.tron.core.services.http.FullNodeHttpApiService;
 
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCode;
+import javafx.scene.Node;
 import javafx.stage.Popup;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.event.ActionEvent;
+import org.tron.studio.ui.BorderSlideBar;
 
 @Slf4j
 public class MainApplication extends Application {
@@ -45,6 +51,11 @@ public class MainApplication extends Application {
 
   public static Args cfgArgs;
   public static org.tron.common.application.Application appT;
+
+  final Popup searchPopup = new Popup();
+  private int spacingSize = 3;
+
+  private List<List<Integer>> matchingPos = new ArrayList<>();
 
   public static void main(String[] args) {
     Args.setParam(args, Constant.TESTNET_CONF);
@@ -84,6 +95,8 @@ public class MainApplication extends Application {
 
     addShotcut(scene);
 
+    ShareData.scene = scene;
+
     final ObservableList<String> stylesheets = scene.getStylesheets();
     stylesheets.addAll(getClass().getResource("/css/jfoenix-fonts.css").toExternalForm(),
         getClass().getResource("/css/jfoenix-design.css").toExternalForm(),
@@ -91,47 +104,6 @@ public class MainApplication extends Application {
             getClass().getResource("/css/keywords.css").toExternalForm());
     primaryStage.setScene(scene);
     primaryStage.show();
-  }
-
-  private void addShotcut(Scene scene)
-  {
-    // Add find shotcut
-    KeyCombination kc = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-    Runnable rn = ()-> {
-      HBox hbox = new HBox();
-      hbox.setPadding(new Insets(5, 5, 5, 5));
-      hbox.setSpacing(10);
-      hbox.setStyle("-fx-background-color: #CFCFCF;");
-
-      JFXTextField searchText = new JFXTextField();
-      searchText.setPrefSize(100, 15);
-
-      Button buttonUp = new Button("Up");
-      buttonUp.setPrefSize(80, 15);
-      Button buttonDown= new Button("Down");
-      buttonDown.setPrefSize(80, 15);
-      Button buttonAll= new Button("All");
-      buttonAll.setPrefSize(80, 15);
-
-      Button buttonClose= new Button("Close");
-      buttonClose.setPrefSize(80, 15);
-
-      hbox.getChildren().addAll(searchText, buttonUp, buttonDown, buttonAll, buttonClose);
-
-      final Popup popup = new Popup();
-      popup.setX(600);
-      popup.setY(100);
-      popup.getContent().add(hbox);
-      popup.show(MainApplication.instance.primaryStage);
-
-      buttonClose.setOnAction((e) -> {
-        popup.hide();
-      });
-
-
-
-    };
-    scene.getAccelerators().put(kc, rn);
   }
 
   private static void startFullNode() {
@@ -179,5 +151,159 @@ public class MainApplication extends Application {
   public static void shutdown(final org.tron.common.application.Application app) {
     logger.info("********register application shutdown hook********");
     Runtime.getRuntime().addShutdownHook(new Thread(app::shutdown));
+  }
+
+  private void addShotcut(Scene scene)
+  {
+    // Add find shotcut
+    KeyCombination kc = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    Runnable rn = ()-> {
+
+      VBox vbox = new VBox();
+      TabPane codeAreaTabPane = (TabPane)scene.lookup("#codeAreaTabPane");
+
+      if (searchPopup.isShowing())
+      {
+        vbox = (VBox) searchPopup.getContent().get(0);
+
+        if (vbox.getChildren().size() == 2)
+        {
+          vbox.getChildren().remove(1);
+          return;
+        }
+
+        HBox hboxReplace = new HBox();
+        hboxReplace.setPadding(new Insets(spacingSize, spacingSize, spacingSize, spacingSize));
+        hboxReplace.setSpacing(2);
+        hboxReplace.setStyle("-fx-background-color: #CFCFCF;");
+
+        JFXTextField replaceText = new JFXTextField();
+        replaceText.setPrefSize(100, 5);
+        replaceText.setStyle("-fx-background-color: #ffffff;-fx-font-size: 11px;");
+
+        Button replaceBtn = new Button("Replace");
+        replaceBtn.setPrefSize(80, 7);
+        replaceBtn.setStyle("-fx-font-size: 11px;");
+
+        Button replaceAllBtn = new Button("All");
+        replaceAllBtn.setPrefSize(50, 7);
+        replaceAllBtn.setStyle("-fx-font-size: 11px;");
+
+        hboxReplace.getChildren().addAll(replaceText, replaceBtn, replaceAllBtn);
+        vbox.getChildren().add(hboxReplace);
+
+        searchPopup.getContent().clear();
+        searchPopup.getContent().add(vbox);
+        searchPopup.show(codeAreaTabPane,520,145);
+        return;
+      }
+
+      vbox.setPadding(new Insets(spacingSize, spacingSize, spacingSize, spacingSize));
+      vbox.setSpacing(2);
+      vbox.setStyle("-fx-background-color: #CFCFCF;");
+
+      HBox hbox = new HBox();
+      hbox.setPadding(new Insets(spacingSize, spacingSize, spacingSize, spacingSize));
+      hbox.setSpacing(2);
+      hbox.setStyle("-fx-background-color: #CFCFCF;");
+
+      JFXTextField searchText = new JFXTextField();
+      searchText.setPrefSize(100, 5);
+      searchText.setStyle("-fx-background-color: #ffffff;-fx-font-size: 11px;");
+
+      MaterialDesignIconView upIcon = new MaterialDesignIconView();
+      upIcon.setGlyphName("CHEVRON_UP");
+      upIcon.setSize("1.5em");
+      upIcon.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+
+        }
+      });
+
+      MaterialDesignIconView downIcon = new MaterialDesignIconView();
+      downIcon.setGlyphName("CHEVRON_DOWN");
+      downIcon.setSize("1.5em");
+
+      downIcon.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+
+        }
+      });
+
+      Button buttonAll= new Button("All");
+      buttonAll.setPrefSize(50, 7);
+      buttonAll.setStyle("-fx-font-size: 11px;");
+
+      MaterialDesignIconView closeIcon = new MaterialDesignIconView();
+      closeIcon.setGlyphName("CLOSE");
+      downIcon.setSize("1.5em");
+
+      hbox.getChildren().addAll(searchText, upIcon, downIcon, buttonAll, closeIcon);
+
+      vbox.getChildren().add(hbox);
+      searchPopup.getContent().add(vbox);
+      searchPopup.show(codeAreaTabPane,550,145);
+
+      closeIcon.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+          searchPopup.hide();
+        }
+      });
+    };
+    scene.getAccelerators().put(kc, rn);
+  }
+
+  private void searchWord(String keyword)
+  {
+    matchingPos.clear();
+
+    CodeArea currentCodeArea = (CodeArea)ShareData.currentContractTab.getContent();
+    int paraNum = currentCodeArea.getParagraphs().size();
+
+    for (int i = 0; i < paraNum; i++)
+    {
+      String currentLine = currentCodeArea.getText(i);
+      //String[] words = regulizeLine(currentLine).split(" ");
+      int wordsInt = currentLine.length();
+      int keywordLength = keyword.length();
+      int loopNum = wordsInt - keywordLength;
+
+      for (int j = 0; j < loopNum; j++)
+      {
+        String curWord = currentLine.substring(j,j + keywordLength);
+        if (curWord.equals(keyword))
+        {
+          // Save position
+          List<Integer> pos = new ArrayList<>();
+          pos.add(i);
+          pos.add(j);
+          matchingPos.add(pos);
+        }
+      }
+    }
+  }
+
+  private void showMatchingWords()
+  {
+    for (List<Integer> pos: matchingPos)
+    {
+      // styles for matching words should be set in highlight file
+    }
+  }
+
+  private String regulizeLine(String str)
+  {
+    str = str.replaceAll("\\+|-|\\*|/|=|&|\\|"," ");
+    str = str.replaceAll("\\{"," { ");
+    str = str.replaceAll("}"," } ");
+    str = str.replaceAll("\\("," ( ");
+    str = str.replaceAll("\\)"," ) ");
+    str = str.replaceAll(","," , ");
+    str = str.replaceAll(";"," ; ");
+
+    return str.replaceAll("( +)"," ").trim();
   }
 }

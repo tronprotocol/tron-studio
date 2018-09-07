@@ -33,12 +33,10 @@ public class BorderSlideBar extends VBox {
      * </pre>
      *
      * @param expandedSize The size of the panel.
-     * @param controlButton The button responsible to open/close slide bar.
      * @param location The location of the panel (TOP_LEFT, BOTTOM_LEFT, BASELINE_RIGHT, BASELINE_LEFT).
      * @param nodes Nodes inside the panel.
      */
-    public BorderSlideBar(double expandedSize,
-                          final Button controlButton, Pos location, Node... nodes) {
+    public BorderSlideBar(double expandedSize, Pos location, Node... nodes) {
 
         getStyleClass().add("sidebar");
         getStylesheets().add(CSS);
@@ -56,61 +54,55 @@ public class BorderSlideBar extends VBox {
         // Add nodes in the vbox
         getChildren().addAll(nodes);
 
-        controlButton.setOnAction(new EventHandler<ActionEvent>() {
+        final Animation hidePanel = new Transition() {
+            {
+                setCycleDuration(Duration.millis(250));
+            }
+
+            @Override
+            protected void interpolate(double frac) {
+                final double size = getExpandedSize() * (1.0 - frac);
+                translateByPos(size);
+            }
+        };
+
+        hidePanel.onFinishedProperty().set(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                // Create an animation to hide the panel.
-                final Animation hidePanel = new Transition() {
-                    {
-                        setCycleDuration(Duration.millis(250));
-                    }
-
-                    @Override
-                    protected void interpolate(double frac) {
-                        final double size = getExpandedSize() * (1.0 - frac);
-                        translateByPos(size);
-                    }
-                };
-
-                hidePanel.onFinishedProperty().set(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent actionEvent) {
-                        setVisible(false);
-                    }
-                });
-
-                // Create an animation to show the panel.
-                final Animation showPanel = new Transition() {
-                    {
-                        setCycleDuration(Duration.millis(250));
-                    }
-
-                    @Override
-                    protected void interpolate(double frac) {
-                        final double size = getExpandedSize() * frac;
-                        translateByPos(size);
-                    }
-                };
-
-                showPanel.onFinishedProperty().set(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent actionEvent) {
-                    }
-                });
-
-                if (showPanel.statusProperty().get() == Animation.Status.STOPPED
-                        && hidePanel.statusProperty().get() == Animation.Status.STOPPED) {
-
-                    if (isVisible()) {
-                        hidePanel.play();
-
-                    } else {
-                        setVisible(true);
-                        showPanel.play();
-                    }
-                }
+                setVisible(false);
             }
         });
+
+        // Create an animation to show the panel.
+        final Animation showPanel = new Transition() {
+            {
+                setCycleDuration(Duration.millis(250));
+            }
+
+            @Override
+            protected void interpolate(double frac) {
+                final double size = getExpandedSize() * frac;
+                translateByPos(size);
+            }
+        };
+
+        showPanel.onFinishedProperty().set(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+            }
+        });
+
+        if (showPanel.statusProperty().get() == Animation.Status.STOPPED
+                && hidePanel.statusProperty().get() == Animation.Status.STOPPED) {
+
+            if (isVisible()) {
+                hidePanel.play();
+
+            } else {
+                setVisible(true);
+                showPanel.play();
+            }
+        }
     }
 
     /**

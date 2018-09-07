@@ -12,6 +12,7 @@ import org.spongycastle.util.encoders.Hex;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.ui.FormatCode;
 import org.tron.studio.walletserver.WalletClient;
+import javafx.scene.Scene;
 
 import java.util.*;
 
@@ -112,6 +113,8 @@ public class ShareData {
 
     // 文本错误信息
     public static List<FormatCode.MissInfo> missInfoList = new ArrayList<>();
+
+    public static Scene scene = null;
 
     private ShareData() {
 
