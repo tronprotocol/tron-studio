@@ -11,7 +11,7 @@
     <VBox spacing="10" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
         <HBox spacing="10" HBox.hgrow="ALWAYS">
             <!--<JFXTextField promptText="Block number" fx:id="blockNumber"/>-->
-            <JFXTextField HBox.hgrow="ALWAYS" promptText="Transaction Id" fx:id="transactionIdTextField"/>
+            <JFXTextField HBox.hgrow="ALWAYS" promptText="Transaction Id" fx:id="transactionIdTextField" editable="false"/>
         </HBox>
         <HBox spacing="10">
             <Region HBox.hgrow="ALWAYS" />
@@ -40,9 +40,11 @@
 
         <Label text="Energy Limit Left" fx:id="energyLimitLeftLabel"/>
         <Label text="Instructions"/>
-        <JFXListView prefHeight="120" fx:id="debugInstructionsList" styleClass="sublist"/>
+        <JFXListView prefHeight="150" fx:id="debugInstructionsList" styleClass="sublist_debug"/>
         <Label text="Stack"/>
-        <JFXListView fx:id="debugStackList" styleClass="sublist"/>
+        <JFXListView prefHeight="150" fx:id="debugStackList" styleClass="sublist_debug"/>
+        <Label text="Memory"/>
+        <JFXListView prefHeight="150" fx:id="debugMemoryList" styleClass="sublist_debug"/>
         <Region VBox.vgrow="ALWAYS"/>
     </VBox>
 </HBox>
