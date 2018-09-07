@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXListView?>
-<JFXListView xmlns:fx="http://javafx.com/fxml" styleClass="jfx-list-view"
-             fx:id="transactionHistoryListView"
-             fx:controller="org.tron.studio.ui.TransactionHistoryController"/>
+<?import com.jfoenix.controls.JFXRippler?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="org.tron.studio.ui.TransactionHistoryController">
+    <JFXListView VBox.vgrow="ALWAYS" styleClass="jfx-list-view" fx:id="transactionHistoryListView"/>
+    <HBox spacing="10">
+        <Region HBox.hgrow="ALWAYS"/>
+        <JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickDelete">
+            <StackPane style="-fx-padding: 10;">
+                <MaterialDesignIconView glyphName="DELETE" styleClass="icon"/>
+            </StackPane>
+        </JFXRippler>
+    </HBox>
+</VBox>

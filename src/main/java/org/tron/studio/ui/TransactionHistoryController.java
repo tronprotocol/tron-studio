@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -189,6 +190,10 @@ public class TransactionHistoryController {
         subList.setGroupnode(hBox);
 
         return subList;
+    }
+
+    public void onClickDelete(MouseEvent mouseEvent) {
+        transactionHistoryListView.getItems().clear();
     }
 
     static final class TransactionDetail extends RecursiveTreeObject<TransactionDetail> {

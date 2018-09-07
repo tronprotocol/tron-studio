@@ -91,7 +91,7 @@ public class MainApplication extends Application {
 
     Screen screen = Screen.getPrimary();
     Rectangle2D bounds = screen.getVisualBounds();
-    Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
+    Scene scene = new Scene(root, bounds.getWidth() * 0.8, bounds.getHeight() * 0.8);
 
     addShotcut(scene);
 
