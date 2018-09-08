@@ -173,9 +173,9 @@ public class MainApplication extends Application {
       VBox vbox = new VBox();
       TabPane codeAreaTabPane = (TabPane)scene.lookup("#codeAreaTabPane");
 
-      VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
-      CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
-      currentCodeArea.setPopupAlignment(PopupAlignment.CARET_BOTTOM);
+      //VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+      //CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
+      //currentCodeArea.setPopupAlignment(PopupAlignment.CARET_BOTTOM);
 
       if (searchPopup.isShowing())
       {
@@ -188,8 +188,8 @@ public class MainApplication extends Application {
         }
 
         HBox hboxReplace = new HBox();
-        hboxReplace.setPadding(new Insets(spacingSize, spacingSize, spacingSize, spacingSize));
-        hboxReplace.setSpacing(2);
+        hboxReplace.setPadding(new Insets(0, spacingSize, 0, spacingSize));
+        hboxReplace.setSpacing(1);
         hboxReplace.setStyle("-fx-background-color: #CFCFCF;");
 
         JFXTextField replaceText = new JFXTextField();
@@ -197,12 +197,55 @@ public class MainApplication extends Application {
         replaceText.setStyle("-fx-background-color: #ffffff;-fx-font-size: 11px;");
 
         Button replaceBtn = new Button("Replace");
-        replaceBtn.setPrefSize(80, 7);
+        replaceBtn.setPrefSize(80, 5);
         replaceBtn.setStyle("-fx-font-size: 11px;");
 
+        replaceBtn.setOnAction(new EventHandler<ActionEvent>() {
+          public void handle(ActionEvent event)
+          {
+            if (searchTextInfo.currentIndex < 0) return;
+
+            String replacement =  replaceText.getText();
+            VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+            CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
+
+            List<Integer> currentPos = searchTextInfo.matchingPos.get(searchTextInfo.currentIndex);
+            String currentKeyword = searchTextInfo.keyword;
+            currentCodeArea.replaceText(currentPos.get(0), currentPos.get(1),
+                    currentPos.get(0), currentPos.get(1)+currentKeyword.length(), replacement);
+
+            searchTextInfo.matchingPos.remove(searchTextInfo.currentIndex);
+            searchTextInfo.currentIndex += 1;
+
+            if (searchTextInfo.matchingPos.size() - 1 < searchTextInfo.currentIndex)
+            {
+              searchTextInfo.currentIndex = 0;
+            }
+          }
+        });
+
         Button replaceAllBtn = new Button("All");
-        replaceAllBtn.setPrefSize(50, 7);
+        replaceAllBtn.setPrefSize(50, 5);
         replaceAllBtn.setStyle("-fx-font-size: 11px;");
+
+        replaceAllBtn.setOnAction(new EventHandler<ActionEvent>() {
+          public void handle(ActionEvent event)
+          {
+            String replacement =  replaceText.getText();
+            VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+            CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
+            String currentKeyword = searchTextInfo.keyword;
+
+            for (List<Integer> cuPos: searchTextInfo.matchingPos)
+            {
+              currentCodeArea.replaceText(cuPos.get(0), cuPos.get(1),
+                      cuPos.get(0), cuPos.get(1)+currentKeyword.length(), replacement);
+            }
+
+            searchTextInfo.matchingPos.clear();
+            searchTextInfo.currentIndex = -1;
+          }
+        });
 
         hboxReplace.getChildren().addAll(replaceText, replaceBtn, replaceAllBtn);
         vbox.getChildren().add(hboxReplace);
@@ -251,6 +294,9 @@ public class MainApplication extends Application {
           {
             searchTextInfo.currentIndex = searchTextInfo.matchingPos.size() - 1;
           }
+
+          VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+          CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
         }
       });
 
@@ -271,16 +317,19 @@ public class MainApplication extends Application {
         }
       });
 
+      /*
       Button buttonAll= new Button("All");
       buttonAll.setPrefSize(50, 7);
       buttonAll.setStyle("-fx-font-size: 11px;");
 
       buttonAll.setOnAction(new EventHandler<ActionEvent>() {
         @Override
-        public void handle(ActionEvent event) {
+        public void handle(ActionEvent event)
+        {
           searchTextInfo.currentIndex = -1;
         }
       });
+      */
 
       MaterialDesignIconView closeIcon = new MaterialDesignIconView();
       closeIcon.setGlyphName("CLOSE");
@@ -294,7 +343,7 @@ public class MainApplication extends Application {
         }
       });
 
-      hbox.getChildren().addAll(searchText, upIcon, downIcon, buttonAll, closeIcon);
+      hbox.getChildren().addAll(searchText, upIcon, downIcon, closeIcon);
 
       vbox.getChildren().add(hbox);
       searchPopup.getContent().add(vbox);

@@ -43,7 +43,6 @@
 }
 
 .current-match-word {
-    -rtfx-background-color: yellow;
-    -rtfx-fill: cadetblue;
+    -rtfx-background-color: green;
 }
 
