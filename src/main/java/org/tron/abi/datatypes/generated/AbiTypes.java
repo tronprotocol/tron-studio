@@ -9,6 +9,7 @@ import org.tron.abi.datatypes.Bytes;
 import org.tron.abi.datatypes.DynamicBytes;
 import org.tron.abi.datatypes.Type;
 import org.tron.abi.datatypes.Utf8String;
+import org.tron.common.runtime.utils.MUtil;
 import org.tron.core.Wallet;
 
 /**
@@ -24,7 +25,7 @@ public final class AbiTypes {
     public static Type getTypeWithValue(String type, String value) {
       switch (type.toLowerCase()) {
         case "address":
-          return new Address(Hex.toHexString(Wallet.decodeFromBase58Check(value)));
+          return new Address(Hex.toHexString(MUtil.convertFromTronAddress(Wallet.decodeFromBase58Check(value))));
         case "bool":
           return new Bool(Boolean.parseBoolean(value));
         case "string":

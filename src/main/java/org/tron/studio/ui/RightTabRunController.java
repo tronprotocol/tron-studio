@@ -190,7 +190,7 @@ public class RightTabRunController implements Initializable {
         final boolean[] deployContractResult = {false};
         StringBuilder bin = new StringBuilder(currentContractFileMetadata.bin);
 
-        {
+        try {
             //Find out constructor, and encode constructor parameter, then append it to the end of bytecode
             List<JSONObject> abiJson = JSONArray.parseArray(currentContractFileMetadata.abi, JSONObject.class);
             Optional<JSONObject> constructorJSONObject = abiJson.stream()
@@ -214,6 +214,15 @@ public class RightTabRunController implements Initializable {
                     bin.append(encodedConstructor);
                 }
             }
+        } catch (Exception e) {
+            String uuid = UUID.randomUUID().toString();
+            addTransactionHistoryItem(uuid, new TransactionHistoryItem(
+                    TransactionHistoryItem.Type.InfoString,
+                    "Failed to deployContract. " + e.getMessage(),
+                    null));
+            logger.error("Failed to deployContract {}", e);
+            isDeploying = false;
+            return;
         }
         {
             long callValue = Long.parseLong(valueTextField.getText());
