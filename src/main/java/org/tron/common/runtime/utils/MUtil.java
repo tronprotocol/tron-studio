@@ -46,6 +46,15 @@ public class MUtil {
     return address;
   }
 
+  public static byte[] convertFromTronAddress(byte[] address) {
+    if (address.length == 21) {
+      byte[] newAddress = new byte[20];
+      System.arraycopy(address, 1, newAddress, 0, 20);
+      address = newAddress;
+    }
+    return address;
+  }
+
   public static String get4BytesSha3HexString(String data) {
     return Hex.toHexString(Arrays.copyOf(Hash.sha3(data.getBytes()), 4));
   }
