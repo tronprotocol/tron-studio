@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.List;
 
 /**
  * Base of Highlighting.
@@ -82,6 +83,8 @@ public abstract class Highlight {
     private void applyHighlighting(final StyleSpans<Collection<String>> highlighting) {
         //System.out.println("highlight");
         codeArea.setStyleSpans(0, highlighting);
+
+        // Show incorrect spells
         for(FormatCode.MissInfo missInfo: ShareData.missInfoList)
         {
             StyleSpansBuilder<Collection<String>> spansBuilder

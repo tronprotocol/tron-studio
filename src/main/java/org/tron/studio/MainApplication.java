@@ -13,14 +13,14 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.tron.common.application.ApplicationFactory;
 import org.tron.common.application.TronApplicationContext;
@@ -31,13 +31,13 @@ import org.tron.core.services.RpcApiService;
 import org.tron.core.services.WitnessService;
 import org.tron.core.services.http.FullNodeHttpApiService;
 
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCode;
 import javafx.scene.Node;
 import javafx.stage.Popup;
 import javafx.geometry.Insets;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.event.ActionEvent;
@@ -55,7 +55,16 @@ public class MainApplication extends Application {
   final Popup searchPopup = new Popup();
   private int spacingSize = 3;
 
-  private List<List<Integer>> matchingPos = new ArrayList<>();
+  //private List<List<Integer>> matchingPos = new ArrayList<>();
+
+  public static class SearchText {
+    public List<List<Integer>> matchingPos = new ArrayList<>();
+    public int currentIndex = 0;
+    public String keyword = "";
+  }
+
+  public static SearchText searchTextInfo = new SearchText();
+
 
   public static void main(String[] args) {
     Args.setParam(args, Constant.TESTNET_CONF);
@@ -211,13 +220,30 @@ public class MainApplication extends Application {
       searchText.setPrefSize(100, 5);
       searchText.setStyle("-fx-background-color: #ffffff;-fx-font-size: 11px;");
 
+      searchText.addEventFilter(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent event) {
+          String keyword = searchText.getText();
+          searchWord(keyword);
+          searchTextInfo.currentIndex = 0;
+
+          showMatchingWords();
+        }
+      });
+
       MaterialDesignIconView upIcon = new MaterialDesignIconView();
       upIcon.setGlyphName("CHEVRON_UP");
       upIcon.setSize("1.5em");
       upIcon.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent event) {
-
+          if (searchTextInfo.currentIndex != 0)
+          {
+            searchTextInfo.currentIndex -= 1;
+          } else
+          {
+            searchTextInfo.currentIndex = searchTextInfo.matchingPos.size() - 1;
+          }
         }
       });
 
@@ -228,7 +254,13 @@ public class MainApplication extends Application {
       downIcon.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent event) {
-
+          if (searchTextInfo.currentIndex == (searchTextInfo.matchingPos.size() - 1))
+          {
+            searchTextInfo.currentIndex = 0;
+          } else
+          {
+            searchTextInfo.currentIndex += 1;
+          }
         }
       });
 
@@ -236,9 +268,24 @@ public class MainApplication extends Application {
       buttonAll.setPrefSize(50, 7);
       buttonAll.setStyle("-fx-font-size: 11px;");
 
+      buttonAll.setOnAction(new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent event) {
+          searchTextInfo.currentIndex = -1;
+        }
+      });
+
       MaterialDesignIconView closeIcon = new MaterialDesignIconView();
       closeIcon.setGlyphName("CLOSE");
       downIcon.setSize("1.5em");
+
+      closeIcon.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+          searchTextInfo.matchingPos.clear();
+          searchTextInfo.currentIndex = -1;
+        }
+      });
 
       hbox.getChildren().addAll(searchText, upIcon, downIcon, buttonAll, closeIcon);
 
@@ -258,7 +305,10 @@ public class MainApplication extends Application {
 
   private void searchWord(String keyword)
   {
-    matchingPos.clear();
+    if (keyword.length() == 0)
+      return;
+
+    searchTextInfo.matchingPos.clear();
 
     CodeArea currentCodeArea = (CodeArea)ShareData.currentContractTab.getContent();
     int paraNum = currentCodeArea.getParagraphs().size();
@@ -280,7 +330,7 @@ public class MainApplication extends Application {
           List<Integer> pos = new ArrayList<>();
           pos.add(i);
           pos.add(j);
-          matchingPos.add(pos);
+          searchTextInfo.matchingPos.add(pos);
         }
       }
     }
@@ -288,22 +338,28 @@ public class MainApplication extends Application {
 
   private void showMatchingWords()
   {
-    for (List<Integer> pos: matchingPos)
+    CodeArea codeArea = (CodeArea)ShareData.currentContractTab.getContent();
+
+    System.out.println(searchTextInfo.matchingPos);
+    if (searchTextInfo == null || searchTextInfo.matchingPos.size() == 0)
     {
-      // styles for matching words should be set in highlight file
+      return;
     }
-  }
 
-  private String regulizeLine(String str)
-  {
-    str = str.replaceAll("\\+|-|\\*|/|=|&|\\|"," ");
-    str = str.replaceAll("\\{"," { ");
-    str = str.replaceAll("}"," } ");
-    str = str.replaceAll("\\("," ( ");
-    str = str.replaceAll("\\)"," ) ");
-    str = str.replaceAll(","," , ");
-    str = str.replaceAll(";"," ; ");
+    for (List<Integer> pos: searchTextInfo.matchingPos)
+    {
+      StyleSpansBuilder<Collection<String>> spansBuilder
+              = new StyleSpansBuilder<>();
+      spansBuilder.add(Collections.singleton("spell-error"), searchTextInfo.keyword.length());
+      codeArea.setStyleSpans(pos.get(0), pos.get(1), spansBuilder.create());
+      System.out.println(String.format("%s: %d, %d", searchTextInfo.keyword, pos.get(0), pos.get(1)));
+    }
 
-    return str.replaceAll("( +)"," ").trim();
+    // Show current matching word
+    List<Integer> curerntPos = searchTextInfo.matchingPos.get(searchTextInfo.currentIndex);
+    StyleSpansBuilder<Collection<String>> spansBuilder
+            = new StyleSpansBuilder<>();
+    spansBuilder.add(Collections.singleton("spell-error"), searchTextInfo.keyword.length());
+    codeArea.setStyleSpans(curerntPos.get(0), curerntPos.get(1), spansBuilder.create());
   }
 }

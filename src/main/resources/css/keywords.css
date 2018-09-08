@@ -38,9 +38,20 @@
     -rtfx-underline: true;
 }
 
-.spell-error1 {
-    -fx-border-insets: 0;
-    -fx-border-width: 2px;
-    -fx-border-color: red;
-    -fx-border-style: hidden hidden solid hidden;
+.match-word {
+    -fx-stroke: green;
+    -fx-stroke-width: 5;
+    -fx-stroke-dash-array: 12 2 4 2;
+    -fx-stroke-dash-offset: 6;
+    -fx-stroke-line-cap: butt;
 }
+
+.current-match-word {
+    -fx-fill: yellow;
+    -fx-stroke: green;
+    -fx-stroke-width: 5;
+    -fx-stroke-dash-array: 12 2 4 2;
+    -fx-stroke-dash-offset: 6;
+    -fx-stroke-line-cap: butt;
+}
+

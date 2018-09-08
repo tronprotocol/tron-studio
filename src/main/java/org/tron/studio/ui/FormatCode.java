@@ -5,12 +5,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.tron.studio.ShareData;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,8 +24,6 @@ public class FormatCode {
     private static final String PATH_TO_KEYWORDS  = "/keywords/solidity.txt";
 
     private static List<String> keywords = new ArrayList<>();
-
-    //private List<MissInfo> missInfos = new ArrayList<>();
 
     public class MissInfo {
         public String missWord;
