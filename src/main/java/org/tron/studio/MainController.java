@@ -26,6 +26,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import javafx.application.Platform;
 
 import javafx.scene.input.KeyCombination;
 
@@ -66,11 +68,13 @@ public class MainController {
         AutoCompletion autocomp = new AutoCompletion(defaultCodeArea);
         autocomp.autoComplete(defaultCodeArea);
 
+        defaultCodeAreaTab.setContent(new VirtualizedScrollPane<>(defaultCodeArea));
+
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
         new FormatCode(defaultCodeArea);
-
         defaultCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(defaultCodeArea));
+        Platform.runLater(() -> defaultCodeArea.selectRange(0, 0));
 
         ShareData.currentContractTab = defaultCodeAreaTab;
         ShareData.allContractFileName.add(defaultContractFile.getName());
@@ -153,7 +157,8 @@ public class MainController {
         codeTab.setText(file.getName());
         //Just not allow to close the default tab
         codeTab.setClosable(true);
-        codeTab.setContent(codeArea);
+        codeTab.setContent(new VirtualizedScrollPane<>(codeArea));
+        Platform.runLater(() -> codeArea.selectRange(0, 0));
         codeAreaTabPane.getTabs().add(codeTab);
 
         new SolidityHighlight(codeArea).highlight();
@@ -185,7 +190,9 @@ public class MainController {
             AutoCompletion autoCompletion = new AutoCompletion(codeArea);
             autoCompletion.autoComplete(codeArea);
 
-            codeTab.setContent(codeArea);
+            codeTab.setContent(new VirtualizedScrollPane<>(codeArea));
+            Platform.runLater(() -> codeArea.selectRange(0, 0));
+
             codeAreaTabPane.getTabs().add(codeTab);
 
             String sourceCode = SolidityFileUtil.getSourceCode(fileName);

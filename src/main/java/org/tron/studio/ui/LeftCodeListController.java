@@ -28,6 +28,7 @@ import org.tron.studio.ShareData;
 import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.utils.FileNameFieldValidator;
 import org.tron.studio.utils.PrivateKeyFieldValidator;
+import org.fxmisc.flowless.VirtualizedScrollPane;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -203,7 +204,8 @@ public class LeftCodeListController {
 
     private void saveContractContent() {
         try {
-            String content = ((CodeArea) ShareData.currentContractTab.getContent()).getText();
+            VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+            String content = ((CodeArea) virScrollPane.getContent()).getText();
             String filename = ShareData.currentContractTab.getText();
             if(StringUtils.equals(lastFileName, filename) && StringUtils.equals(content, lastCodeContent)) {
                 return;

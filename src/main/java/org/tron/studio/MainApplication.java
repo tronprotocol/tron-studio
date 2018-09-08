@@ -38,8 +38,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import org.fxmisc.richtext.PopupAlignment;
 
 import javafx.event.ActionEvent;
+
+import org.fxmisc.flowless.VirtualizedScrollPane;
 
 @Slf4j
 public class MainApplication extends Application {
@@ -170,6 +173,10 @@ public class MainApplication extends Application {
       VBox vbox = new VBox();
       TabPane codeAreaTabPane = (TabPane)scene.lookup("#codeAreaTabPane");
 
+      VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+      CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
+      currentCodeArea.setPopupAlignment(PopupAlignment.CARET_BOTTOM);
+
       if (searchPopup.isShowing())
       {
         vbox = (VBox) searchPopup.getContent().get(0);
@@ -223,6 +230,7 @@ public class MainApplication extends Application {
         @Override
         public void handle(KeyEvent event) {
           String keyword = searchText.getText();
+          searchTextInfo.keyword = keyword;
           searchWord(keyword);
           searchTextInfo.currentIndex = 0;
 
@@ -309,7 +317,8 @@ public class MainApplication extends Application {
 
     searchTextInfo.matchingPos.clear();
 
-    CodeArea currentCodeArea = (CodeArea)ShareData.currentContractTab.getContent();
+    VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+    CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
     int paraNum = currentCodeArea.getParagraphs().size();
 
     for (int i = 0; i < paraNum; i++)
@@ -335,11 +344,11 @@ public class MainApplication extends Application {
     }
   }
 
-  private void showMatchingWords()
+  public static void showMatchingWords()
   {
-    CodeArea codeArea = (CodeArea)ShareData.currentContractTab.getContent();
+    VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+    CodeArea codeArea = (CodeArea)virScrollPane.getContent();
 
-    System.out.println(searchTextInfo.matchingPos);
     if (searchTextInfo == null || searchTextInfo.matchingPos.size() == 0)
     {
       return;
@@ -349,16 +358,15 @@ public class MainApplication extends Application {
     {
       StyleSpansBuilder<Collection<String>> spansBuilder
               = new StyleSpansBuilder<>();
-      spansBuilder.add(Collections.singleton("spell-error"), searchTextInfo.keyword.length());
+      spansBuilder.add(Collections.singleton("match-word"), searchTextInfo.keyword.length());
       codeArea.setStyleSpans(pos.get(0), pos.get(1), spansBuilder.create());
-      System.out.println(String.format("%s: %d, %d", searchTextInfo.keyword, pos.get(0), pos.get(1)));
     }
 
     // Show current matching word
     List<Integer> curerntPos = searchTextInfo.matchingPos.get(searchTextInfo.currentIndex);
     StyleSpansBuilder<Collection<String>> spansBuilder
             = new StyleSpansBuilder<>();
-    spansBuilder.add(Collections.singleton("spell-error"), searchTextInfo.keyword.length());
+    spansBuilder.add(Collections.singleton("current-match-word"), searchTextInfo.keyword.length());
     codeArea.setStyleSpans(curerntPos.get(0), curerntPos.get(1), spansBuilder.create());
   }
 }

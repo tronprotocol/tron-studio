@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Tab;
 import lombok.Getter;
 import lombok.Setter;
+import org.fxmisc.richtext.CodeArea;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.ui.FormatCode;

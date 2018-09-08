@@ -2,6 +2,7 @@ package org.tron.studio.ui;
 
 import com.jfoenix.controls.JFXPopup;
 import javafx.scene.input.KeyCode;
+import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 
 import org.fxmisc.richtext.PopupAlignment;
@@ -10,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 import javafx.scene.input.KeyEvent;
 import javafx.event.*;
+import org.tron.studio.ShareData;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -37,7 +39,6 @@ public class AutoCompletion {
 
         keywords = readKeywords();
 
-        //extractAllwords(textArea,0,0);
         textArea.setPopupAlignment(PopupAlignment.SELECTION_BOTTOM_RIGHT);
         popup.setPopupContent(list);
         textArea.setPopupWindow(popup);
@@ -55,11 +56,14 @@ public class AutoCompletion {
                     return;
                 }
 
+                VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane) ShareData.currentContractTab.getContent();
+                CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
+
                 String curentValue = list.getSelectionModel().getSelectedItem();
                 String currCha = "";
                 if (startCol != 0)
                 {
-                    currCha = textArea.getText(currentPara, startCol - 1,
+                    currCha = currentCodeArea.getText(currentPara, startCol - 1,
                             currentPara, startCol);
                 }
 
@@ -69,7 +73,7 @@ public class AutoCompletion {
                     return;
                 }
 
-                textArea.insertText(currentPara, startCol, curentValue.substring(subStrSize));
+                currentCodeArea.insertText(currentPara, startCol, curentValue.substring(subStrSize));
                 popup.hide();
             }
         });

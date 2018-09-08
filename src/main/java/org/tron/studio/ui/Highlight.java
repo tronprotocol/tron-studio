@@ -5,6 +5,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
+import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
 
 import java.time.Duration;
@@ -92,6 +93,8 @@ public abstract class Highlight {
             spansBuilder.add(Collections.singleton("spell-error"), missInfo.missWord.length());
             codeArea.setStyleSpans(missInfo.paraNo, missInfo.startNo, spansBuilder.create());
         }
+
+        MainApplication.showMatchingWords();
     }
 
     /**
