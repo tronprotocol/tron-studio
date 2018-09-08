@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.spongycastle.util.encoders.Hex;
 import org.tron.common.runtime.vm.DataWord;
 import org.tron.common.runtime.vm.trace.Op;
 import org.tron.common.runtime.vm.trace.ProgramTrace;
@@ -16,7 +17,10 @@ import org.tron.studio.filesystem.VmTraceFileUtil;
 
 import java.io.File;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,6 +28,7 @@ public class RightTabDebugController implements Initializable {
 
     public JFXListView debugInstructionsList;
     public JFXListView debugStackList;
+    public JFXListView debugMemoryList;
     public JFXTextField transactionIdTextField;
     public Label energyLimitLeftLabel;
 
@@ -70,11 +75,17 @@ public class RightTabDebugController implements Initializable {
         }
         debugStackList.getItems().clear();
         debugStackList.getItems().addAll(stacks);
-        debugStackList.setPrefHeight(stacks.size() * 40);
 
         String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
         debugInstructionsList.scrollTo(currentItem);
         energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
+
+        debugMemoryList.getItems().clear();
+        if (statusItem.memory != null && statusItem.memory.getChunks() != null) {
+            for (int i = 0; i < statusItem.memory.getChunks().size(); i++) {
+                debugMemoryList.getItems().add("" + i + ": " + Hex.toHexString(statusItem.memory.getChunks().get(i)));
+            }
+        }
     }
 
     public void onClickStop(MouseEvent mouseEvent) {
@@ -95,10 +106,17 @@ public class RightTabDebugController implements Initializable {
         }
         debugStackList.getItems().clear();
         debugStackList.getItems().addAll(stacks);
-        debugStackList.setPrefHeight(stacks.size() * 40);
 
         String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
         debugInstructionsList.scrollTo(currentItem);
+
+        debugMemoryList.getItems().clear();
+        if (statusItem.memory != null && statusItem.memory.getChunks() != null) {
+            for (int i = 0; i < statusItem.memory.getChunks().size(); i++) {
+                debugMemoryList.getItems().add("" + i + ": " + Hex.toHexString(statusItem.memory.getChunks().get(i)));
+            }
+        }
+
         energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
     }
 
@@ -115,10 +133,16 @@ public class RightTabDebugController implements Initializable {
         }
         debugStackList.getItems().clear();
         debugStackList.getItems().addAll(stacks);
-        debugStackList.setPrefHeight(stacks.size() * 40);
 
         String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
         debugInstructionsList.scrollTo(currentItem);
+
+        debugMemoryList.getItems().clear();
+        if (statusItem.memory != null && statusItem.memory.getChunks() != null) {
+            for (int i = 0; i < statusItem.memory.getChunks().size(); i++) {
+                debugMemoryList.getItems().add("" + i + ": " + Hex.toHexString(statusItem.memory.getChunks().get(i)));
+            }
+        }
 
         energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
     }

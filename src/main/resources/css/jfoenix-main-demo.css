@@ -557,6 +557,11 @@
     -fx-background-color: TRANSPARENT;
 }
 
+.sublist_debug{
+    -fx-background-color: white;
+    -fx-font-size: 12;
+}
+
 .sublist .jfx-list-cell:odd:selected > .jfx-rippler > StackPane,
 .sublist .jfx-list-cell:even:selected > .jfx-rippler > StackPane {
     -fx-background-color: TRANSPARENT

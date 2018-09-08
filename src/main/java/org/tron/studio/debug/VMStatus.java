@@ -1,5 +1,6 @@
 package org.tron.studio.debug;
 
+import org.spongycastle.util.encoders.Hex;
 import org.tron.common.runtime.vm.DataWord;
 import org.tron.common.runtime.vm.OpCode;
 import org.tron.common.runtime.vm.program.Memory;
@@ -32,11 +33,12 @@ public class VMStatus {
             this.pc = pc;
             this.energy = energy;
             this.actions = actions;
+            this.stack = new Stack();
+            this.memory = new Memory();
             for (OpActions.Action action : actions.getStack()) {
                 if (lastStack == null) {
                     lastStack = new Stack();
                 }
-                stack = new Stack();
                 stack.addAll(lastStack);
                 switch (action.getName()) {
                     case pop:
@@ -56,10 +58,17 @@ public class VMStatus {
                 if (lastMemory == null) {
                     lastMemory = new Memory();
                 }
-                memory = new Memory();
                 memory.getChunks().addAll(lastMemory.getChunks());
 
-                //TODO
+                switch (action.getName()) {
+                    case extend:
+                        break;
+                    case write:
+                        int address = Integer.parseInt((String) action.getParams().get("address"));
+                        byte[] data = Hex.decode((String) action.getParams().get("data"));
+                        memory.write(address, data, data.length, false);
+                        break;
+                }
 
                 lastMemory.getChunks().clear();
                 lastMemory.getChunks().addAll(memory.getChunks());

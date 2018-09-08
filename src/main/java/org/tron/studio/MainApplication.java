@@ -7,15 +7,15 @@ import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Paint;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,6 @@ import org.tron.core.services.RpcApiService;
 import org.tron.core.services.WitnessService;
 import org.tron.core.services.http.FullNodeHttpApiService;
 
-import javafx.scene.Node;
 import javafx.stage.Popup;
 import javafx.geometry.Insets;
 import java.io.IOException;
@@ -41,7 +40,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javafx.event.ActionEvent;
-import org.tron.studio.ui.BorderSlideBar;
 
 @Slf4j
 public class MainApplication extends Application {
@@ -97,10 +95,11 @@ public class MainApplication extends Application {
 
     Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
     primaryStage.setTitle("Tron Studio");
+    primaryStage.getIcons().add(new Image(MainApplication.class.getResourceAsStream("/images/icon.png")));
 
     Screen screen = Screen.getPrimary();
     Rectangle2D bounds = screen.getVisualBounds();
-    Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
+    Scene scene = new Scene(root, bounds.getWidth() * 0.8, bounds.getHeight() * 0.8);
 
     addShotcut(scene);
 
