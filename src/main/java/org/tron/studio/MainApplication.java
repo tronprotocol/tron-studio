@@ -294,15 +294,12 @@ public class MainApplication extends Application {
           {
             searchTextInfo.currentIndex = searchTextInfo.matchingPos.size() - 1;
           }
-
-          VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
-          CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
         }
       });
 
       MaterialDesignIconView downIcon = new MaterialDesignIconView();
       downIcon.setGlyphName("CHEVRON_DOWN");
-      downIcon.setSize("1.5em");
+      downIcon.setSize("1em");
 
       downIcon.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
         @Override
@@ -316,20 +313,6 @@ public class MainApplication extends Application {
           }
         }
       });
-
-      /*
-      Button buttonAll= new Button("All");
-      buttonAll.setPrefSize(50, 7);
-      buttonAll.setStyle("-fx-font-size: 11px;");
-
-      buttonAll.setOnAction(new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent event)
-        {
-          searchTextInfo.currentIndex = -1;
-        }
-      });
-      */
 
       MaterialDesignIconView closeIcon = new MaterialDesignIconView();
       closeIcon.setGlyphName("CLOSE");

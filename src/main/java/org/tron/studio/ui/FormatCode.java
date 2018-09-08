@@ -210,6 +210,7 @@ public class FormatCode {
                         // spell error
                         int startIndex = currentLine.indexOf(word);
                         setErrorStyle(word, i, startIndex);
+                        findSpellErrorInLine(word, currentLine, startIndex, i);
                     } else
                     {
                         preWord = word;
@@ -225,6 +226,7 @@ public class FormatCode {
                         // spell error
                         int startIndex = currentLine.indexOf(word);
                         setErrorStyle(word, i, startIndex);
+                        findSpellErrorInLine(word, currentLine, startIndex, i);
                     } else if (inContract && !inFunc || preWord.equals("function"))
                         varContract.add(word);
                     else
@@ -237,11 +239,31 @@ public class FormatCode {
                     // spell error
                     int startIndex = currentLine.indexOf(word);
                     setErrorStyle(word, i, startIndex);
+                    findSpellErrorInLine(word, currentLine, startIndex, i);
                 }
 
                 if (interuptFlg) interuptFlg = false;
 
                 preWord = word;
+            }
+        }
+    }
+
+    private void findSpellErrorInLine(String word, String strLine, int startIndex, int curPara)
+    {
+        int endInd = strLine.length() - word.length() + 1;
+        for (int  m = startIndex + word.length(); m < endInd; m++)
+        {
+            String curCha = strLine.substring(m, m+word.length());
+            String preCha = strLine.substring(m-1, m-1);
+            String nextCha = "";
+            if (m + word.length() + 1 <= strLine.length())
+                nextCha = strLine.substring(m + word.length() + 1, m + word.length() + 1);
+
+            if (curCha.equals(word) && !preCha.matches("[A-Za-z0-9]")
+                    && !nextCha.matches("[A-Za-z0-9]"))
+            {
+                setErrorStyle(word, curPara, m);
             }
         }
     }
