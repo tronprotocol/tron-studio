@@ -7,35 +7,31 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
-import org.tron.common.crypto.ECKey;
-import org.tron.common.utils.StringUtil;
-import org.tron.core.Wallet;
 import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
 import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.utils.FileNameFieldValidator;
-import org.tron.studio.utils.PrivateKeyFieldValidator;
-import org.fxmisc.flowless.VirtualizedScrollPane;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -84,78 +80,70 @@ public class LeftCodeListController {
                     }
                 });
 
-        ContextMenu cm = new ContextMenu();
+        ContextMenu contextMenu = new ContextMenu();
         MenuItem delMenu = new MenuItem("Delete");
-        cm.getItems().add(delMenu);
+        contextMenu.getItems().add(delMenu);
 
-        delMenu.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
 
-                // Get current file name
-                String currentFile = ShareData.currentContractFileName.get();
-                int currentIndex = -1;
+        delMenu.setOnAction(event -> {
 
-                ShareData.deleteContract.set(currentFile);
+            //Not allowed to delete last file
+            if(SolidityFileUtil.getFileNameList().size() == 1) {
+                return;
+            }
 
-                for (int i = 0; i < SolidityFileUtil.getFileNameList().size(); i++) {
-                    if (SolidityFileUtil.getFileNameList().get(i).getName().equals(
-                            ShareData.currentContractFileName.get())) {
-                        currentIndex = i;
-                        break;
+            // Get current file name
+            String selectedFile = fileNameTable.getSelectionModel().selectedItemProperty().getValue().getValue().fileName.get();
+            ShareData.deleteContract.set(selectedFile);
+
+            int currentIndex = -1;
+            for (int i = 0; i < SolidityFileUtil.getFileNameList().size(); i++) {
+                if (StringUtils.equals(SolidityFileUtil.getFileNameList().get(i).getName(), selectedFile)) {
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            if (currentIndex == -1) {
+                return;
+            }
+
+            ShareData.allContractFileName.remove(selectedFile);
+
+            for (FileName filename : fileNameData) {
+                if (filename.fileName.get().contains(selectedFile)) {
+                    fileNameData.remove(filename);
+                    break;
+                }
+            }
+
+            for (File file : SolidityFileUtil.getFileNameList()) {
+                if (org.apache.commons.lang3.StringUtils.equals(file.getName(), selectedFile)) {
+                    SolidityFileUtil.getFileNameList().remove(file);
+                    if (file.delete()) {
+                        logger.info(String.format("%s is deleted", file.getName()));
+                    } else {
+                        logger.info(String.format("Deleting %s failed", file.getName()));
                     }
                 }
+            }
 
-                if (currentIndex == -1) {
-                    return;
+            int fileCounter = SolidityFileUtil.getFileNameList().size();
+            int nextCurrentIndex = currentIndex;
+
+            if (fileCounter != 0) {
+                if (currentIndex > fileCounter - 1) {
+                    nextCurrentIndex = currentIndex + 1;
                 }
 
-                if (ShareData.allContractFileName.contains(currentFile)) {
-                    ShareData.allContractFileName.remove(ShareData.currentContractFileName.get());
-                }
-
-                for (FileName filename : fileNameData) {
-                    if (filename.fileName.get().contains(currentFile)) {
-                        fileNameData.remove(filename);
-                        break;
-                    }
-                }
-
-                for (File file : SolidityFileUtil.getFileNameList()) {
-                    if (file.getName().contains(currentFile)) {
-                        SolidityFileUtil.getFileNameList().remove(file);
-                        if (file.delete()) {
-                            logger.info(String.format("%s is deleted", file.getName()));
-                        } else {
-                            logger.info(String.format("Deleting %s failed", file.getName()));
-                        }
-                    }
-                }
-
-                int file_num = SolidityFileUtil.getFileNameList().size();
-                int nextCurrentIndex = currentIndex;
-
-                if (file_num != 0) {
-                    if (currentIndex > file_num - 1) {
-                        nextCurrentIndex = currentIndex + 1;
-                    }
-
-                    fileNameTable.getSelectionModel().select(nextCurrentIndex);
-                    ShareData.currentContractFileName.set(fileNameTable.getSelectionModel().getSelectedItem().getValue().fileName.getValue());
-                } else {
-                    logger.info("No file to show");
-                }
+                fileNameTable.getSelectionModel().select(nextCurrentIndex);
+                ShareData.currentContractFileName.set(fileNameTable.getSelectionModel().getSelectedItem().getValue().fileName.getValue());
+            } else {
+                logger.info("No file to show");
             }
         });
 
-        fileNameTable.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-                if (t.getButton() == MouseButton.SECONDARY) {
-                    cm.show(fileNameTable, t.getScreenX(), t.getScreenY());
-                }
-            }
-        });
+        fileNameTable.setContextMenu(contextMenu);
 
         List<File> files = SolidityFileUtil.getFileNameList();
         ShareData.newContractFileName.set(files.get(0).getName());
@@ -204,10 +192,10 @@ public class LeftCodeListController {
 
     private void saveContractContent() {
         try {
-            VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+            VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane) ShareData.currentContractTab.getContent();
             String content = ((CodeArea) virScrollPane.getContent()).getText();
             String filename = ShareData.currentContractTab.getText();
-            if(StringUtils.equals(lastFileName, filename) && StringUtils.equals(content, lastCodeContent)) {
+            if (StringUtils.equals(lastFileName, filename) && StringUtils.equals(content, lastCodeContent)) {
                 return;
             }
 
