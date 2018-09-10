@@ -11,14 +11,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.abi.FunctionReturnDecoder;
@@ -53,20 +50,8 @@ public class TransactionHistoryController {
         });
     }
 
-    private JFXTreeTableView<TransactionDetail> createDetailTable(String transactionHistoryId) {
+    private GridPane createDetailPanel(String transactionHistoryId) {
         TransactionHistoryItem item = ShareData.transactionHistory.get(transactionHistoryId);
-        JFXTreeTableView<TransactionDetail> detailTable = new JFXTreeTableView<>();
-        JFXTreeTableColumn<TransactionDetail, String> keyCol = new JFXTreeTableColumn<>("Item");
-        JFXTreeTableColumn<TransactionDetail, String> valueCol = new JFXTreeTableColumn<>("Value");
-
-        detailTable.setColumnResizePolicy(JFXTreeTableView.CONSTRAINED_RESIZE_POLICY);
-
-        detailTable.getColumns().add(keyCol);
-        detailTable.getColumns().add(valueCol);
-
-        setupCellValueFactory(keyCol, TransactionDetail::keyProperty);
-        setupCellValueFactory(valueCol, TransactionDetail::valueProperty);
-
         GrpcAPI.TransactionExtention lastTransactionExtention = ShareData.wallet.getLastTransactionExtention();
         Protocol.Transaction lastTransaction = ShareData.wallet.getLastTransaction();
         String transactionId;
@@ -135,20 +120,31 @@ public class TransactionHistoryController {
                     new TransactionDetail("net_fee", Long.toString(transactionInfo.getReceipt().getNetFee()))
             );
         }
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(20);
+        ColumnConstraints columnConstraints0 = new ColumnConstraints();
+        columnConstraints0.setHgrow(Priority.NEVER);
+        ColumnConstraints columnConstraints1 = new ColumnConstraints();
+        columnConstraints1.setHgrow(Priority.ALWAYS);
+        gridPane.getColumnConstraints().add(columnConstraints0);
+        gridPane.getColumnConstraints().add(columnConstraints1);
 
-        detailTable.setMaxHeight(120);
-        detailTable.setRoot(new RecursiveTreeItem<>(detailTableData, RecursiveTreeObject::getChildren));
-        detailTable.setShowRoot(false);
-
-        return detailTable;
+        for (int i = 0; i < detailTableData.size(); i++) {
+            TransactionDetail detail = detailTableData.get(i);
+            gridPane.add(new Label(detail.keyProperty.get()), 0, i);
+            gridPane.add(new Label(detail.valueProperty.get()), 1, i);
+        }
+        gridPane.setUserData(detailTableData);
+        return gridPane;
     }
 
     private JFXListView<Object> createSubList(String transactionHistoryId) {
         TransactionHistoryItem transactionHistoryItem = ShareData.transactionHistory.get(transactionHistoryId);
         JFXListView<Object> subList = new JFXListView<>();
 
-        JFXTreeTableView<TransactionDetail> detailTable = createDetailTable(transactionHistoryId);
-        subList.getItems().add(detailTable);
+        GridPane gridPane = createDetailPanel(transactionHistoryId);
+        subList.getItems().add(gridPane);
 
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
@@ -193,8 +189,9 @@ public class TransactionHistoryController {
         });
         copyBtn.setOnAction(event -> {
             JSONObject result = new JSONObject();
-            for (TreeItem<TransactionDetail> transactionDetailTreeItem : detailTable.getRoot().getChildren()) {
-                result.put(transactionDetailTreeItem.getValue().keyProperty.get(), transactionDetailTreeItem.getValue().valueProperty.get());
+            ObservableList<TransactionDetail> detailPanelData = (ObservableList<TransactionDetail>) gridPane.getUserData();
+            for (TransactionDetail detailPanelDatum : detailPanelData) {
+                result.put(detailPanelDatum.keyProperty.get(), detailPanelDatum.valueProperty.get());
             }
             Clipboard clipboard = Clipboard.getSystemClipboard();
             ClipboardContent clipboardContent = new ClipboardContent();
