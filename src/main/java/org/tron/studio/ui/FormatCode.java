@@ -155,7 +155,7 @@ public class FormatCode {
             String[] words = regulizeLine(currentLine).split(" ");
 
             if ( words.length == 0 ) continue;
-            if(words[0].equals("pragma")) continue;
+            if(words[0].startsWith("//") || words[0].equals("pragma")) continue;
 
             // check contract
             if (words[0].equals("contract")) inContract = true;
@@ -193,7 +193,9 @@ public class FormatCode {
             boolean interuptFlg = false;
             for (String word: words)
             {
+                if (word.startsWith("//")) continue;
                 if (StringUtils.isNumeric(word)) continue;
+                word = word.replaceAll("/+", "");
 
                 if (!word.matches("[A-Za-z0-9]+"))
                 {
@@ -270,7 +272,7 @@ public class FormatCode {
 
     private String regulizeLine(String str)
     {
-        str = str.replaceAll("\\+|-|\\*|/|=|&|\\|"," ");
+        str = str.replaceAll("\\+|-|\\*|=|&|\\|"," ");
         str = str.replaceAll("\\{"," { ");
         str = str.replaceAll("}"," } ");
         str = str.replaceAll("\\("," ( ");
