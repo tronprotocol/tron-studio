@@ -19,6 +19,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -103,7 +104,7 @@ public class MainApplication extends Application {
     Rectangle2D bounds = screen.getVisualBounds();
     Scene scene = new Scene(root, bounds.getWidth() * 0.8, bounds.getHeight() * 0.8);
 
-    addShotcut(scene);
+    addShortcut(scene);
 
     ShareData.scene = scene;
 
@@ -163,10 +164,11 @@ public class MainApplication extends Application {
     Runtime.getRuntime().addShutdownHook(new Thread(app::shutdown));
   }
 
-  private void addShotcut(Scene scene)
+  private void addShortcut(Scene scene)
   {
     // Add find shotcut
-    KeyCombination kc = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    KeyCombination ctrlCombination = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    KeyCombination metaCombination = new KeyCodeCombination(KeyCode.F, KeyCombination.META_DOWN);
     Runnable rn = ()-> {
 
       VBox vbox = new VBox();
@@ -193,33 +195,30 @@ public class MainApplication extends Application {
 
         JFXTextField replaceText = new JFXTextField();
         replaceText.setPrefSize(100, 5);
-        replaceText.setStyle("-fx-background-color: #ffffff;-fx-font-size: 11px;");
+        replaceText.setStyle("-fx-background-color: #ffffff;");
 
         Button replaceBtn = new Button("Replace");
         replaceBtn.setPrefSize(80, 5);
         replaceBtn.setStyle("-fx-font-size: 11px;");
 
-        replaceBtn.setOnAction(new EventHandler<ActionEvent>() {
-          public void handle(ActionEvent event)
+        replaceBtn.setOnAction(event -> {
+          if (searchTextInfo.currentIndex < 0) return;
+
+          String replacement =  replaceText.getText();
+          VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
+          CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
+
+          List<Integer> currentPos = searchTextInfo.matchingPos.get(searchTextInfo.currentIndex);
+          String currentKeyword = searchTextInfo.keyword;
+          currentCodeArea.replaceText(currentPos.get(0), currentPos.get(1),
+                  currentPos.get(0), currentPos.get(1)+currentKeyword.length(), replacement);
+
+          searchTextInfo.matchingPos.remove(searchTextInfo.currentIndex);
+          searchTextInfo.currentIndex += 1;
+
+          if (searchTextInfo.matchingPos.size() - 1 < searchTextInfo.currentIndex)
           {
-            if (searchTextInfo.currentIndex < 0) return;
-
-            String replacement =  replaceText.getText();
-            VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
-            CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
-
-            List<Integer> currentPos = searchTextInfo.matchingPos.get(searchTextInfo.currentIndex);
-            String currentKeyword = searchTextInfo.keyword;
-            currentCodeArea.replaceText(currentPos.get(0), currentPos.get(1),
-                    currentPos.get(0), currentPos.get(1)+currentKeyword.length(), replacement);
-
-            searchTextInfo.matchingPos.remove(searchTextInfo.currentIndex);
-            searchTextInfo.currentIndex += 1;
-
-            if (searchTextInfo.matchingPos.size() - 1 < searchTextInfo.currentIndex)
-            {
-              searchTextInfo.currentIndex = 0;
-            }
+            searchTextInfo.currentIndex = 0;
           }
         });
 
@@ -266,7 +265,7 @@ public class MainApplication extends Application {
 
       JFXTextField searchText = new JFXTextField();
       searchText.setPrefSize(100, 5);
-      searchText.setStyle("-fx-background-color: #ffffff;-fx-font-size: 11px;");
+      searchText.setStyle("-fx-background-color: #ffffff;");
 
       searchText.addEventFilter(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
         @Override
@@ -338,12 +337,12 @@ public class MainApplication extends Application {
         }
       });
     };
-    scene.getAccelerators().put(kc, rn);
+    scene.getAccelerators().put(ctrlCombination, rn);
+    scene.getAccelerators().put(metaCombination, rn);
   }
 
-  private void searchWord(String keyword)
-  {
-    if (keyword.length() == 0)
+  private void searchWord(String keyword) {
+    if (StringUtils.isEmpty(keyword))
       return;
 
     searchTextInfo.matchingPos.clear();
@@ -352,16 +351,14 @@ public class MainApplication extends Application {
     CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
     int paraNum = currentCodeArea.getParagraphs().size();
 
-    for (int i = 0; i < paraNum; i++)
-    {
+    for (int i = 0; i < paraNum; i++) {
       String currentLine = currentCodeArea.getText(i);
       //String[] words = regulizeLine(currentLine).split(" ");
       int wordsInt = currentLine.length();
       int keywordLength = keyword.length();
       int loopNum = wordsInt - keywordLength;
 
-      for (int j = 0; j < loopNum; j++)
-      {
+      for (int j = 0; j < loopNum; j++) {
         String curWord = currentLine.substring(j,j + keywordLength);
         if (curWord.equals(keyword))
         {
@@ -380,13 +377,11 @@ public class MainApplication extends Application {
     VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
     CodeArea codeArea = (CodeArea)virScrollPane.getContent();
 
-    if (searchTextInfo == null || searchTextInfo.matchingPos.size() == 0)
-    {
+    if (searchTextInfo == null || searchTextInfo.matchingPos.size() == 0) {
       return;
     }
 
-    for (List<Integer> pos: searchTextInfo.matchingPos)
-    {
+    for (List<Integer> pos: searchTextInfo.matchingPos) {
       StyleSpansBuilder<Collection<String>> spansBuilder
               = new StyleSpansBuilder<>();
       spansBuilder.add(Collections.singleton("match-word"), searchTextInfo.keyword.length());
