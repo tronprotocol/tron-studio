@@ -1,21 +1,11 @@
 package org.tron.studio;
 
-import com.jfoenix.controls.JFXTextField;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
-import javafx.stage.Popup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-
 import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.ui.SolidityHighlight;
 import org.tron.studio.ui.AutoCompletion;
@@ -26,10 +16,13 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.input.ScrollEvent;
 
-import javafx.scene.input.KeyCombination;
 
 @Slf4j
 public class MainController {
@@ -68,7 +61,9 @@ public class MainController {
         AutoCompletion autocomp = new AutoCompletion(defaultCodeArea);
         autocomp.autoComplete(defaultCodeArea);
 
-        defaultCodeAreaTab.setContent(new VirtualizedScrollPane<>(defaultCodeArea));
+        VirtualizedScrollPane scrollPane = new VirtualizedScrollPane<>(defaultCodeArea);
+        defaultCodeAreaTab.setContent(scrollPane);
+        //scrollPane
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
