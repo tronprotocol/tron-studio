@@ -53,7 +53,6 @@ public class RightTabDebugController implements Initializable {
             vmStatus = new VMStatus();
             for (Op op : programTrace.getOps()) {
                 vmStatus.addStatus(new VMStatus.StatusItem(contractAddress, op.getCode(), op.getDeep(), op.getPc(), op.getEnergy(), op.getActions()));
-                logger.error(op.toString());
                 instructionsInfo.add("" + op.getPc() + ": " + op.getCode().name());
             }
 

@@ -173,8 +173,12 @@ public class RightTabRunController implements Initializable {
         CompilationResult compilationResult = null;
         try {
             compilationResult = CompilationResult.parse(solidityCompileResult.output);
-        } catch (IOException e) {
-            logger.error("Failed to parse compile result {}", e);
+        } catch (Exception e) {
+            String uuid = UUID.randomUUID().toString();
+            addTransactionHistoryItem(uuid, new TransactionHistoryItem(
+                    TransactionHistoryItem.Type.InfoString,
+                    "Not ready to parse compile result {} " + e.getMessage(),
+                    null));
             isDeploying = false;
             return;
         }
@@ -261,7 +265,7 @@ public class RightTabRunController implements Initializable {
             String uuid = UUID.randomUUID().toString();
             addTransactionHistoryItem(uuid, new TransactionHistoryItem(
                     TransactionHistoryItem.Type.InfoString,
-                    "Failed to deployContract. Please check tron.log",
+                    "Failed to deployContract. Please try again",
                     null));
             isDeploying = false;
             return;
