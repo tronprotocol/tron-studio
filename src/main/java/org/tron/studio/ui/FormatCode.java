@@ -147,6 +147,7 @@ public class FormatCode {
         int bracketsNumFunc = 0;
         boolean inContract = false;
         boolean inFunc = false;
+        boolean inCommont = false;
 
         for (int i = 0; i < endParaNo; i++)
         {
@@ -193,9 +194,21 @@ public class FormatCode {
             boolean interuptFlg = false;
             for (String word: words)
             {
-                if (word.startsWith("//")) continue;
+                if (word.endsWith("*/") && inCommont)
+                {
+                    inCommont = false;
+                }
+
+                if (word.startsWith("/*"))
+                {
+                    inCommont = true;
+                    break;
+                }
+
+                if (word.startsWith("//") || inCommont) continue;
+
                 if (StringUtils.isNumeric(word)) continue;
-                word = word.replaceAll("/+", "");
+                word = word.replaceAll("[*/]+", "");
 
                 if (!word.matches("[A-Za-z0-9]+"))
                 {
@@ -272,7 +285,7 @@ public class FormatCode {
 
     private String regulizeLine(String str)
     {
-        str = str.replaceAll("\\+|-|\\*|=|&|\\|"," ");
+        str = str.replaceAll("\\+|-|=|&|\\|"," ");
         str = str.replaceAll("\\{"," { ");
         str = str.replaceAll("}"," } ");
         str = str.replaceAll("\\("," ( ");
