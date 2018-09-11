@@ -37,11 +37,12 @@ public class FormatCode {
         keywords = readKeywords();
 
         formatAllCode();
-        spellCheckerAllContent(codeArea.getParagraphs().size());
+        //spellCheckerAllContent(codeArea.getParagraphs().size());
     }
 
     public void formatAllCode()
     {
+
         this.codeArea.caretColumnProperty().addListener((observable, oldValue, currentContractName) -> {
             startCol = codeArea.getCaretColumn();
             currentPara = codeArea.getCurrentParagraph();
@@ -66,6 +67,7 @@ public class FormatCode {
 
                 // Check spell
                 spellCheckerAllContent(codeArea.getParagraphs().size());
+
             }
         });
 
@@ -256,7 +258,7 @@ public class FormatCode {
                     else
                         varFunc.add(word);
                 }
-;
+
                 if (!keywords.contains(preWord) && !varContract.contains(word)
                         && !varFunc.contains(word) && !interuptFlg)
                 {
@@ -313,6 +315,7 @@ public class FormatCode {
 
     private void setErrorStyle(String missWord, int paraNo, int startNo)
     {
+
         MissInfo missInfo = new MissInfo();
         missInfo.missWord = missWord;
         missInfo.paraNo = paraNo;

@@ -1,17 +1,23 @@
 package org.tron.studio;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.StackPane;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.tron.common.storage.Key;
 import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.ui.SolidityHighlight;
 import org.tron.studio.ui.AutoCompletion;
 import org.tron.studio.ui.FormatCode;
 
 import javax.annotation.PostConstruct;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,8 +27,7 @@ import org.fxmisc.flowless.VirtualizedScrollPane;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.input.ScrollEvent;
-
+import javafx.geometry.Bounds;
 
 @Slf4j
 public class MainController {
@@ -31,6 +36,8 @@ public class MainController {
 
     public Tab defaultCodeAreaTab;
     public CodeArea defaultCodeArea;
+
+    int scrollPos = 0;
 
     private static List<Tab> allTabs = new ArrayList<>();
 
@@ -63,7 +70,8 @@ public class MainController {
 
         VirtualizedScrollPane scrollPane = new VirtualizedScrollPane<>(defaultCodeArea);
         defaultCodeAreaTab.setContent(scrollPane);
-        //scrollPane
+
+        setScrollStatus(defaultCodeArea, scrollPane);
 
         defaultCodeArea.replaceText(0, 0, builder.toString());
 
@@ -152,8 +160,14 @@ public class MainController {
         codeTab.setText(file.getName());
         //Just not allow to close the default tab
         codeTab.setClosable(true);
-        codeTab.setContent(new VirtualizedScrollPane<>(codeArea));
+
+        VirtualizedScrollPane scrollPane = new VirtualizedScrollPane<>(codeArea);
+        codeTab.setContent(scrollPane);
+
+        setScrollStatus(codeArea, scrollPane);
+
         Platform.runLater(() -> codeArea.selectRange(0, 0));
+
         codeAreaTabPane.getTabs().add(codeTab);
 
         new SolidityHighlight(codeArea).highlight();
@@ -185,8 +199,11 @@ public class MainController {
             AutoCompletion autoCompletion = new AutoCompletion(codeArea);
             autoCompletion.autoComplete(codeArea);
 
-            codeTab.setContent(new VirtualizedScrollPane<>(codeArea));
+            VirtualizedScrollPane scrollPane = new VirtualizedScrollPane<>(codeArea);
+            codeTab.setContent(scrollPane);
             Platform.runLater(() -> codeArea.selectRange(0, 0));
+
+            setScrollStatus(codeArea, scrollPane);
 
             codeAreaTabPane.getTabs().add(codeTab);
 
@@ -203,6 +220,23 @@ public class MainController {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void setScrollStatus(CodeArea codeArea, VirtualizedScrollPane scrollPane)
+    {
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                ShareData.isScrolling = false;
+            }
+        });
+
+        scrollPane.addEventFilter(ScrollEvent.ANY, new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                ShareData.isScrolling = true;
+            }
+        });
     }
 
     private void closeTab(Tab currTab)

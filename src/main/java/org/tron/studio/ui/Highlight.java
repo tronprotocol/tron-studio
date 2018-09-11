@@ -65,6 +65,7 @@ public abstract class Highlight {
      * @return
      */
     private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
+
         final String text = codeArea.getText();
 
         final Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
@@ -73,7 +74,12 @@ public abstract class Highlight {
                 return computeHighlighting(text);
             }
         };
-        executor.execute(task);
+
+        if (!ShareData.isScrolling)
+        {
+            executor.execute(task);
+        }
+
         return task;
     }
 

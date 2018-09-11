@@ -84,7 +84,6 @@ public class AutoCompletion {
         textArea.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-
                 String subStr = "";
                 for (int i = 1; i <= startCol; i++)
                 {

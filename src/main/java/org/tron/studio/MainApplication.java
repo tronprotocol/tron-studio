@@ -166,17 +166,15 @@ public class MainApplication extends Application {
 
   private void addShortcut(Scene scene)
   {
+    TabPane codeAreaTabPane = (TabPane)scene.lookup("#codeAreaTabPane");
+    ScrollPane scrollPane = new ScrollPane();
+
     // Add find shotcut
     KeyCombination ctrlCombination = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
     KeyCombination metaCombination = new KeyCodeCombination(KeyCode.F, KeyCombination.META_DOWN);
     Runnable rn = ()-> {
 
       VBox vbox = new VBox();
-      TabPane codeAreaTabPane = (TabPane)scene.lookup("#codeAreaTabPane");
-
-      //VirtualizedScrollPane virScrollPane = (VirtualizedScrollPane)ShareData.currentContractTab.getContent();
-      //CodeArea currentCodeArea = (CodeArea)virScrollPane.getContent();
-      //currentCodeArea.setPopupAlignment(PopupAlignment.CARET_BOTTOM);
 
       if (searchPopup.isShowing())
       {

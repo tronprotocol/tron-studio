@@ -117,6 +117,8 @@ public class ShareData {
 
     public static Scene scene = null;
 
+    public static boolean isScrolling = false;
+    //public static int currentPara = 0;
     private ShareData() {
 
     }
