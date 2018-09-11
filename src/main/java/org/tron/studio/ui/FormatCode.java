@@ -147,7 +147,12 @@ public class FormatCode {
         int bracketsNumFunc = 0;
         boolean inContract = false;
         boolean inFunc = false;
+
         boolean inCommont = false;
+        int commentStartPara = 0;
+        int commentStartIndex = 0;
+        String commentStartLine = "";
+        String commentStartWord = "";
 
         for (int i = 0; i < endParaNo; i++)
         {
@@ -202,6 +207,10 @@ public class FormatCode {
                 if (word.startsWith("/*"))
                 {
                     inCommont = true;
+                    commentStartIndex = currentLine.indexOf(word);
+                    commentStartPara = i;
+                    commentStartWord = word;
+                    commentStartLine = currentLine;
                     break;
                 }
 
@@ -261,6 +270,12 @@ public class FormatCode {
 
                 preWord = word;
             }
+        }
+
+        if (inCommont)
+        {
+            setErrorStyle(commentStartWord, commentStartPara, commentStartIndex);
+            findSpellErrorInLine(commentStartWord, commentStartLine, commentStartIndex, commentStartPara);
         }
     }
 

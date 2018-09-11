@@ -83,6 +83,7 @@ public class SolidityHighlight extends Highlight {
                             + "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")"
                             + "|(?<STRING>" + STRING_PATTERN + ")"
                             + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
+                            + "|^(?!\\\\s*//)"
             );
         } catch (Exception e) {
             logger.error("failed to make Pattern", e);
