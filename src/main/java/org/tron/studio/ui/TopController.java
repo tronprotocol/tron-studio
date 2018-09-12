@@ -126,6 +126,8 @@ public class TopController {
             }
             dialog.close();
         });
+        testNetIpTextField.requestFocus();
+        closeButton.setDefaultButton(true);
         layout.setActions(closeButton);
         dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
     }
@@ -156,6 +158,8 @@ public class TopController {
             }
             dialog.close();
         });
+        privateKeyTextField.resetValidation();
+        closeButton.setDefaultButton(true);
         layout.setActions(closeButton);
         dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
     }
@@ -171,6 +175,8 @@ public class TopController {
         JFXButton closeButton = new JFXButton("OK");
         closeButton.getStyleClass().add("dialog-accept");
         closeButton.setOnAction(event -> dialog.close());
+        textArea.requestFocus();
+        closeButton.setDefaultButton(true);
         layout.setActions(closeButton);
         dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
     }
