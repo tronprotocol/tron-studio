@@ -100,7 +100,7 @@ public abstract class Highlight {
             codeArea.setStyleSpans(missInfo.paraNo, missInfo.startNo, spansBuilder.create());
         }
 
-        MainApplication.showMatchingWords();
+//        MainApplication.showMatchingWords();
     }
 
     /**

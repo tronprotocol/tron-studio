@@ -9,7 +9,8 @@ import org.tron.studio.ShareData;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,7 +22,7 @@ public class FormatCode {
     private int currentPara = 0;
     private boolean releasedEnterKey = false;
 
-    private static final String PATH_TO_KEYWORDS  = "/keywords/solidity.txt";
+    private static final String PATH_TO_KEYWORDS = "/keywords/solidity.txt";
 
     private static List<String> keywords = new ArrayList<>();
 
@@ -31,8 +32,7 @@ public class FormatCode {
         public int startNo;
     }
 
-    public FormatCode(CodeArea codeArea)
-    {
+    public FormatCode(CodeArea codeArea) {
         this.codeArea = codeArea;
         keywords = readKeywords();
 
@@ -40,14 +40,12 @@ public class FormatCode {
         //spellCheckerAllContent(codeArea.getParagraphs().size());
     }
 
-    public void formatAllCode()
-    {
+    public void formatAllCode() {
 
         this.codeArea.caretColumnProperty().addListener((observable, oldValue, currentContractName) -> {
             startCol = codeArea.getCaretColumn();
             currentPara = codeArea.getCurrentParagraph();
-            if (releasedEnterKey)
-            {
+            if (releasedEnterKey) {
                 releasedEnterKey = false;
                 autoindent();
             }
@@ -60,13 +58,12 @@ public class FormatCode {
                     String s = StringUtils.repeat(' ', tabWidth);
                     codeArea.insertText(codeArea.getCaretPosition(), s);
                     e.consume();
-                } else if (e.getCode() == KeyCode.ENTER)
-                {
+                } else if (e.getCode() == KeyCode.ENTER) {
                     releasedEnterKey = true;
                 }
 
                 // Check spell
-                spellCheckerAllContent(codeArea.getParagraphs().size());
+                // spellCheckerAllContent(codeArea.getParagraphs().size());
 
             }
         });
@@ -74,46 +71,39 @@ public class FormatCode {
         correctIndent();
     }
 
-    public void correctIndent()
-    {
+    public void correctIndent() {
         calIndentLevel(codeArea.getParagraphs().size(), true);
     }
 
-    private int calIndentLevel(int endPara, boolean correctIndent)
-    {
+    private int calIndentLevel(int endPara, boolean correctIndent) {
         int indentLevel = 0;
 
-        for (int i = 0; i < endPara; i++)
-        {
+        for (int i = 0; i < endPara; i++) {
             String currentLine = codeArea.getText(i);
             int lineLength = currentLine.length();
             // intentLevel+1 when entering a block or new line in a sentence
             currentLine = currentLine.trim();
 
             // merge multi-spaces into one space
-            currentLine = currentLine.replaceAll("( +)"," ");
+            currentLine = currentLine.replaceAll("( +)", " ");
 
-            if (currentLine.endsWith("}"))
-            {
+            if (currentLine.endsWith("}")) {
                 indentLevel -= 1;
             }
 
-            if (correctIndent)
-            {
-                currentLine = StringUtils.repeat(' ', tabWidth*indentLevel) + currentLine;
-                codeArea.replaceText(i,0,i,lineLength,currentLine);
+            if (correctIndent) {
+                currentLine = StringUtils.repeat(' ', tabWidth * indentLevel) + currentLine;
+                codeArea.replaceText(i, 0, i, lineLength, currentLine);
             }
 
-            if (currentLine.endsWith("{"))
-            {
+            if (currentLine.endsWith("{")) {
                 indentLevel += 1;
             }
         }
         return indentLevel;
     }
 
-    public void autoindent()
-    {
+    public void autoindent() {
         // auto intent
         // Get last character in previous line
         int currentIndent = calIndentLevel(currentPara, false);
@@ -121,23 +111,20 @@ public class FormatCode {
         int currLineLength = currLine.length();
         currLine = currLine.trim();
 
-        if (currLine.equals("}"))
-        {
+        if (currLine.equals("}")) {
             currentIndent -= 1;
         }
 
-        if (currLine.length() > 0)
-        {
+        if (currLine.length() > 0) {
             currLine = StringUtils.repeat(' ', tabWidth * currentIndent) + currLine;
-            codeArea.replaceText(currentPara,0, currentPara, currLineLength, currLine);
+            codeArea.replaceText(currentPara, 0, currentPara, currLineLength, currLine);
         } else {
             String indentStr = StringUtils.repeat(' ', tabWidth * currentIndent);
-            codeArea.insertText(currentPara,0,indentStr);
+            codeArea.insertText(currentPara, 0, indentStr);
         }
     }
 
-    public  void spellCheckerAllContent(int endParaNo)
-    {
+    public void spellCheckerAllContent(int endParaNo) {
         //int paraSize = codeArea.getParagraphs().size();
 
         // Clear error list
@@ -156,25 +143,21 @@ public class FormatCode {
         String commentStartLine = "";
         String commentStartWord = "";
 
-        for (int i = 0; i < endParaNo; i++)
-        {
+        for (int i = 0; i < endParaNo; i++) {
             // check each line
             String currentLine = codeArea.getText(i);
             String[] words = regulizeLine(currentLine).split(" ");
 
-            if ( words.length == 0 ) continue;
-            if(words[0].startsWith("//") || words[0].equals("pragma")) continue;
+            if (words.length == 0) continue;
+            if (words[0].startsWith("//") || words[0].equals("pragma")) continue;
 
             // check contract
             if (words[0].equals("contract")) inContract = true;
-            if (inContract)
-            {
+            if (inContract) {
                 if (currentLine.contains("{")) bracketsNumContract += 1;
-                if (currentLine.contains("}"))
-                {
+                if (currentLine.contains("}")) {
                     bracketsNumContract -= 1;
-                    if (bracketsNumContract == 0)
-                    {
+                    if (bracketsNumContract == 0) {
                         inContract = false;
                         varContract.clear();
                     }
@@ -183,14 +166,11 @@ public class FormatCode {
 
             // check function
             if (words[0].equals("function")) inFunc = true;
-            if (inFunc)
-            {
+            if (inFunc) {
                 if (currentLine.contains("{")) bracketsNumFunc += 1;
-                if (currentLine.contains("}"))
-                {
+                if (currentLine.contains("}")) {
                     bracketsNumFunc -= 1;
-                    if (bracketsNumFunc == 0)
-                    {
+                    if (bracketsNumFunc == 0) {
                         inFunc = false;
                         varFunc.clear();
                     }
@@ -199,15 +179,12 @@ public class FormatCode {
 
             String preWord = null;
             boolean interuptFlg = false;
-            for (String word: words)
-            {
-                if (word.endsWith("*/") && inCommont)
-                {
+            for (String word : words) {
+                if (word.endsWith("*/") && inCommont) {
                     inCommont = false;
                 }
 
-                if (word.startsWith("/*"))
-                {
+                if (word.startsWith("/*")) {
                     inCommont = true;
                     commentStartIndex = currentLine.indexOf(word);
                     commentStartPara = i;
@@ -221,8 +198,7 @@ public class FormatCode {
                 if (StringUtils.isNumeric(word)) continue;
                 word = word.replaceAll("[*/]+", "");
 
-                if (!word.matches("[A-Za-z0-9]+"))
-                {
+                if (!word.matches("[A-Za-z0-9]+")) {
                     interuptFlg = true;
                     continue;
                 }
@@ -231,24 +207,20 @@ public class FormatCode {
 
                     if (!keywords.contains(word)
                             && (inContract && !inFunc && !varContract.contains(word)
-                            || inFunc && !varFunc.contains(word) && !varContract.contains(word)))
-                    {
+                            || inFunc && !varFunc.contains(word) && !varContract.contains(word))) {
                         // spell error
                         int startIndex = currentLine.indexOf(word);
                         setErrorStyle(word, i, startIndex);
                         findSpellErrorInLine(word, currentLine, startIndex, i);
-                    } else
-                    {
+                    } else {
                         preWord = word;
                     }
                     continue;
                 }
 
-                if (keywords.contains(preWord) && !keywords.contains(word))
-                {
+                if (keywords.contains(preWord) && !keywords.contains(word)) {
                     if (inContract && !inFunc && varContract.contains(word)
-                            || inFunc && varFunc.contains(word))
-                    {
+                            || inFunc && varFunc.contains(word)) {
                         // spell error
                         int startIndex = currentLine.indexOf(word);
                         setErrorStyle(word, i, startIndex);
@@ -260,8 +232,7 @@ public class FormatCode {
                 }
 
                 if (!keywords.contains(preWord) && !varContract.contains(word)
-                        && !varFunc.contains(word) && !interuptFlg)
-                {
+                        && !varFunc.contains(word) && !interuptFlg) {
                     // spell error
                     int startIndex = currentLine.indexOf(word);
                     setErrorStyle(word, i, startIndex);
@@ -274,47 +245,41 @@ public class FormatCode {
             }
         }
 
-        if (inCommont)
-        {
+        if (inCommont) {
             setErrorStyle(commentStartWord, commentStartPara, commentStartIndex);
             findSpellErrorInLine(commentStartWord, commentStartLine, commentStartIndex, commentStartPara);
         }
     }
 
-    private void findSpellErrorInLine(String word, String strLine, int startIndex, int curPara)
-    {
+    private void findSpellErrorInLine(String word, String strLine, int startIndex, int curPara) {
         int endInd = strLine.length() - word.length() + 1;
-        for (int  m = startIndex + word.length(); m < endInd; m++)
-        {
-            String curCha = strLine.substring(m, m+word.length());
-            String preCha = strLine.substring(m-1, m-1);
+        for (int m = startIndex + word.length(); m < endInd; m++) {
+            String curCha = strLine.substring(m, m + word.length());
+            String preCha = strLine.substring(m - 1, m - 1);
             String nextCha = "";
             if (m + word.length() + 1 <= strLine.length())
                 nextCha = strLine.substring(m + word.length() + 1, m + word.length() + 1);
 
             if (curCha.equals(word) && !preCha.matches("[A-Za-z0-9]")
-                    && !nextCha.matches("[A-Za-z0-9]"))
-            {
+                    && !nextCha.matches("[A-Za-z0-9]")) {
                 setErrorStyle(word, curPara, m);
             }
         }
     }
 
-    private String regulizeLine(String str)
-    {
-        str = str.replaceAll("\\+|-|=|&|\\|"," ");
-        str = str.replaceAll("\\{"," { ");
-        str = str.replaceAll("}"," } ");
-        str = str.replaceAll("\\("," ( ");
-        str = str.replaceAll("\\)"," ) ");
-        str = str.replaceAll(","," , ");
-        str = str.replaceAll(";"," ; ");
+    private String regulizeLine(String str) {
+        str = str.replaceAll("\\+|-|=|&|\\|", " ");
+        str = str.replaceAll("\\{", " { ");
+        str = str.replaceAll("}", " } ");
+        str = str.replaceAll("\\(", " ( ");
+        str = str.replaceAll("\\)", " ) ");
+        str = str.replaceAll(",", " , ");
+        str = str.replaceAll(";", " ; ");
 
-        return str.replaceAll("( +)"," ").trim();
+        return str.replaceAll("( +)", " ").trim();
     }
 
-    private void setErrorStyle(String missWord, int paraNo, int startNo)
-    {
+    private void setErrorStyle(String missWord, int paraNo, int startNo) {
 
         MissInfo missInfo = new MissInfo();
         missInfo.missWord = missWord;
@@ -324,15 +289,13 @@ public class FormatCode {
         ShareData.missInfoList.add(missInfo);
     }
 
-    private List<String> readKeywords()
-    {
+    private List<String> readKeywords() {
         Stream<String> lines = new BufferedReader(new InputStreamReader(
                 getClass().getResourceAsStream(PATH_TO_KEYWORDS))).lines();
         String[] words = lines.collect(Collectors.joining("|")).split("\\|");
 
         List<String> keywords = new ArrayList<>();
-        for (String word: words)
-        {
+        for (String word : words) {
             keywords.add(word);
         }
         return keywords;

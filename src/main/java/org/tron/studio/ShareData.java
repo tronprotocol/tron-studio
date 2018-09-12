@@ -115,7 +115,7 @@ public class ShareData {
     // 文本错误信息
     public static List<FormatCode.MissInfo> missInfoList = new ArrayList<>();
 
-    public static Scene scene = null;
+    public static SimpleObjectProperty<Scene> sceneObjectProperty = new SimpleObjectProperty();
 
     public static boolean isScrolling = false;
     //public static int currentPara = 0;
