@@ -96,7 +96,9 @@ public class RightTabRunController implements Initializable {
         });
         ShareData.newAccount.set(ShareData.testAccount.keySet().stream().findFirst().get());
         accountComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            ShareData.wallet = new WalletClient(Hex.decode(ShareData.testAccount.get(newValue)));
+            if(StringUtils.isNotEmpty(newValue)) {
+                ShareData.wallet = new WalletClient(Hex.decode(ShareData.testAccount.get(newValue)));
+            }
         });
 
 
