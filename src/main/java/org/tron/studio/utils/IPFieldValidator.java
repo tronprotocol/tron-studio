@@ -2,7 +2,6 @@ package org.tron.studio.utils;
 
 import com.jfoenix.validation.base.ValidatorBase;
 import javafx.beans.DefaultProperty;
-import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.TextInputControl;
 
 import java.util.regex.Matcher;
@@ -25,7 +24,7 @@ public class IPFieldValidator extends ValidatorBase {
         if (textField.getText() == null || textField.getText().isEmpty()) {
             hasErrors.set(true);
         } else {
-            if(!isIP(textField.getText())) {
+            if (!isIP(textField.getText())) {
                 hasErrors.set(true);
                 return;
             }

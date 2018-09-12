@@ -77,7 +77,7 @@ public class RightTabDebugController implements Initializable {
 
         String currentItem = "" + statusItem.pc + ": " + statusItem.code.name();
         debugInstructionsList.scrollTo(currentItem);
-        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
+        energyLimitLeftLabel.setText("Energy Limit Left: " + statusItem.energy.toString());
 
         debugMemoryList.getItems().clear();
         if (statusItem.memory != null && statusItem.memory.getChunks() != null) {
@@ -116,7 +116,7 @@ public class RightTabDebugController implements Initializable {
             }
         }
 
-        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
+        energyLimitLeftLabel.setText("Energy Limit Left: " + statusItem.energy.toString());
     }
 
     public void onClickForward(MouseEvent mouseEvent) {
@@ -143,6 +143,6 @@ public class RightTabDebugController implements Initializable {
             }
         }
 
-        energyLimitLeftLabel.setText("Energy Limit Left: " +statusItem.energy.toString());
+        energyLimitLeftLabel.setText("Energy Limit Left: " + statusItem.energy.toString());
     }
 }

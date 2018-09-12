@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
-import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
 
 import javax.annotation.PostConstruct;
@@ -27,11 +26,10 @@ import java.util.List;
 
 @Slf4j(topic = "CodeAreaController")
 public class CodeAreaController {
-    public CodeArea codeArea;
-
     private final Popup searchPopup = new Popup();
     private final SearchText searchTextInfo = new SearchText();
     private final int spacingSize = 3;
+    public CodeArea codeArea;
 
     @PostConstruct
     public void initialize() throws IOException {
@@ -39,7 +37,9 @@ public class CodeAreaController {
             ShareData.currentContractSourceCode.set(newValue);
         });
         ShareData.sceneObjectProperty.addListener((observable, oldValue, newValue) -> {
-            addShortcut(codeArea);
+            if (newValue != null) {
+                addShortcut(codeArea);
+            }
         });
     }
 

@@ -1,11 +1,10 @@
-package org.tron.studio.ui;
+package org.tron.studio.utils;
 
 import javafx.concurrent.Task;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
-import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
 
 import java.time.Duration;
@@ -14,7 +13,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.List;
 
 /**
  * Base of Highlighting.
@@ -23,14 +21,19 @@ import java.util.List;
  */
 public abstract class Highlight {
 
-    /** Target CodeArea. */
+    /**
+     * Target CodeArea.
+     */
     protected final CodeArea codeArea;
 
-    /** ExecutorService. */
+    /**
+     * ExecutorService.
+     */
     protected final ExecutorService executor;
 
     /**
      * Initialize with codeArea.
+     *
      * @param codeArea
      */
     public Highlight(final CodeArea codeArea) {
@@ -44,24 +47,25 @@ public abstract class Highlight {
     public final Subscription highlight() {
         final String code = codeArea.getText();
         final Subscription subscription = codeArea.richChanges()
-            .filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
-            .successionEnds(Duration.ofMillis(500))
-            .supplyTask(this::computeHighlightingAsync)
-            .awaitLatest(codeArea.richChanges())
-            .filterMap(t -> {
-                if(t.isSuccess()) {
-                    return Optional.of(t.get());
-                }
-                t.getFailure().printStackTrace();
-                return Optional.empty();
-            })
-            .subscribe(this::applyHighlighting);
+                .filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
+                .successionEnds(Duration.ofMillis(500))
+                .supplyTask(this::computeHighlightingAsync)
+                .awaitLatest(codeArea.richChanges())
+                .filterMap(t -> {
+                    if (t.isSuccess()) {
+                        return Optional.of(t.get());
+                    }
+                    t.getFailure().printStackTrace();
+                    return Optional.empty();
+                })
+                .subscribe(this::applyHighlighting);
         codeArea.replaceText(code);
         return subscription;
     }
 
     /**
      * Compute highlighting.
+     *
      * @return
      */
     private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
@@ -75,8 +79,7 @@ public abstract class Highlight {
             }
         };
 
-        if (!ShareData.isScrolling)
-        {
+        if (!ShareData.isScrolling) {
             executor.execute(task);
         }
 
@@ -85,6 +88,7 @@ public abstract class Highlight {
 
     /**
      * Apply highlighting.
+     *
      * @param highlighting
      */
     private void applyHighlighting(final StyleSpans<Collection<String>> highlighting) {
@@ -92,8 +96,7 @@ public abstract class Highlight {
         codeArea.setStyleSpans(0, highlighting);
 
         // Show incorrect spells
-        for(FormatCode.MissInfo missInfo: ShareData.missInfoList)
-        {
+        for (FormatCode.MissInfo missInfo : ShareData.missInfoList) {
             StyleSpansBuilder<Collection<String>> spansBuilder
                     = new StyleSpansBuilder<>();
             spansBuilder.add(Collections.singleton("spell-error"), missInfo.missWord.length());
@@ -105,6 +108,7 @@ public abstract class Highlight {
 
     /**
      * Compute highlighting.
+     *
      * @param text
      * @return
      */

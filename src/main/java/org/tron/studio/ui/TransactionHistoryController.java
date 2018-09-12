@@ -1,7 +1,9 @@
 package org.tron.studio.ui;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jfoenix.controls.*;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.beans.property.SimpleStringProperty;
@@ -208,6 +210,16 @@ public class TransactionHistoryController {
         transactionHistoryListView.getItems().clear();
     }
 
+    private <T> void setupCellValueFactory(JFXTreeTableColumn<TransactionDetail, T> column, java.util.function.Function<TransactionDetail, ObservableValue<T>> mapper) {
+        column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TransactionDetail, T> param) -> {
+            if (column.validateValue(param)) {
+                return mapper.apply(param.getValue().getValue());
+            } else {
+                return column.getComputedValue(param);
+            }
+        });
+    }
+
     static final class TransactionDetail extends RecursiveTreeObject<TransactionDetail> {
 
         final StringProperty keyProperty;
@@ -225,16 +237,6 @@ public class TransactionHistoryController {
         StringProperty valueProperty() {
             return valueProperty;
         }
-    }
-
-    private <T> void setupCellValueFactory(JFXTreeTableColumn<TransactionDetail, T> column, java.util.function.Function<TransactionDetail, ObservableValue<T>> mapper) {
-        column.setCellValueFactory((TreeTableColumn.CellDataFeatures<TransactionDetail, T> param) -> {
-            if (column.validateValue(param)) {
-                return mapper.apply(param.getValue().getValue());
-            } else {
-                return column.getComputedValue(param);
-            }
-        });
     }
 
 }

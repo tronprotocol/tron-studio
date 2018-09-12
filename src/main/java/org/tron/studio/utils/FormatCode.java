@@ -1,4 +1,4 @@
-package org.tron.studio.ui;
+package org.tron.studio.utils;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
@@ -16,21 +16,13 @@ import java.util.stream.Stream;
 
 public class FormatCode {
 
-    CodeArea codeArea;
+    private static final String PATH_TO_KEYWORDS = "/keywords/solidity.txt";
     private static int tabWidth = 2;
+    private static List<String> keywords = new ArrayList<>();
+    CodeArea codeArea;
     private int startCol = 0;
     private int currentPara = 0;
     private boolean releasedEnterKey = false;
-
-    private static final String PATH_TO_KEYWORDS = "/keywords/solidity.txt";
-
-    private static List<String> keywords = new ArrayList<>();
-
-    public class MissInfo {
-        public String missWord;
-        public int paraNo;
-        public int startNo;
-    }
 
     public FormatCode(CodeArea codeArea) {
         this.codeArea = codeArea;
@@ -299,5 +291,11 @@ public class FormatCode {
             keywords.add(word);
         }
         return keywords;
+    }
+
+    public class MissInfo {
+        public String missWord;
+        public int paraNo;
+        public int startNo;
     }
 }

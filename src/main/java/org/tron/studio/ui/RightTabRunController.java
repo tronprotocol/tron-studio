@@ -29,7 +29,6 @@ import org.tron.abi.TypeReference;
 import org.tron.abi.datatypes.Function;
 import org.tron.abi.datatypes.Type;
 import org.tron.abi.datatypes.generated.AbiTypes;
-import org.tron.abi.datatypes.generated.Uint256;
 import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.TransactionCapsule;
@@ -39,14 +38,12 @@ import org.tron.keystore.CipherException;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.studio.ShareData;
 import org.tron.studio.TransactionHistoryItem;
-import org.tron.studio.filesystem.VmTraceFileUtil;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.CompilationResult.ContractMetadata;
 import org.tron.studio.solc.SolidityCompiler;
 import org.tron.studio.utils.AbiUtil;
 import org.tron.studio.walletserver.WalletClient;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -56,6 +53,9 @@ import java.util.regex.Pattern;
 public class RightTabRunController implements Initializable {
 
     static final Logger logger = LoggerFactory.getLogger(RightTabRunController.class);
+    private static String DEFAULT_FEE_LIMIT = String.valueOf(100);
+    private static String DEFAULT_VALUE = String.valueOf(0);
+    private static String DEFAULT_RATIO = String.valueOf(100);
     public JFXComboBox<String> environmentComboBox;
     public JFXComboBox<String> contractComboBox;
     public JFXComboBox<String> accountComboBox;
@@ -65,13 +65,7 @@ public class RightTabRunController implements Initializable {
     public JFXComboBox<String> valueUnitComboBox;
     public JFXTextField userPayRatio;
     public JFXListView deployedContractList;
-
     public JFXTextField constructorParaTextField;
-
-    private static String DEFAULT_FEE_LIMIT = String.valueOf(100);
-    private static String DEFAULT_VALUE = String.valueOf(0);
-    private static String DEFAULT_RATIO = String.valueOf(100);
-
     private boolean isDeploying;
 
     public void initialize(URL location, ResourceBundle resources) {
@@ -378,15 +372,15 @@ public class RightTabRunController implements Initializable {
         ShareData.transactionHistory.put(uuid.toString(), new TransactionHistoryItem(TransactionHistoryItem.Type.InfoString, transactionHeadMsg, null));
         ShareData.addTransactionAction.set(uuid.toString());
 
-        new Thread(() ->{
+        new Thread(() -> {
             try {
-                if(item.getType() == TransactionHistoryItem.Type.Transaction) {
+                if (item.getType() == TransactionHistoryItem.Type.Transaction) {
                     Thread.sleep(2000);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            Platform.runLater(()->{
+            Platform.runLater(() -> {
                 ShareData.transactionHistory.put(id, item);
                 ShareData.addTransactionAction.set(id);
             });
@@ -501,11 +495,11 @@ public class RightTabRunController implements Initializable {
                         String.format("Unable to get last TransactionExtention: %s",
                                 transactionExtention.getResult().getMessage().toStringUtf8()),
                         null
-                        ));
+                ));
                 return;
             }
 
-            if(transactionExtention.getConstantResultCount() > 0) {
+            if (transactionExtention.getConstantResultCount() > 0) {
                 addTransactionHistoryItem(transactionId, new TransactionHistoryItem(TransactionHistoryItem.Type.TransactionExtension, transactionExtention, function));
                 return;
             }

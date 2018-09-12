@@ -1,4 +1,4 @@
-package org.tron.studio.ui;
+package org.tron.studio.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.fxmisc.richtext.CodeArea;
@@ -22,18 +22,19 @@ import java.util.stream.Stream;
 @Slf4j
 public class SolidityHighlight extends Highlight {
 
-    private static final String PATH_TO_KEYWORDS  = "/keywords/solidity.txt";
-    private static final String PAREN_PATTERN     = "\\(|\\)";
-    private static final String BRACE_PATTERN     = "\\{|\\}";
-    private static final String BRACKET_PATTERN   = "\\[|\\]";
+    private static final String PATH_TO_KEYWORDS = "/keywords/solidity.txt";
+    private static final String PAREN_PATTERN = "\\(|\\)";
+    private static final String BRACE_PATTERN = "\\{|\\}";
+    private static final String BRACKET_PATTERN = "\\[|\\]";
     private static final String SEMICOLON_PATTERN = "\\;";
-    private static final String STRING_PATTERN    = "\"([^\"\\\\]|\\\\.)*\"";
-    private static final String COMMENT_PATTERN   = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/";
+    private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
+    private static final String COMMENT_PATTERN = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/";
 
     private Pattern pattern;
 
     /**
      * Initialize with CodeArea.
+     *
      * @param codeArea
      */
     public SolidityHighlight(final CodeArea codeArea) {
@@ -51,13 +52,14 @@ public class SolidityHighlight extends Highlight {
         while (matcher.find()) {
             final String styleClass =
                     matcher.group("KEYWORD") != null ? "keyword" :
-                    matcher.group("PAREN") != null ? "paren" :
-                    matcher.group("BRACE") != null ? "brace" :
-                    matcher.group("BRACKET") != null ? "bracket" :
-                    matcher.group("SEMICOLON") != null ? "semicolon" :
-                    matcher.group("STRING") != null ? "string" :
-                    matcher.group("COMMENT") != null ? "comment" :
-                    null; /* never happens */ assert styleClass != null;
+                            matcher.group("PAREN") != null ? "paren" :
+                                    matcher.group("BRACE") != null ? "brace" :
+                                            matcher.group("BRACKET") != null ? "bracket" :
+                                                    matcher.group("SEMICOLON") != null ? "semicolon" :
+                                                            matcher.group("STRING") != null ? "string" :
+                                                                    matcher.group("COMMENT") != null ? "comment" :
+                                                                            null; /* never happens */
+            assert styleClass != null;
             spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
             spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
             lastKwEnd = matcher.end();

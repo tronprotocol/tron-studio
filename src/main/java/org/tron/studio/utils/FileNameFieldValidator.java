@@ -36,7 +36,7 @@ public class FileNameFieldValidator extends ValidatorBase {
         if (fileName.length() < 1 || fileName.length() > 16 || "".equals(fileName)) {
             return false;
         }
-        if(!fileName.endsWith(".sol")) {
+        if (!fileName.endsWith(".sol")) {
             return false;
         }
         String rexp = "\\w*.sol";

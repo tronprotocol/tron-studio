@@ -7,13 +7,11 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableColumn;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
@@ -39,16 +37,12 @@ import java.util.function.Function;
 
 public class LeftCodeListController {
     static final Logger logger = LoggerFactory.getLogger(RightTabCompileController.class);
-
+    private final FileChooser fileChooser = new FileChooser();
     public JFXTreeTableView<FileName> fileNameTable;
     public JFXTreeTableColumn<FileName, String> fileNameColumn;
-
     private ObservableList<FileName> fileNameData;
-
     private String lastCodeContent;
     private String lastFileName;
-
-    private final FileChooser fileChooser = new FileChooser();
     private ScheduledExecutorService autoSaveExecutor = Executors.newSingleThreadScheduledExecutor();
 
     @FXML
@@ -88,7 +82,7 @@ public class LeftCodeListController {
         delMenu.setOnAction(event -> {
 
             //Not allowed to delete last file
-            if(SolidityFileUtil.getFileNameList().size() == 1) {
+            if (SolidityFileUtil.getFileNameList().size() == 1) {
                 return;
             }
 
