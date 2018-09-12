@@ -1,6 +1,7 @@
 package org.tron.studio.ui;
 
 import com.jfoenix.controls.JFXButton;
+import java.math.BigDecimal;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public class BottomController {
                 return;
             }
 
-            String balance = Long.toString(account.getBalance() / 1_000_000);
+            String balance = new BigDecimal(account.getBalance()).divide(new BigDecimal(1_000_000)).toPlainString();
             String blockNumber = Long.toString(ShareData.wallet.getBlock(-1).getBlockHeader().getRawData().getNumber());
             String energy =  Long.toString(accountResource.getEnergyLimit() -  accountResource.getEnergyUsed());
             Platform.runLater(() -> {
