@@ -1,5 +1,5 @@
 ## Tron Studio
-TronStudio is an IDE to develop deploy debug smart contract based on TVM.
+TronStudio is an IDE to develop/deploy/debug smart contract based on TVM.
 
 ## Screenshot
 ![](image/screenshot.png)
