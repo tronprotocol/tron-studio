@@ -49,6 +49,7 @@
     <appender-ref ref="ASYNC"/>
   </root>
 
+  <logger name="Manager" level="INFO" />
   <logger name="CodeAreaController" level="INFO" />
   <logger name="BottomController" level="INFO" />
 

@@ -1,38 +1,16 @@
 package org.tron.core.db;
 
-import static org.tron.core.config.Parameter.ChainConstant.SOLIDIFIED_THRESHOLD;
-import static org.tron.core.config.Parameter.NodeConstant.MAX_TRANSACTION_PENDING;
-
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javafx.util.Pair;
-import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,21 +25,11 @@ import org.tron.common.overlay.discover.node.Node;
 import org.tron.common.runtime.Runtime;
 import org.tron.common.runtime.vm.program.invoke.ProgramInvokeFactoryImpl;
 import org.tron.common.storage.DepositImpl;
-import org.tron.common.utils.ByteArray;
-import org.tron.common.utils.ForkController;
-import org.tron.common.utils.SessionOptional;
-import org.tron.common.utils.Sha256Hash;
-import org.tron.common.utils.StringUtil;
+import org.tron.common.utils.*;
 import org.tron.core.Constant;
 import org.tron.core.Wallet;
-import org.tron.core.capsule.AccountCapsule;
-import org.tron.core.capsule.BlockCapsule;
+import org.tron.core.capsule.*;
 import org.tron.core.capsule.BlockCapsule.BlockId;
-import org.tron.core.capsule.BytesCapsule;
-import org.tron.core.capsule.ReceiptCapsule;
-import org.tron.core.capsule.TransactionCapsule;
-import org.tron.core.capsule.TransactionInfoCapsule;
-import org.tron.core.capsule.WitnessCapsule;
 import org.tron.core.capsule.utils.BlockUtil;
 import org.tron.core.config.Parameter.ChainConstant;
 import org.tron.core.config.args.Args;
@@ -69,35 +37,23 @@ import org.tron.core.config.args.GenesisBlock;
 import org.tron.core.db.KhaosDatabase.KhaosBlock;
 import org.tron.core.db2.core.ISession;
 import org.tron.core.db2.core.ITronChainBase;
-import org.tron.core.exception.AccountResourceInsufficientException;
-import org.tron.core.exception.BadBlockException;
-import org.tron.core.exception.BadItemException;
-import org.tron.core.exception.BadNumberBlockException;
-import org.tron.core.exception.BalanceInsufficientException;
-import org.tron.core.exception.ContractExeException;
-import org.tron.core.exception.ContractSizeNotEqualToOneException;
-import org.tron.core.exception.ContractValidateException;
-import org.tron.core.exception.DupTransactionException;
-import org.tron.core.exception.HeaderNotFound;
-import org.tron.core.exception.ItemNotFoundException;
-import org.tron.core.exception.NonCommonBlockException;
-import org.tron.core.exception.ReceiptCheckErrException;
-import org.tron.core.exception.TaposException;
-import org.tron.core.exception.TooBigTransactionException;
-import org.tron.core.exception.TooBigTransactionResultException;
-import org.tron.core.exception.TransactionExpirationException;
-import org.tron.core.exception.UnLinkedBlockException;
-import org.tron.core.exception.VMIllegalException;
-import org.tron.core.exception.ValidateScheduleException;
-import org.tron.core.exception.ValidateSignatureException;
+import org.tron.core.exception.*;
 import org.tron.core.witness.ProposalController;
 import org.tron.core.witness.WitnessController;
 import org.tron.protos.Protocol;
 import org.tron.protos.Protocol.AccountType;
 import org.tron.protos.Protocol.Block;
 
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
-@Slf4j
+import static org.tron.core.config.Parameter.ChainConstant.SOLIDIFIED_THRESHOLD;
+import static org.tron.core.config.Parameter.NodeConstant.MAX_TRANSACTION_PENDING;
+
+
+@Slf4j (topic = "Manager")
 @Component
 public class Manager {
 
@@ -826,7 +782,7 @@ public class Manager {
           throw throwable;
         }
       }
-      logger.info("save block: " + newBlock);
+      logger.debug("save block: " + newBlock);
     }
   }
 
@@ -853,7 +809,7 @@ public class Manager {
       logger.warn("missedBlocks [" + slot + "] is illegal");
     }
 
-    logger.info("update head, num = {}", block.getNum());
+    logger.debug("update head, num = {}", block.getNum());
     this.dynamicPropertiesStore.saveLatestBlockHeaderHash(block.getBlockId().getByteString());
 
     this.dynamicPropertiesStore.saveLatestBlockHeaderNumber(block.getNum());
@@ -1005,10 +961,10 @@ public class Manager {
 
     transactionHistoryStore.put(trxCap.getTransactionId().getBytes(), transactionInfo);
 
-//    if (Objects.nonNull(blockCap)) {
-//      sendEventLog(runtime.getResult().getContractAddress(),
-//          transactionInfo.getInstance().getLogList(), blockCap.getInstance(), transactionInfo);
-//    }
+    if (Objects.nonNull(blockCap)) {
+      sendEventLog(runtime.getResult().getContractAddress(),
+          transactionInfo.getInstance().getLogList(), blockCap.getInstance(), transactionInfo);
+    }
     return true;
   }
 
@@ -1040,33 +996,56 @@ public class Manager {
             TypeReference<?> tr = AbiTypes.getTypeReference(input.getType(), input.getIndexed());
             typeList.add(tr);
           });
+          JSONArray returnValuesJsonArray = new JSONArray();
+          JSONObject rawJsonObject = new JSONObject();
+
+          String eventHexString = Hex.toHexString(log.getTopicsList().get(0).toByteArray());
+          JSONArray rawTopicsJsonArray = new JSONArray();
+          rawTopicsJsonArray.add(eventHexString);
+
           Event event = new Event(entryName, typeList);
-          String encodeEventHexString = EventEncoder.encode(event);
-          JSONArray resultJsonArray = new JSONArray();
-          log.getTopicsList().forEach(topic -> {
-            String topicHexString = Hex.toHexString(topic.toByteArray());
+          String rawLogData = ByteArray.toHexString(log.getData().toByteArray());
+          List<Type> nonIndexedValues = FunctionReturnDecoder.decode(rawLogData, event.getNonIndexedParameters());
+          List<Type> indexedValues = new ArrayList<>();
 
-            if (StringUtils.equalsIgnoreCase(encodeEventHexString, topicHexString)) {
-              //Event Log
-              List<Type> results = FunctionReturnDecoder.decode(
-                  ByteArray.toHexString(log.getData().toByteArray()), event.getNonIndexedParameters());
-              for (Type result : results) {
-                resultJsonArray.add(result.getValue());
-              }
+          List<TypeReference<Type>> indexedParameters = event.getIndexedParameters();
+          for (int i = 0; i < indexedParameters.size(); i++) {
+            String topicHexString = Hex.toHexString(log.getTopicsList().get(i + 1).toByteArray());
+            rawTopicsJsonArray.add(topicHexString);
+            Type value = FunctionReturnDecoder.decodeIndexedValue(topicHexString, indexedParameters.get(i));
+            indexedValues.add(value);
+          }
+          int counter = 0;
+          int indexedCounter = 0;
+          int nonIndexedCounter = 0;
+          for (TypeReference<?> typeReference : typeList) {
+            if(typeReference.isIndexed()) {
+              JSONObject jsonObject = new JSONObject();
+              jsonObject.put(nameList.get(counter), indexedValues.get(indexedCounter).getValue());
+              returnValuesJsonArray.add(counter, jsonObject);
+              indexedCounter++;
             } else {
-
+              JSONObject jsonObject = new JSONObject();
+              jsonObject.put(nameList.get(counter), nonIndexedValues.get(nonIndexedCounter).getValue());
+              returnValuesJsonArray.add(counter, jsonObject);
+              nonIndexedCounter++;
             }
-          });
+            counter++;
+          }
+
+          rawJsonObject.put("topics", rawTopicsJsonArray);
+          rawJsonObject.put("data", rawLogData);
 
           long blockNumber = block.getBlockHeader().getRawData().getNumber();
           long blockTimestamp = block.getBlockHeader().getRawData().getTimestamp();
-          logger.info("",blockNumber, blockTimestamp,
-              Wallet.encode58Check(contractAddress), entryName, resultJsonArray,
-              Hex.toHexString(transactionInfoCapsule.getId()));
+          logger.info("Event blockNumber:{} blockTimestamp:{} contractAddress:{} eventName:{} returnValues:{} raw:{} txId:{}",
+                  blockNumber, blockTimestamp,
+                  Wallet.encode58Check(contractAddress), entryName, returnValuesJsonArray, rawJsonObject,
+                  Hex.toHexString(transactionInfoCapsule.getId()));
         });
       });
     } catch (Exception e) {
-      logger.error("SendEventToMQ Failed {}", e);
+      logger.error("sendEventLog Failed {}", e);
     }
   }
   /**
@@ -1179,7 +1158,7 @@ public class Manager {
       logger.info("{} transactions over the block size limit", postponedTrxCount);
     }
 
-    logger.info(
+    logger.debug(
         "postponedTrxCount[" + postponedTrxCount + "],TrxLeft[" + pendingTransactions.size()
             + "],repushTrxCount[" + repushTransactions.size() + "]");
     blockCapsule.setMerkleRoot();
@@ -1308,7 +1287,7 @@ public class Manager {
       return;
     }
     getDynamicPropertiesStore().saveLatestSolidifiedBlockNum(latestSolidifiedBlockNum);
-    logger.info("update solid block, num = {}", latestSolidifiedBlockNum);
+    logger.debug("update solid block, num = {}", latestSolidifiedBlockNum);
   }
 
   public void updateFork() {
