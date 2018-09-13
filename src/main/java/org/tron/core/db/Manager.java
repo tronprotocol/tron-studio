@@ -996,7 +996,7 @@ public class Manager {
             TypeReference<?> tr = AbiTypes.getTypeReference(input.getType(), input.getIndexed());
             typeList.add(tr);
           });
-          JSONArray returnValuesJsonArray = new JSONArray();
+          JSONObject resultJsonObject = new JSONObject();
           JSONObject rawJsonObject = new JSONObject();
 
           String eventHexString = Hex.toHexString(log.getTopicsList().get(0).toByteArray());
@@ -1020,14 +1020,10 @@ public class Manager {
           int nonIndexedCounter = 0;
           for (TypeReference<?> typeReference : typeList) {
             if(typeReference.isIndexed()) {
-              JSONObject jsonObject = new JSONObject();
-              jsonObject.put(nameList.get(counter), indexedValues.get(indexedCounter).getValue());
-              returnValuesJsonArray.add(counter, jsonObject);
+              resultJsonObject.put(nameList.get(counter), indexedValues.get(indexedCounter).getValue());
               indexedCounter++;
             } else {
-              JSONObject jsonObject = new JSONObject();
-              jsonObject.put(nameList.get(counter), nonIndexedValues.get(nonIndexedCounter).getValue());
-              returnValuesJsonArray.add(counter, jsonObject);
+              resultJsonObject.put(nameList.get(counter), nonIndexedValues.get(nonIndexedCounter).getValue());
               nonIndexedCounter++;
             }
             counter++;
@@ -1040,8 +1036,14 @@ public class Manager {
           long blockTimestamp = block.getBlockHeader().getRawData().getTimestamp();
           logger.info("Event blockNumber:{} blockTimestamp:{} contractAddress:{} eventName:{} returnValues:{} raw:{} txId:{}",
                   blockNumber, blockTimestamp,
-                  Wallet.encode58Check(contractAddress), entryName, returnValuesJsonArray, rawJsonObject,
+                  Wallet.encode58Check(contractAddress), entryName, resultJsonObject, rawJsonObject,
                   Hex.toHexString(transactionInfoCapsule.getId()));
+
+//          EventLogEntity eventLogEntity = new EventLogEntity(blockNumber, blockTimestamp,
+//                  Wallet.encode58Check(contractAddress), entryName, resultJsonObject, rawJsonObject,
+//                  Hex.toHexString(transactionInfoCapsule.getId()));
+//          // 事件日志写入MongoDB
+//          eventLogService.insertEventLog(eventLogEntity);
         });
       });
     } catch (Exception e) {
