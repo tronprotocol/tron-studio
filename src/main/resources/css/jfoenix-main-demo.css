@@ -471,6 +471,15 @@
     -jfx-expanded: false;
 }
 
+.jfx-list-view-courier {
+    -fx-background-insets: 0.0;
+    -jfx-cell-horizontal-margin: 0.0;
+    -jfx-cell-vertical-margin: 5.0;
+    -jfx-vertical-gap: 10.0;
+    -jfx-expanded: false;
+    -fx-font-family: "Courier";
+}
+
 .jfx-debug-list-view {
     -fx-background-insets: 0.0;
     -jfx-cell-horizontal-margin: 0.0;

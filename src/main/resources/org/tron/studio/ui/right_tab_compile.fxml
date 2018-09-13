@@ -22,5 +22,5 @@
         <JFXComboBox fx:id="contractComboBox" onAction="#onSelectContract" HBox.hgrow="ALWAYS"/>
         <JFXButton styleClass="custom-jfx-button-raised" onAction="#onClickDetail" text="Detail"/>
     </HBox>
-    <JFXListView VBox.vgrow="ALWAYS" fx:id="compileResultInfoListView" styleClass="jfx-list-view" />
+    <JFXListView VBox.vgrow="ALWAYS" fx:id="compileResultInfoListView" styleClass="jfx-list-view-courier" />
 </VBox>
