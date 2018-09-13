@@ -1,18 +1,18 @@
 ## Tron Studio
-TronStudio是用于开发、部署、调试基于TVM的智能合约的工具。
+TronStudio is an IDE to develop deploy debug smart contract based on TVM.
 
 ## Screenshot
 ![](image/screenshot.png)
 
-## 运行环境要求
-安装Oracle JDK 1.8
+## System Requirement
+Oracle JDK 1.8
 
-- Windows 64位系统
-- Linux 64位系统
+- Windows 64Bit
+- Linux 64Bit
 - Mac
 
 
-## 编译运行
+## Compile & Run
 ```
 ./gradlew build -x test -x check
 cd  build/libs
