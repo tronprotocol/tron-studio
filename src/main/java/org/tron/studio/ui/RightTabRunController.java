@@ -351,7 +351,7 @@ public class RightTabRunController implements Initializable {
                     for (int j = 0; j < outputsJsonArray.size(); j++) {
                         JSONObject outputItem = outputsJsonArray.getJSONObject(j);
                         String type = outputItem.getString("type");
-                        outputParaList.add(AbiTypes.getTypeReference(type));
+                        outputParaList.add(AbiTypes.getTypeReference(type, false));
                     }
                 }
                 Function functionForReturn = new Function(entryJson.getString("name"),

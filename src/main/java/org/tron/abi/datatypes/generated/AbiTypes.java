@@ -436,307 +436,307 @@ public final class AbiTypes {
         }
     }
 
-    public static TypeReference<?> getTypeReference(String type) {
+    public static TypeReference<?> getTypeReference(String type, boolean indexed) {
         switch (type.toLowerCase()) {
             case "address":
-                return new TypeReference<Address>() {
+                return new TypeReference<Address>(indexed) {
                 };
             case "bool":
-                return new TypeReference<Bool>() {
+                return new TypeReference<Bool>(indexed) {
                 };
             case "string":
-                return new TypeReference<Utf8String>() {
+                return new TypeReference<Utf8String>(indexed) {
                 };
             case "bytes":
-                return new TypeReference<DynamicBytes>() {
+                return new TypeReference<DynamicBytes>(indexed) {
                 };
             case "uint8":
-                return new TypeReference<Uint8>() {
+                return new TypeReference<Uint8>(indexed) {
                 };
             case "int8":
-                return new TypeReference<Int8>() {
+                return new TypeReference<Int8>(indexed) {
                 };
             case "uint16":
-                return new TypeReference<Uint16>() {
+                return new TypeReference<Uint16>(indexed) {
                 };
             case "int16":
-                return new TypeReference<Int16>() {
+                return new TypeReference<Int16>(indexed) {
                 };
             case "uint24":
-                return new TypeReference<Uint24>() {
+                return new TypeReference<Uint24>(indexed) {
                 };
             case "int24":
-                return new TypeReference<Int24>() {
+                return new TypeReference<Int24>(indexed) {
                 };
             case "uint32":
-                return new TypeReference<Uint32>() {
+                return new TypeReference<Uint32>(indexed) {
                 };
             case "int32":
-                return new TypeReference<Int32>() {
+                return new TypeReference<Int32>(indexed) {
                 };
             case "uint40":
-                return new TypeReference<Uint40>() {
+                return new TypeReference<Uint40>(indexed) {
                 };
             case "int40":
-                return new TypeReference<Int40>() {
+                return new TypeReference<Int40>(indexed) {
                 };
             case "uint48":
-                return new TypeReference<Uint48>() {
+                return new TypeReference<Uint48>(indexed) {
                 };
             case "int48":
-                return new TypeReference<Int48>() {
+                return new TypeReference<Int48>(indexed) {
                 };
             case "uint56":
-                return new TypeReference<Uint56>() {
+                return new TypeReference<Uint56>(indexed) {
                 };
             case "int56":
-                return new TypeReference<Int56>() {
+                return new TypeReference<Int56>(indexed) {
                 };
             case "uint64":
-                return new TypeReference<Uint64>() {
+                return new TypeReference<Uint64>(indexed) {
                 };
             case "int64":
-                return new TypeReference<Int64>() {
+                return new TypeReference<Int64>(indexed) {
                 };
             case "uint72":
-                return new TypeReference<Uint72>() {
+                return new TypeReference<Uint72>(indexed) {
                 };
             case "int72":
-                return new TypeReference<Int72>() {
+                return new TypeReference<Int72>(indexed) {
                 };
             case "uint80":
-                return new TypeReference<Uint80>() {
+                return new TypeReference<Uint80>(indexed) {
                 };
             case "int80":
-                return new TypeReference<Int80>() {
+                return new TypeReference<Int80>(indexed) {
                 };
             case "uint88":
-                return new TypeReference<Uint88>() {
+                return new TypeReference<Uint88>(indexed) {
                 };
             case "int88":
-                return new TypeReference<Int88>() {
+                return new TypeReference<Int88>(indexed) {
                 };
             case "uint96":
-                return new TypeReference<Uint96>() {
+                return new TypeReference<Uint96>(indexed) {
                 };
             case "int96":
-                return new TypeReference<Int96>() {
+                return new TypeReference<Int96>(indexed) {
                 };
             case "uint104":
-                return new TypeReference<Uint104>() {
+                return new TypeReference<Uint104>(indexed) {
                 };
             case "int104":
-                return new TypeReference<Int104>() {
+                return new TypeReference<Int104>(indexed) {
                 };
             case "uint112":
-                return new TypeReference<Uint112>() {
+                return new TypeReference<Uint112>(indexed) {
                 };
             case "int112":
-                return new TypeReference<Int112>() {
+                return new TypeReference<Int112>(indexed) {
                 };
             case "uint120":
-                return new TypeReference<Uint120>() {
+                return new TypeReference<Uint120>(indexed) {
                 };
             case "int120":
-                return new TypeReference<Int120>() {
+                return new TypeReference<Int120>(indexed) {
                 };
             case "uint128":
-                return new TypeReference<Uint128>() {
+                return new TypeReference<Uint128>(indexed) {
                 };
             case "int128":
-                return new TypeReference<Int128>() {
+                return new TypeReference<Int128>(indexed) {
                 };
             case "uint136":
-                return new TypeReference<Uint136>() {
+                return new TypeReference<Uint136>(indexed) {
                 };
             case "int136":
-                return new TypeReference<Int136>() {
+                return new TypeReference<Int136>(indexed) {
                 };
             case "uint144":
-                return new TypeReference<Uint144>() {
+                return new TypeReference<Uint144>(indexed) {
                 };
             case "int144":
-                return new TypeReference<Int144>() {
+                return new TypeReference<Int144>(indexed) {
                 };
             case "uint152":
-                return new TypeReference<Uint152>() {
+                return new TypeReference<Uint152>(indexed) {
                 };
             case "int152":
-                return new TypeReference<Int152>() {
+                return new TypeReference<Int152>(indexed) {
                 };
             case "uint160":
-                return new TypeReference<Uint160>() {
+                return new TypeReference<Uint160>(indexed) {
                 };
             case "int160":
-                return new TypeReference<Int160>() {
+                return new TypeReference<Int160>(indexed) {
                 };
             case "uint168":
-                return new TypeReference<Uint168>() {
+                return new TypeReference<Uint168>(indexed) {
                 };
             case "int168":
-                return new TypeReference<Int168>() {
+                return new TypeReference<Int168>(indexed) {
                 };
             case "uint176":
-                return new TypeReference<Uint176>() {
+                return new TypeReference<Uint176>(indexed) {
                 };
             case "int176":
-                return new TypeReference<Int176>() {
+                return new TypeReference<Int176>(indexed) {
                 };
             case "uint184":
-                return new TypeReference<Uint184>() {
+                return new TypeReference<Uint184>(indexed) {
                 };
             case "int184":
-                return new TypeReference<Int184>() {
+                return new TypeReference<Int184>(indexed) {
                 };
             case "uint192":
-                return new TypeReference<Uint192>() {
+                return new TypeReference<Uint192>(indexed) {
                 };
             case "int192":
-                return new TypeReference<Int192>() {
+                return new TypeReference<Int192>(indexed) {
                 };
             case "uint200":
-                return new TypeReference<Uint200>() {
+                return new TypeReference<Uint200>(indexed) {
                 };
             case "int200":
-                return new TypeReference<Int200>() {
+                return new TypeReference<Int200>(indexed) {
                 };
             case "uint208":
-                return new TypeReference<Uint208>() {
+                return new TypeReference<Uint208>(indexed) {
                 };
             case "int208":
-                return new TypeReference<Int208>() {
+                return new TypeReference<Int208>(indexed) {
                 };
             case "uint216":
-                return new TypeReference<Uint216>() {
+                return new TypeReference<Uint216>(indexed) {
                 };
             case "int216":
-                return new TypeReference<Int216>() {
+                return new TypeReference<Int216>(indexed) {
                 };
             case "uint224":
-                return new TypeReference<Uint224>() {
+                return new TypeReference<Uint224>(indexed) {
                 };
             case "int224":
-                return new TypeReference<Int224>() {
+                return new TypeReference<Int224>(indexed) {
                 };
             case "uint232":
-                return new TypeReference<Uint232>() {
+                return new TypeReference<Uint232>(indexed) {
                 };
             case "int232":
-                return new TypeReference<Int232>() {
+                return new TypeReference<Int232>(indexed) {
                 };
             case "uint240":
-                return new TypeReference<Uint240>() {
+                return new TypeReference<Uint240>(indexed) {
                 };
             case "int240":
-                return new TypeReference<Int240>() {
+                return new TypeReference<Int240>(indexed) {
                 };
             case "uint248":
-                return new TypeReference<Uint248>() {
+                return new TypeReference<Uint248>(indexed) {
                 };
             case "int248":
-                return new TypeReference<Int248>() {
+                return new TypeReference<Int248>(indexed) {
                 };
             case "uint256":
-                return new TypeReference<Uint256>() {
+                return new TypeReference<Uint256>(indexed) {
                 };
             case "int256":
-                return new TypeReference<Int256>() {
+                return new TypeReference<Int256>(indexed) {
                 };
             case "bytes1":
-                return new TypeReference<Bytes1>() {
+                return new TypeReference<Bytes1>(indexed) {
                 };
             case "bytes2":
-                return new TypeReference<Bytes2>() {
+                return new TypeReference<Bytes2>(indexed) {
                 };
             case "bytes3":
-                return new TypeReference<Bytes3>() {
+                return new TypeReference<Bytes3>(indexed) {
                 };
             case "bytes4":
-                return new TypeReference<Bytes4>() {
+                return new TypeReference<Bytes4>(indexed) {
                 };
             case "bytes5":
-                return new TypeReference<Bytes5>() {
+                return new TypeReference<Bytes5>(indexed) {
                 };
             case "bytes6":
-                return new TypeReference<Bytes6>() {
+                return new TypeReference<Bytes6>(indexed) {
                 };
             case "bytes7":
-                return new TypeReference<Bytes7>() {
+                return new TypeReference<Bytes7>(indexed) {
                 };
             case "bytes8":
-                return new TypeReference<Bytes8>() {
+                return new TypeReference<Bytes8>(indexed) {
                 };
             case "bytes9":
-                return new TypeReference<Bytes9>() {
+                return new TypeReference<Bytes9>(indexed) {
                 };
             case "bytes10":
-                return new TypeReference<Bytes10>() {
+                return new TypeReference<Bytes10>(indexed) {
                 };
             case "bytes11":
-                return new TypeReference<Bytes11>() {
+                return new TypeReference<Bytes11>(indexed) {
                 };
             case "bytes12":
-                return new TypeReference<Bytes12>() {
+                return new TypeReference<Bytes12>(indexed) {
                 };
             case "bytes13":
-                return new TypeReference<Bytes13>() {
+                return new TypeReference<Bytes13>(indexed) {
                 };
             case "bytes14":
-                return new TypeReference<Bytes14>() {
+                return new TypeReference<Bytes14>(indexed) {
                 };
             case "bytes15":
-                return new TypeReference<Bytes15>() {
+                return new TypeReference<Bytes15>(indexed) {
                 };
             case "bytes16":
-                return new TypeReference<Bytes16>() {
+                return new TypeReference<Bytes16>(indexed) {
                 };
             case "bytes17":
-                return new TypeReference<Bytes17>() {
+                return new TypeReference<Bytes17>(indexed) {
                 };
             case "bytes18":
-                return new TypeReference<Bytes18>() {
+                return new TypeReference<Bytes18>(indexed) {
                 };
             case "bytes19":
-                return new TypeReference<Bytes19>() {
+                return new TypeReference<Bytes19>(indexed) {
                 };
             case "bytes20":
-                return new TypeReference<Bytes20>() {
+                return new TypeReference<Bytes20>(indexed) {
                 };
             case "bytes21":
-                return new TypeReference<Bytes21>() {
+                return new TypeReference<Bytes21>(indexed) {
                 };
             case "bytes22":
-                return new TypeReference<Bytes22>() {
+                return new TypeReference<Bytes22>(indexed) {
                 };
             case "bytes23":
-                return new TypeReference<Bytes23>() {
+                return new TypeReference<Bytes23>(indexed) {
                 };
             case "bytes24":
-                return new TypeReference<Bytes24>() {
+                return new TypeReference<Bytes24>(indexed) {
                 };
             case "bytes25":
-                return new TypeReference<Bytes25>() {
+                return new TypeReference<Bytes25>(indexed) {
                 };
             case "bytes26":
-                return new TypeReference<Bytes26>() {
+                return new TypeReference<Bytes26>(indexed) {
                 };
             case "bytes27":
-                return new TypeReference<Bytes27>() {
+                return new TypeReference<Bytes27>(indexed) {
                 };
             case "bytes28":
-                return new TypeReference<Bytes28>() {
+                return new TypeReference<Bytes28>(indexed) {
                 };
             case "bytes29":
-                return new TypeReference<Bytes29>() {
+                return new TypeReference<Bytes29>(indexed) {
                 };
             case "bytes30":
-                return new TypeReference<Bytes30>() {
+                return new TypeReference<Bytes30>(indexed) {
                 };
             case "bytes31":
-                return new TypeReference<Bytes31>() {
+                return new TypeReference<Bytes31>(indexed) {
                 };
             case "bytes32":
-                return new TypeReference<Bytes32>() {
+                return new TypeReference<Bytes32>(indexed) {
                 };
             default:
                 throw new UnsupportedOperationException("Unsupported type encountered: "

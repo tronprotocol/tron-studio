@@ -3,6 +3,7 @@ package org.tron.core.db;
 import static org.tron.core.config.Parameter.ChainConstant.SOLIDIFIED_THRESHOLD;
 import static org.tron.core.config.Parameter.NodeConstant.MAX_TRANSACTION_PENDING;
 
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
@@ -31,10 +32,17 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.tron.abi.EventEncoder;
+import org.tron.abi.FunctionReturnDecoder;
+import org.tron.abi.TypeReference;
+import org.tron.abi.datatypes.Event;
+import org.tron.abi.datatypes.Type;
+import org.tron.abi.datatypes.generated.AbiTypes;
 import org.tron.common.overlay.discover.node.Node;
 import org.tron.common.runtime.Runtime;
 import org.tron.common.runtime.vm.program.invoke.ProgramInvokeFactoryImpl;
@@ -45,6 +53,7 @@ import org.tron.common.utils.SessionOptional;
 import org.tron.common.utils.Sha256Hash;
 import org.tron.common.utils.StringUtil;
 import org.tron.core.Constant;
+import org.tron.core.Wallet;
 import org.tron.core.capsule.AccountCapsule;
 import org.tron.core.capsule.BlockCapsule;
 import org.tron.core.capsule.BlockCapsule.BlockId;
@@ -83,12 +92,18 @@ import org.tron.core.exception.ValidateScheduleException;
 import org.tron.core.exception.ValidateSignatureException;
 import org.tron.core.witness.ProposalController;
 import org.tron.core.witness.WitnessController;
+import org.tron.protos.Protocol;
 import org.tron.protos.Protocol.AccountType;
+import org.tron.protos.Protocol.Block;
 
 
 @Slf4j
 @Component
 public class Manager {
+
+  private Cache<byte[], Protocol.SmartContract.ABI> abiCache = CacheBuilder.newBuilder()
+      .maximumSize(100_000).expireAfterWrite(1, TimeUnit.HOURS).initialCapacity(100_000)
+      .recordStats().build();
 
   // db store
   @Autowired
@@ -990,10 +1005,70 @@ public class Manager {
 
     transactionHistoryStore.put(trxCap.getTransactionId().getBytes(), transactionInfo);
 
+//    if (Objects.nonNull(blockCap)) {
+//      sendEventLog(runtime.getResult().getContractAddress(),
+//          transactionInfo.getInstance().getLogList(), blockCap.getInstance(), transactionInfo);
+//    }
     return true;
   }
 
+  private void sendEventLog(byte[] contractAddress, List<org.tron.protos.Protocol.TransactionInfo.Log> logList, Block block, TransactionInfoCapsule transactionInfoCapsule) {
+    if (block == null || block.getBlockHeader().getWitnessSignature().isEmpty()) {
+      return;
+    }
+    try {
+      Protocol.SmartContract.ABI abi = abiCache.getIfPresent(contractAddress);
+      if (abi == null) {
+        abi = getContractStore().getABI(contractAddress);
+        if (abi == null) {
+          return;
+        }
+        abiCache.put(contractAddress, abi);
+      }
+      Protocol.SmartContract.ABI finalAbi = abi;
+      logList.forEach(log -> {
+        finalAbi.getEntrysList().forEach(abiEntry -> {
+          if (abiEntry.getType() != Protocol.SmartContract.ABI.Entry.EntryType.Event) {
+            return;
+          }
+          //parse abi
+          String entryName = abiEntry.getName();
+          List<TypeReference<?>> typeList = new ArrayList<>();
+          List<String> nameList = new ArrayList<>();
+          abiEntry.getInputsList().forEach(input -> {
+            nameList.add(input.getName());
+            TypeReference<?> tr = AbiTypes.getTypeReference(input.getType(), input.getIndexed());
+            typeList.add(tr);
+          });
+          Event event = new Event(entryName, typeList);
+          String encodeEventHexString = EventEncoder.encode(event);
+          JSONArray resultJsonArray = new JSONArray();
+          log.getTopicsList().forEach(topic -> {
+            String topicHexString = Hex.toHexString(topic.toByteArray());
 
+            if (StringUtils.equalsIgnoreCase(encodeEventHexString, topicHexString)) {
+              //Event Log
+              List<Type> results = FunctionReturnDecoder.decode(
+                  ByteArray.toHexString(log.getData().toByteArray()), event.getNonIndexedParameters());
+              for (Type result : results) {
+                resultJsonArray.add(result.getValue());
+              }
+            } else {
+
+            }
+          });
+
+          long blockNumber = block.getBlockHeader().getRawData().getNumber();
+          long blockTimestamp = block.getBlockHeader().getRawData().getTimestamp();
+          logger.info("",blockNumber, blockTimestamp,
+              Wallet.encode58Check(contractAddress), entryName, resultJsonArray,
+              Hex.toHexString(transactionInfoCapsule.getId()));
+        });
+      });
+    } catch (Exception e) {
+      logger.error("SendEventToMQ Failed {}", e);
+    }
+  }
   /**
    * Get the block id from the number.
    */
