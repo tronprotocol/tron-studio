@@ -47,6 +47,6 @@ public class FileNameFieldValidator extends ValidatorBase {
 
     @Override
     public String getMessage() {
-        return "Invalid contract file name, eg: Example.sol";
+        return "Invalid contract file name.File name length should be less than 16.  eg: Example.sol";
     }
 }
