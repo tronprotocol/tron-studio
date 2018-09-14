@@ -608,7 +608,7 @@ public class Runtime {
       }
     }
 
-    if (config.vmTrace() && program != null) {
+    if (config.vmTrace() && program != null && blockCap != null && !blockCap.getInstance().getBlockHeader().getWitnessSignature().isEmpty()) {
       String traceContent = program.getTrace()
           .result(result.getHReturn())
           .error(result.getException())

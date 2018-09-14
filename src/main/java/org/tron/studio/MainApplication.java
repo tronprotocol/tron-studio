@@ -57,7 +57,7 @@ public class MainApplication extends Application {
     Args.setParam(args, Constant.TESTNET_CONF);
     cfgArgs = Args.getInstance();
     cfgArgs.setWitness(true);
-    cfgArgs.setDebug(true);
+    cfgArgs.setDebug(false);
     launch(args);
   }
 

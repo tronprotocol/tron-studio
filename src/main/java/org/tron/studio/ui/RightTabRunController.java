@@ -380,7 +380,7 @@ public class RightTabRunController implements Initializable {
         new Thread(() -> {
             try {
                 if (item.getType() == TransactionHistoryItem.Type.Transaction) {
-                    Thread.sleep(2000);
+                    Thread.sleep(3000);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
