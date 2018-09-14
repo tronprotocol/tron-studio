@@ -105,6 +105,9 @@ public class RightTabCompileController implements Initializable {
                         contractBin.add(contractResult.bin);
                         contractABI.add(contractResult.abi);
                         JSONObject metaData = JSON.parseObject(contractResult.metadata);
+                        if(metaData == null) {
+                            return;
+                        }
                         JSONObject compilationTarget = metaData.getJSONObject("settings").getJSONObject("compilationTarget");
                         compilationTarget.forEach((sol, value) -> {
                             contractNameList.add((String) value);

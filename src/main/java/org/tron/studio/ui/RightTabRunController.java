@@ -141,6 +141,9 @@ public class RightTabRunController implements Initializable {
             }
             compilationResult.getContracts().forEach(contractResult -> {
                 JSONObject metaData = JSON.parseObject(contractResult.metadata);
+                if(metaData == null) {
+                    return;
+                }
                 JSONObject compilationTarget = metaData.getJSONObject("settings")
                         .getJSONObject("compilationTarget");
                 compilationTarget.forEach((sol, value) -> {
