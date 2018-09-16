@@ -321,7 +321,11 @@ public class RightTabRunController implements Initializable {
             JSONObject entryJson = JSONObject.parseObject(entry);
             if (StringUtils.equalsIgnoreCase("function", entryJson.getString("type"))) {
                 JFXButton functionButton = new JFXButton(entryJson.getString("name"));
-                functionButton.getStyleClass().add("custom-jfx-button-raised-fix-width");
+                if(entryJson.getBoolean("constant")) {
+                    functionButton.getStyleClass().add("custom-jfx-button-raised-fix-width2");
+                } else {
+                    functionButton.getStyleClass().add("custom-jfx-button-raised-fix-width");
+                }
 
                 JFXTextField parameterText = new JFXTextField();
                 gridPane.add(functionButton, 0, index);

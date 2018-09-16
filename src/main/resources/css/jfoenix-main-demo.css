@@ -340,6 +340,15 @@
     -fx-wrap-text: true;
     -fx-text-alignment: center;
 }
+.custom-jfx-button-raised-fix-width2 {
+    -jfx-button-type: FLAT;
+    -fx-background-color: #ddffdd;
+    -fx-text-fill: BLACK;
+    -fx-min-width: 100;
+    -fx-max-width: 100;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+}
 /*******************************************************************************
  *                                                                             *
  * Tab Pane			                                                           *
