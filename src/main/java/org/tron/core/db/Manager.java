@@ -1482,7 +1482,7 @@ public class Manager {
   }
 
   public void closeAllStore() {
-    logger.info("******** begin to close db ********");
+    logger.debug("******** begin to close db ********");
     closeOneStore(accountStore);
     closeOneStore(blockStore);
     closeOneStore(blockIndexStore);
@@ -1502,17 +1502,17 @@ public class Manager {
     closeOneStore(recentBlockStore);
     closeOneStore(transactionHistoryStore);
     closeOneStore(votesStore);
-    logger.info("******** end to close db ********");
+    logger.debug("******** end to close db ********");
   }
 
   private void closeOneStore(ITronChainBase database) {
-    logger.info("******** begin to close " + database.getName() + " ********");
+    logger.debug("******** begin to close " + database.getName() + " ********");
     try {
       database.close();
     } catch (Exception e) {
-      logger.info("failed to close  " + database.getName() + ". " + e);
+      logger.error("failed to close  " + database.getName() + ". " + e);
     } finally {
-      logger.info("******** end to close " + database.getName() + " ********");
+      logger.debug("******** end to close " + database.getName() + " ********");
     }
   }
 

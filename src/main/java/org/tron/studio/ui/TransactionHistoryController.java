@@ -3,6 +3,7 @@ package org.tron.studio.ui;
 import com.alibaba.fastjson.JSONObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXRippler;
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
@@ -11,6 +12,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableColumn;
@@ -134,8 +136,27 @@ public class TransactionHistoryController {
 
         for (int i = 0; i < detailTableData.size(); i++) {
             TransactionDetail detail = detailTableData.get(i);
+
+            MaterialDesignIconView copyIcon = new MaterialDesignIconView();
+            copyIcon.setGlyphName("CONTENT_COPY");
+            copyIcon.setStyleClass("icon");
+            JFXRippler jfxRippler = new JFXRippler();
+            jfxRippler.getStyleClass().add("icons-rippler1");
+            jfxRippler.setPosition(JFXRippler.RipplerPos.BACK);
+            jfxRippler.getChildren().add(copyIcon);
+            jfxRippler.setOnMouseClicked(event -> {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent clipboardContent = new ClipboardContent();
+                clipboardContent.putString(detail.valueProperty.get());
+                clipboard.setContent(clipboardContent);
+            });
+
+            HBox hBox = new HBox();
+            hBox.setSpacing(5);
+            hBox.getChildren().add(new Label(detail.valueProperty.get()));
+            hBox.getChildren().add(jfxRippler);
             gridPane.add(new Label(detail.keyProperty.get()), 0, i);
-            gridPane.add(new Label(detail.valueProperty.get()), 1, i);
+            gridPane.add(hBox, 1, i);
         }
         gridPane.setUserData(detailTableData);
         return gridPane;
