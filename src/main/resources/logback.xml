@@ -52,6 +52,7 @@
   <logger name="Manager" level="INFO" />
   <logger name="CodeAreaController" level="INFO" />
   <logger name="BottomController" level="INFO" />
+  <logger name="AbiUtil" level="INFO" />
 
 </configuration>
 

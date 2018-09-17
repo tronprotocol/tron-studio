@@ -1,17 +1,20 @@
 package org.tron.studio.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.common.crypto.Hash;
 import org.tron.common.runtime.vm.DataWord;
 import org.tron.studio.walletserver.WalletClient;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j(topic = "AbiUtil")
 public class AbiUtil {
 
     static Pattern paramTypeBytes = Pattern.compile("^bytes([0-9]*)$");
@@ -150,10 +153,6 @@ public class AbiUtil {
         return data;
     }
 
-    public static String parseMethod(String methodSign, String params) {
-        return parseMethod(methodSign, params, false);
-    }
-
     public static String parseMethod(String methodSign, String params, boolean isHex) {
         byte[] selector = new byte[4];
         System.arraycopy(Hash.sha3(methodSign.getBytes()), 0, selector, 0, 4);
@@ -170,7 +169,8 @@ public class AbiUtil {
         try {
             strings = mapper.readValue(params, List.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Unable to read params, each param should be quoted and separated by comma. {}", e.getMessage());
+            throw new InvalidParameterException("Unable to read params, string and address should be quoted and separated by comma." + e.getMessage());
         }
 
         List<Coder> coders = new ArrayList<>();
@@ -185,37 +185,6 @@ public class AbiUtil {
     }
 
 //  static class
-
-    public static void main(String[] args) {
-//    String method = "test(address,string,int)";
-        String method = "test(string,int2,string)";
-        String params = "asdf,3123,adf";
-
-        String arrayMethod1 = "test(uint,uint256[3])";
-        String arrayMethod2 = "test(uint,uint256[])";
-        String arrayMethod3 = "test(uint,address[])";
-        String byteMethod1 = "test(bytes32,bytes11)";
-
-        String method1 = "test(uint256,string,string,uint256[])";
-        String expected1 = "db103cf30000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000014200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000143000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003";
-        String method2 = "test(uint256,string,string,uint256[3])";
-        String expected2 = "000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003";
-        String listString = "1 ,\"B\",\"C\", [1, 2, 3]";
-        System.out.println(parseMethod(method1, listString));
-        System.out.println(parseMethod(method2, listString));
-
-        String bytesValue1 = "\"0112313\",112313";
-        String bytesValue2 = "123123123";
-
-        System.out.println(parseMethod(byteMethod1, bytesValue1));
-//    System.out.println(parseMethod(byteMethod1, bytesValue2));
-
-//    String method3 = "voteForSingleWitness(address,uint256)";
-//    String method3 = "voteForSingleWitness(address)";
-//    String params3 = "\"TNNqZuYhMfQvooC4kJwTsMJEQVU3vWGa5u\"";
-//
-//    System.out.println(parseMethod(method3, params3));
-    }
 
     public static byte[] concat(byte[]... bytesArray) {
         int length = 0;

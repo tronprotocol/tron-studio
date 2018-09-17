@@ -12,7 +12,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableColumn;
@@ -23,6 +22,7 @@ import javafx.scene.layout.*;
 import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.abi.FunctionReturnDecoder;
+import org.tron.abi.datatypes.Address;
 import org.tron.abi.datatypes.Function;
 import org.tron.api.GrpcAPI;
 import org.tron.common.utils.ByteArray;
@@ -34,6 +34,7 @@ import org.tron.studio.TransactionHistoryItem;
 import org.tron.studio.TransactionHistoryItem.Type;
 
 import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.util.List;
 
 public class TransactionHistoryController {
@@ -74,7 +75,14 @@ public class TransactionHistoryController {
             if (function != null) {
                 output = FunctionReturnDecoder.decode(rawBuilder.toString(), function.getOutputParameters());
                 for (int i = 0; i < output.size(); i++) {
-                    outputBuilder.append(output.get(i).getValue());
+                    if ( output.get(i) instanceof Address) {
+                        String hexTronAddress = ((Address) output.get(i)).toUint160().getValue()
+                                .or(new BigInteger("410000000000000000000000000000000000000000", 16))
+                                .toString(16);
+                        outputBuilder.append(Wallet.encode58Check(Hex.decode(hexTronAddress)));
+                    } else {
+                        outputBuilder.append(output.get(i).getValue());
+                    }
                     if (i != output.size() - 1) {
                         outputBuilder.append(",");
                     }
@@ -100,7 +108,14 @@ public class TransactionHistoryController {
             if (function != null) {
                 output = FunctionReturnDecoder.decode(rawBuilder.toString(), function.getOutputParameters());
                 for (int i = 0; i < output.size(); i++) {
-                    outputBuilder.append(output.get(i).getValue());
+                    if ( output.get(i) instanceof Address) {
+                        String hexTronAddress = ((Address) output.get(i)).toUint160().getValue()
+                                .or(new BigInteger("410000000000000000000000000000000000000000", 16))
+                                .toString(16);
+                        outputBuilder.append(Wallet.encode58Check(Hex.decode(hexTronAddress)));
+                    } else {
+                        outputBuilder.append(output.get(i).getValue());
+                    }
                     if (i != output.size() - 1) {
                         outputBuilder.append(",");
                     }

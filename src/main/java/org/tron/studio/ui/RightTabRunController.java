@@ -21,6 +21,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.apache.commons.lang3.StringUtils;
+import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
@@ -488,10 +489,9 @@ public class RightTabRunController implements Initializable {
                 byte[] data = Hex.decode(AbiUtil.parseMethod(methodStr, parameterText.getText().trim(), false));
                 ShareData.wallet.triggerContract(contractAddress, callValue, data, feeLimit);
                 processTriggerContractResult();
-            } catch (IOException | CipherException | CancelException e) {
-                e.printStackTrace();
             } catch (Exception e) {
-                System.out.println(e);
+                Notifications note = Notifications.create().title("Trigger Contract Failed").text(e.getMessage());
+                note.show();
             }
         }
 
