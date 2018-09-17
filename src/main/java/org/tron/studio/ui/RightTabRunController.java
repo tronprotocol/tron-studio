@@ -33,9 +33,7 @@ import org.tron.abi.datatypes.generated.AbiTypes;
 import org.tron.api.GrpcAPI.TransactionExtention;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.TransactionCapsule;
-import org.tron.core.exception.CancelException;
 import org.tron.core.services.http.Util;
-import org.tron.keystore.CipherException;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.studio.ShareData;
 import org.tron.studio.TransactionHistoryItem;
@@ -97,7 +95,7 @@ public class RightTabRunController implements Initializable {
         });
         ShareData.newAccount.set(ShareData.testAccount.keySet().stream().findFirst().get());
         accountComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(StringUtils.isNotEmpty(newValue)) {
+            if (StringUtils.isNotEmpty(newValue)) {
                 ShareData.wallet = new WalletClient(Hex.decode(ShareData.testAccount.get(newValue)));
             }
         });
@@ -142,7 +140,7 @@ public class RightTabRunController implements Initializable {
             }
             compilationResult.getContracts().forEach(contractResult -> {
                 JSONObject metaData = JSON.parseObject(contractResult.metadata);
-                if(metaData == null) {
+                if (metaData == null) {
                     return;
                 }
                 JSONObject compilationTarget = metaData.getJSONObject("settings")
@@ -230,10 +228,20 @@ public class RightTabRunController implements Initializable {
         }
         {
             long callValue = Long.parseLong(valueTextField.getText());
+            if (callValue < 0) {
+                Notifications note = Notifications.create().title("Trigger Contract Failed").text("Call value should be equal or greater than 0");
+                note.show();
+                return;
+            }
             if (valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
                 callValue *= ShareData.TRX_SUN_UNIT;
             }
             long feeLimit = Long.parseLong(feeLimitTextField.getText());
+            if (feeLimit < 0 || feeLimit > 1000) {
+                Notifications note = Notifications.create().title("Trigger Contract Failed").text("Fee limit should between 0 and 1000");
+                note.show();
+                return;
+            }
             if (feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
                 feeLimit *= ShareData.TRX_SUN_UNIT;
             }
@@ -322,7 +330,7 @@ public class RightTabRunController implements Initializable {
             JSONObject entryJson = JSONObject.parseObject(entry);
             if (StringUtils.equalsIgnoreCase("function", entryJson.getString("type"))) {
                 JFXButton functionButton = new JFXButton(entryJson.getString("name"));
-                if(entryJson.getBoolean("constant")) {
+                if (entryJson.getBoolean("constant")) {
                     functionButton.getStyleClass().add("custom-jfx-button-raised-fix-width2");
                 } else {
                     functionButton.getStyleClass().add("custom-jfx-button-raised-fix-width");

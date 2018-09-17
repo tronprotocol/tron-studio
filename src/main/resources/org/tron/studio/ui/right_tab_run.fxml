@@ -25,7 +25,7 @@
         <Label text="Environment"     GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <Label text="Account"         GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <Label text="Fee Limit"       GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <Label text="Value"           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Label text="Call Value"      GridPane.rowIndex="3" GridPane.columnIndex="0"/>
         <Label text="User Pay Ratio"  GridPane.rowIndex="4" GridPane.columnIndex="0"/>
 
         <JFXComboBox  fx:id="environmentComboBox" HBox.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
