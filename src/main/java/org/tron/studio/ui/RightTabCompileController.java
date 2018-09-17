@@ -179,7 +179,7 @@ public class RightTabCompileController implements Initializable {
 
         StringBuilder builder = new StringBuilder();
         contractHashes.forEach((name, hashCode) -> {
-            builder.append(name).append(":").append(hashCode).append("\n");
+            builder.append(hashCode).append(": ").append(name).append("\n");
         });
 
 
