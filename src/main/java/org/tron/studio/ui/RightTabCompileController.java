@@ -14,6 +14,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.*;
+import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.MainApplication;
@@ -95,6 +97,8 @@ public class RightTabCompileController implements Initializable {
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
                     });
+                    Notifications note = Notifications.create().title("Compile Result").text("Fail");
+                    note.show();
                     return;
                 } else {
                     CompilationResult compilationResult = CompilationResult.parse(solidityCompilerResult.output);
@@ -140,6 +144,9 @@ public class RightTabCompileController implements Initializable {
                             compileResultInfoListView.getItems().add(text);
                             text.maxWidthProperty().bind(compileResultInfoListView.widthProperty().subtract(40));
                         });
+
+                        Notifications note = Notifications.create().title("Compile Result").text("Success");
+                        note.show();
                     });
                 }
 
