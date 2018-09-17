@@ -3,6 +3,7 @@ package org.tron.studio.ui;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jfoenix.controls.*;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -10,8 +11,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tron.studio.MainApplication;
@@ -176,9 +178,60 @@ public class RightTabCompileController implements Initializable {
         bytecodeTextArea.setWrapText(true);
         abiTextArea.setText(contractABI.get(currentContractIndex));
         bytecodeTextArea.setText(contractBin.get(currentContractIndex));
-        bodyVBox.getChildren().add(new Label("ABI:"));
+
+        HBox abiHeaderHbox = new HBox();
+        {
+            Region abiHeaderRegin = new Region();
+            HBox.setHgrow(abiHeaderRegin, Priority.ALWAYS);
+            MaterialDesignIconView copyIcon = new MaterialDesignIconView();
+            copyIcon.setGlyphName("CONTENT_COPY");
+            copyIcon.setStyleClass("icon");
+            StackPane abiStackPane = new StackPane();
+            abiStackPane.setStyle("-fx-padding: 10;");
+            abiStackPane.getChildren().add(copyIcon);
+            JFXRippler jfxRippler = new JFXRippler();
+            jfxRippler.getStyleClass().add("icons-rippler1");
+            jfxRippler.setPosition(JFXRippler.RipplerPos.BACK);
+            jfxRippler.getChildren().add(abiStackPane);
+            jfxRippler.setOnMouseClicked(event -> {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent clipboardContent = new ClipboardContent();
+                clipboardContent.putString(contractABI.get(currentContractIndex));
+                clipboard.setContent(clipboardContent);
+            });
+            abiHeaderHbox.getChildren().add(new Label("ABI:"));
+            abiHeaderHbox.getChildren().add(abiHeaderRegin);
+            abiHeaderHbox.getChildren().add(jfxRippler);
+        }
+
+        HBox byteCodeHeaderHbox = new HBox();
+        {
+            Region byteCodeHeaderRegin = new Region();
+            HBox.setHgrow(byteCodeHeaderRegin, Priority.ALWAYS);
+            MaterialDesignIconView byteCodeIcon = new MaterialDesignIconView();
+            byteCodeIcon.setGlyphName("CONTENT_COPY");
+            byteCodeIcon.setStyleClass("icon");
+            StackPane byteCodeStackPane = new StackPane();
+            byteCodeStackPane.setStyle("-fx-padding: 10;");
+            byteCodeStackPane.getChildren().add(byteCodeIcon);
+            JFXRippler byteCodeRippler = new JFXRippler();
+            byteCodeRippler.getStyleClass().add("icons-rippler1");
+            byteCodeRippler.setPosition(JFXRippler.RipplerPos.BACK);
+            byteCodeRippler.getChildren().add(byteCodeStackPane);
+            byteCodeRippler.setOnMouseClicked(event -> {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent clipboardContent = new ClipboardContent();
+                clipboardContent.putString(contractABI.get(currentContractIndex));
+                clipboard.setContent(clipboardContent);
+            });
+            byteCodeHeaderHbox.getChildren().add(new Label("ByteCode:"));
+            byteCodeHeaderHbox.getChildren().add(byteCodeHeaderRegin);
+            byteCodeHeaderHbox.getChildren().add(byteCodeRippler);
+        }
+
+        bodyVBox.getChildren().add(abiHeaderHbox);
         bodyVBox.getChildren().add(abiTextArea);
-        bodyVBox.getChildren().add(new Label("ByteCode:"));
+        bodyVBox.getChildren().add(byteCodeHeaderHbox);
         bodyVBox.getChildren().add(bytecodeTextArea);
 
         layout.setBody(bodyVBox);
