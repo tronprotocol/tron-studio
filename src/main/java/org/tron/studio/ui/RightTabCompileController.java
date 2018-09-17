@@ -25,9 +25,7 @@ import org.tron.studio.solc.SolidityCompiler;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static org.tron.studio.solc.SolidityCompiler.Options.*;
 
@@ -43,6 +41,7 @@ public class RightTabCompileController implements Initializable {
     private List<String> contractABI = new ArrayList<>();
     private List<String> contractNameList = new ArrayList<>();
     private List<String> contractBin = new ArrayList<>();
+    private Map<String, String> contractHashes = new HashMap<>();
 
     private int currentContractIndex = -1;
     private boolean isCompiling;
@@ -103,9 +102,11 @@ public class RightTabCompileController implements Initializable {
                     contractNameList.clear();
                     contractBin.clear();
                     contractABI.clear();
+                    contractHashes.clear();
                     compilationResult.getContracts().forEach(contractResult -> {
                         contractBin.add(contractResult.bin);
                         contractABI.add(contractResult.abi);
+                        contractHashes = contractResult.hashes;
                         JSONObject metaData = JSON.parseObject(contractResult.metadata);
                         if(metaData == null) {
                             return;
@@ -168,16 +169,27 @@ public class RightTabCompileController implements Initializable {
         layout.setPrefWidth(800);
         layout.setHeading(new Label("Detail"));
 
+
+        StringBuilder builder = new StringBuilder();
+        contractHashes.forEach((name, hashCode) -> {
+            builder.append(name).append(":").append(hashCode).append("\n");
+        });
+
+
         VBox bodyVBox = new VBox();
         bodyVBox.setSpacing(5);
         TextArea abiTextArea = new TextArea();
         TextArea bytecodeTextArea = new TextArea();
+        TextArea hashesTextArea = new TextArea();
         abiTextArea.setEditable(false);
         abiTextArea.setWrapText(true);
         bytecodeTextArea.setEditable(false);
         bytecodeTextArea.setWrapText(true);
+        hashesTextArea.setEditable(false);
+        hashesTextArea.setWrapText(true);
         abiTextArea.setText(contractABI.get(currentContractIndex));
         bytecodeTextArea.setText(contractBin.get(currentContractIndex));
+        hashesTextArea.setText(builder.toString());
 
         HBox abiHeaderHbox = new HBox();
         {
@@ -221,7 +233,7 @@ public class RightTabCompileController implements Initializable {
             byteCodeRippler.setOnMouseClicked(event -> {
                 Clipboard clipboard = Clipboard.getSystemClipboard();
                 ClipboardContent clipboardContent = new ClipboardContent();
-                clipboardContent.putString(contractABI.get(currentContractIndex));
+                clipboardContent.putString(contractBin.get(currentContractIndex));
                 clipboard.setContent(clipboardContent);
             });
             byteCodeHeaderHbox.getChildren().add(new Label("ByteCode:"));
@@ -229,10 +241,37 @@ public class RightTabCompileController implements Initializable {
             byteCodeHeaderHbox.getChildren().add(byteCodeRippler);
         }
 
+        HBox hashesHeaderHbox = new HBox();
+        {
+            Region hashesHeaderRegin = new Region();
+            HBox.setHgrow(hashesHeaderRegin, Priority.ALWAYS);
+            MaterialDesignIconView hashesIcon = new MaterialDesignIconView();
+            hashesIcon.setGlyphName("CONTENT_COPY");
+            hashesIcon.setStyleClass("icon");
+            StackPane hashesStackPane = new StackPane();
+            hashesStackPane.setStyle("-fx-padding: 10;");
+            hashesStackPane.getChildren().add(hashesIcon);
+            JFXRippler hashesRippler = new JFXRippler();
+            hashesRippler.getStyleClass().add("icons-rippler1");
+            hashesRippler.setPosition(JFXRippler.RipplerPos.BACK);
+            hashesRippler.getChildren().add(hashesStackPane);
+            hashesRippler.setOnMouseClicked(event -> {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent clipboardContent = new ClipboardContent();
+                clipboardContent.putString(builder.toString());
+                clipboard.setContent(clipboardContent);
+            });
+            hashesHeaderHbox.getChildren().add(new Label("Hashes:"));
+            hashesHeaderHbox.getChildren().add(hashesHeaderRegin);
+            hashesHeaderHbox.getChildren().add(hashesRippler);
+        }
+
         bodyVBox.getChildren().add(abiHeaderHbox);
         bodyVBox.getChildren().add(abiTextArea);
         bodyVBox.getChildren().add(byteCodeHeaderHbox);
         bodyVBox.getChildren().add(bytecodeTextArea);
+        bodyVBox.getChildren().add(hashesHeaderHbox);
+        bodyVBox.getChildren().add(hashesTextArea);
 
         layout.setBody(bodyVBox);
         dialog.setContent(layout);
