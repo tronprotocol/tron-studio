@@ -3,7 +3,7 @@ package org.tron.studio.utils;
 import com.jfoenix.validation.base.ValidatorBase;
 import javafx.beans.DefaultProperty;
 import javafx.scene.control.TextInputControl;
-
+import org.tron.studio.CONSTANTS;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,18 +32,36 @@ public class IPFieldValidator extends ValidatorBase {
         }
     }
 
-    private boolean isIP(String addr) {
-        if (addr.length() < 7 || addr.length() > 15 || "".equals(addr)) {
-            return false;
+    /*
+    @param: String addr: url of target testnet
+    @return: url with headers.
+        EX: input: 127.0.0.1
+            output: http://127.0.0.1
+            input: https://abc.def.ghi
+            return: https://abc.def.hgi
+     */
+    private String url_validation(String addr){
+        for (String header : CONSTANTS.URL_HEAD){
+            if (addr.matches("(?i)" + header + ".*"))
+                return addr;
         }
-        String rexp = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$";
-        Pattern pat = Pattern.compile(rexp);
-        Matcher mat = pat.matcher(addr);
-        return mat.find();
+        return "http://" + addr;
+    }
+
+    /*
+    @param: String addr: an url of target testnet
+    @return: boolean indicate if address provide is valid or not
+             A valid address url contains only ascii characters
+     */
+    private boolean isIP(String addr) {
+
+        addr = this.url_validation(addr.toLowerCase());
+        return addr.matches("\\A\\p{ASCII}*\\z");
     }
 
     @Override
     public String getMessage() {
         return "Invalid IP";
     }
+
 }

@@ -120,6 +120,22 @@ public class TopController {
                 ShareData.testNetRpcPort = Integer.parseInt(testNetPortTextField.getText());
                 ShareData.mainNetRpcIp = mainNetIpTextField.getText();
                 ShareData.mainNetRpcPort = Integer.parseInt(mainNetPortTextField.getText());
+
+                // just change the above 4 variable is not enough, the current using ip and port
+                // will not be reset
+                // reset current using ip and port
+                switch (ShareData.currentEnvironment){
+                    case 1:
+                        ShareData.currentRpcIp = ShareData.testNetRpcIp;
+                        ShareData.currentRpcPort = ShareData.testNetRpcPort;
+                        break;
+                    case 2:
+                        ShareData.currentRpcIp = ShareData.mainNetRpcIp;
+                        ShareData.currentRpcPort = ShareData.mainNetRpcPort;
+                        break;
+
+                }
+
             } catch (Exception e) {
                 logger.error("Failed: {}", e);
                 return;
