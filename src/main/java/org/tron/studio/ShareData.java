@@ -67,6 +67,10 @@ public class ShareData {
     public static int currentRpcPort = localRpcPort;
 
 
+    @Getter
+    @Setter
+    public static int currentEnvironment = 0;   // 0:local tvm; 1:testnet;  2:mainnet
+
     public static Boolean enableOptimize = true;
     public static long TRX_SUN_UNIT = 1_000_000;
 

@@ -23,20 +23,21 @@
             <ColumnConstraints hgrow="ALWAYS" prefWidth="80.0"/>
         </columnConstraints>
         <Label text="Environment"     GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <Label text="Account"         GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <Label text="Fee Limit"       GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <Label text="Call Value"      GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <Label text="User Pay Ratio"  GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <Label text="Account"         GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Label text="Fee Limit"       GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Label text="Call Value"      GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Label text="User Pay Ratio"  GridPane.rowIndex="7" GridPane.columnIndex="0"/>
 
         <JFXComboBox  fx:id="environmentComboBox" HBox.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
-        <JFXComboBox  fx:id="accountComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
-        <JFXTextField fx:id="feeLimitTextField"   HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
-        <JFXComboBox  fx:id="feeUnitComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
-        <JFXTextField fx:id="valueTextField"      HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
-        <JFXComboBox  fx:id="valueUnitComboBox"   HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
-        <JFXTextField fx:id="userPayRatio"        HBox.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="current_ip_port"     HBox.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXComboBox  fx:id="accountComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="feeLimitTextField"   HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXComboBox  fx:id="feeUnitComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="valueTextField"      HBox.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXComboBox  fx:id="valueUnitComboBox"   HBox.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="userPayRatio"        HBox.hgrow="ALWAYS" GridPane.rowIndex="7" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
 
-        <HBox GridPane.rowIndex="1" GridPane.columnIndex="2" GridPane.columnSpan="1" alignment="CENTER_RIGHT">
+        <HBox GridPane.rowIndex="2" GridPane.columnIndex="2" GridPane.columnSpan="1" alignment="CENTER_RIGHT">
             <JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickCopyAddress">
                 <StackPane style="-fx-padding: 2;">
                     <MaterialDesignIconView glyphName="CONTENT_COPY" styleClass="icon"/>

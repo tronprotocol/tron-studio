@@ -65,6 +65,7 @@ public class RightTabRunController implements Initializable {
     public JFXTextField userPayRatio;
     public JFXListView deployedContractList;
     public JFXTextField constructorParaTextField;
+    public JFXTextField current_ip_port = new JFXTextField();
     private boolean isDeploying;
 
     public void initialize(URL location, ResourceBundle resources) {
@@ -79,14 +80,23 @@ public class RightTabRunController implements Initializable {
             if (StringUtils.equals(newValue, "Local TVM")) {
                 ShareData.currentRpcIp = ShareData.localRpcIp;
                 ShareData.currentRpcPort = ShareData.localRpcPort;
+                ShareData.currentEnvironment = 0;
             } else if (StringUtils.equals(newValue, "Test Net")) {
                 ShareData.currentRpcIp = ShareData.testNetRpcIp;
                 ShareData.currentRpcPort = ShareData.testNetRpcPort;
+                ShareData.currentEnvironment = 1;
             } else if (StringUtils.equals(newValue, "Main Net")) {
                 ShareData.currentRpcIp = ShareData.mainNetRpcIp;
                 ShareData.currentRpcPort = ShareData.mainNetRpcPort;
+                ShareData.currentEnvironment = 2;
             }
+
+            this.current_ip_port.setText(ShareData.currentRpcIp + ":" + String.valueOf(ShareData.currentRpcPort));
+            this.current_ip_port.setDisable(true);
+
+
         });
+
 
         ShareData.newAccount.addListener((observable, oldValue, newValue) -> {
             accountComboBox.getItems().clear();
