@@ -70,6 +70,7 @@ public class RightTabRunController implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
         isDeploying = false;
+        this.current_ip_port.setDisable(true);
         environmentComboBox.setItems(FXCollections.observableArrayList(
                 "Local TVM",
                 "Test Net",
@@ -93,7 +94,6 @@ public class RightTabRunController implements Initializable {
 
             this.current_ip_port.setText(ShareData.currentRpcIp + ":" + String.valueOf(ShareData.currentRpcPort));
             this.current_ip_port.setDisable(true);
-
 
         });
 
@@ -133,6 +133,8 @@ public class RightTabRunController implements Initializable {
 
                 }
         );
+
+
     }
 
     private void reloadContract() {
@@ -482,6 +484,10 @@ public class RightTabRunController implements Initializable {
         ClipboardContent clipboardContent = new ClipboardContent();
         clipboardContent.putString(accountComboBox.valueProperty().get());
         clipboard.setContent(clipboardContent);
+    }
+
+    public void onClickRefresh(MouseEvent mouseEvent){
+        this.current_ip_port.setText(ShareData.currentRpcIp + ":" + String.valueOf(ShareData.currentRpcPort));
     }
 
     class ClickTriggerAction implements EventHandler<ActionEvent> {
