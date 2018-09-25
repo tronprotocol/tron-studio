@@ -75,8 +75,10 @@ public class ShareData {
     public static long TRX_SUN_UNIT = 1_000_000;
 
     public static SimpleStringProperty newAccount = new SimpleStringProperty();
-    public static final TreeMap<String, String> testAccount = new TreeMap<>();
+    public static final LinkedHashMap<String, String> testAccount = new LinkedHashMap<>();
     public static WalletClient wallet = new WalletClient(Hex.decode(testAccountPrivateKey[0]));
+
+
 
     //合约的编译结果
     public static SimpleObjectProperty<SolidityCompiler.Result> currentSolidityCompilerResult = new SimpleObjectProperty<>();
@@ -127,11 +129,11 @@ public class ShareData {
     }
 
     static {
-        testAccount.put(testAccountAddress[0], testAccountPrivateKey[0]);
-        testAccount.put(testAccountAddress[1], testAccountPrivateKey[1]);
-        testAccount.put(testAccountAddress[2], testAccountPrivateKey[2]);
-        testAccount.put(testAccountAddress[3], testAccountPrivateKey[3]);
-        testAccount.put(testAccountAddress[4], testAccountPrivateKey[4]);
+        if (testAccountAddress.length == testAccountPrivateKey.length) {
+            for (int i = 0; i < testAccountAddress.length; ++i) {
+                testAccount.put(testAccountAddress[i], testAccountPrivateKey[i]);
+            }
+        }
     }
 
     public static SolidityCompiler.Result getSolidityCompilerResult(String contractName) {

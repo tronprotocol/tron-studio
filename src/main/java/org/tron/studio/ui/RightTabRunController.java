@@ -70,6 +70,7 @@ public class RightTabRunController implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
         isDeploying = false;
+        this.current_ip_port.setDisable(true);
         environmentComboBox.setItems(FXCollections.observableArrayList(
                 "Local TVM",
                 "Test Net",
@@ -93,7 +94,6 @@ public class RightTabRunController implements Initializable {
 
             this.current_ip_port.setText(ShareData.currentRpcIp + ":" + String.valueOf(ShareData.currentRpcPort));
             this.current_ip_port.setDisable(true);
-
 
         });
 
@@ -133,6 +133,8 @@ public class RightTabRunController implements Initializable {
 
                 }
         );
+
+
     }
 
     private void reloadContract() {
@@ -236,7 +238,8 @@ public class RightTabRunController implements Initializable {
             isDeploying = false;
             return;
         }
-        {
+
+        {   // GONNA ADD OVERFLOW CHECK LATER
             long callValue = Long.parseLong(valueTextField.getText());
             if (callValue < 0) {
                 Notifications note = Notifications.create().title("Trigger Contract Failed").text("Call value should be equal or greater than 0");
@@ -246,18 +249,22 @@ public class RightTabRunController implements Initializable {
             if (valueUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
                 callValue *= ShareData.TRX_SUN_UNIT;
             }
+
             long feeLimit = Long.parseLong(feeLimitTextField.getText());
-            if (feeLimit < 0 || feeLimit > 1000) {
-                Notifications note = Notifications.create().title("Trigger Contract Failed").text("Fee limit should between 0 and 1000");
-                note.show();
-                return;
-            }
+
             if (feeUnitComboBox.getSelectionModel().getSelectedIndex() == 0) {
                 feeLimit *= ShareData.TRX_SUN_UNIT;
             }
+            if (feeLimit < 0 || feeLimit > 1000 * ShareData.TRX_SUN_UNIT) {
+                Notifications note = Notifications.create().title("Trigger Contract Failed").text("Fee limit should between 0 and 1000 trx or 1E9 Sun");
+                note.show();
+                return;
+            }
+
             long finalFeeLimit = feeLimit;
             long finalCallValue = callValue;
             String byteCode = bin.toString();
+
             try {
                 if (hasLibrary(byteCode)) {
                     byteCode = deployLibrary(compilationResult, currentContractName, byteCode, finalFeeLimit);
@@ -477,6 +484,10 @@ public class RightTabRunController implements Initializable {
         ClipboardContent clipboardContent = new ClipboardContent();
         clipboardContent.putString(accountComboBox.valueProperty().get());
         clipboard.setContent(clipboardContent);
+    }
+
+    public void onClickRefresh(MouseEvent mouseEvent){
+        this.current_ip_port.setText(ShareData.currentRpcIp + ":" + String.valueOf(ShareData.currentRpcPort));
     }
 
     class ClickTriggerAction implements EventHandler<ActionEvent> {

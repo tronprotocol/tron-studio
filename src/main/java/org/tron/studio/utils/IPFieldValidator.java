@@ -32,14 +32,6 @@ public class IPFieldValidator extends ValidatorBase {
         }
     }
 
-    /*
-    @param: String addr: url of target testnet
-    @return: url with headers.
-        EX: input: 127.0.0.1
-            output: http://127.0.0.1
-            input: https://abc.def.ghi
-            return: https://abc.def.hgi
-     */
     private String url_validation(String addr){
         for (String header : CONSTANTS.URL_HEAD){
             if (addr.matches("(?i)" + header + ".*"))
@@ -48,15 +40,11 @@ public class IPFieldValidator extends ValidatorBase {
         return "http://" + addr;
     }
 
-    /*
-    @param: String addr: an url of target testnet
-    @return: boolean indicate if address provide is valid or not
-             A valid address url contains only ascii characters
-     */
     private boolean isIP(String addr) {
-
+        if (!addr.matches("\\A\\p{ASCII}*\\z"))
+            return false;
         addr = this.url_validation(addr.toLowerCase());
-        return addr.matches("\\A\\p{ASCII}*\\z");
+        return true;
     }
 
     @Override

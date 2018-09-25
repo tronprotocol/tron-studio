@@ -30,6 +30,11 @@
 
         <JFXComboBox  fx:id="environmentComboBox" HBox.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
         <JFXTextField fx:id="current_ip_port"     HBox.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXRippler   position="BACK" styleClass="icons-rippler1"  onMouseClicked="#onClickRefresh" GridPane.rowIndex="1" GridPane.columnIndex="2" >
+            <StackPane style="-fx-padding: 2;">
+                <MaterialDesignIconView glyphName="REFRESH" styleClass="icon"/>
+            </StackPane>
+        </JFXRippler>
         <JFXComboBox  fx:id="accountComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
         <JFXTextField fx:id="feeLimitTextField"   HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
         <JFXComboBox  fx:id="feeUnitComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="1"/>

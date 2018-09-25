@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.fxml.FXMLLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.common.crypto.ECKey;
@@ -136,6 +137,8 @@ public class TopController {
 
                 }
 
+
+
             } catch (Exception e) {
                 logger.error("Failed: {}", e);
                 return;
@@ -168,6 +171,7 @@ public class TopController {
                 ECKey ecKey = ECKey.fromPrivate(Hex.decode(privateKeyTextField.getText()));
                 ShareData.testAccount.put(Wallet.encode58Check(ecKey.getAddress()), privateKeyTextField.getText());
                 ShareData.newAccount.set(Wallet.encode58Check(ecKey.getAddress()));
+                ShareData.currentAccount = Wallet.encode58Check(ecKey.getAddress());
             } catch (Exception e) {
                 logger.error("Failed: {}", e);
                 return;
