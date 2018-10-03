@@ -23,6 +23,7 @@ import java.util.*;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import javafx.application.Platform;
 
+
 @Slf4j
 public class MainController {
     public TabPane rightContentTabPane;
@@ -271,5 +272,6 @@ public class MainController {
         }
         ShareData.currentContractTab = preTab;
     }
+
 
 }

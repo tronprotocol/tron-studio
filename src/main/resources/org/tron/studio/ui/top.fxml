@@ -31,6 +31,11 @@
                        <MaterialDesignIconView glyphSize="20" glyphName="SETTINGS" styleClass="icon-top2"/>
                    </StackPane>
                </JFXRippler>
+               <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onAddSettings">
+                   <StackPane style="-fx-padding: 10;">
+                       <MaterialDesignIconView glyphSize="20" glyphName="PLUS" styleClass="icon-top2"/>
+                   </StackPane>
+               </JFXRippler>
            </HBox>
        </rightItems>
 
