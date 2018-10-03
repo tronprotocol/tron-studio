@@ -13,6 +13,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.fxml.FXMLLoader;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.common.crypto.ECKey;
@@ -20,6 +21,7 @@ import org.tron.core.Wallet;
 import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
 import org.tron.studio.utils.IPFieldValidator;
+import org.tron.studio.utils.NetworkNameValidator;
 import org.tron.studio.utils.PortFieldValidator;
 import org.tron.studio.utils.PrivateKeyFieldValidator;
 
@@ -36,7 +38,7 @@ public class TopController {
         JFXDialog dialog = new JFXDialog();
         JFXDialogLayout layout = new JFXDialogLayout();
         layout.setPrefWidth(800);
-        layout.setHeading(new Label("Settings"));
+        layout.setHeading(new Label("Existing Settings"));
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
@@ -48,56 +50,38 @@ public class TopController {
         gridPane.getColumnConstraints().add(columnConstraints0);
         gridPane.getColumnConstraints().add(columnConstraints1);
 
-        Label localTitle = new Label("Local TVM");
-        Label testNetTitle = new Label("Test Net");
-        Label mainNetTitle = new Label("Main Net");
+        int rownIdx = 0;
+        List<JFXTextField> textfields = new ArrayList<>();
+        for(String label : ShareData.saved_network.keySet()){
+            Label title = new Label(label);
+            JFXTextField ipTextField = new JFXTextField();
+            JFXTextField portTextField = new JFXTextField();
+            ipTextField.setText(ShareData.saved_network.get(label).url);
+            portTextField.setText(Integer.toString(ShareData.saved_network.get(label).port));
 
-        JFXTextField localIpTextField = new JFXTextField();
-        JFXTextField localPortTextField = new JFXTextField();
-        localIpTextField.setText(ShareData.localRpcIp);
-        localPortTextField.setText(String.valueOf(ShareData.localRpcPort));
-        localIpTextField.setDisable(true);
-        localPortTextField.setDisable(true);
+            gridPane.add(title, 0, rownIdx);
+            gridPane.add(ipTextField, 1, rownIdx);
+            gridPane.add(portTextField, 2, rownIdx);
 
-        JFXTextField testNetIpTextField = new JFXTextField();
-        JFXTextField testNetPortTextField = new JFXTextField();
-        testNetIpTextField.setText(ShareData.testNetRpcIp);
-        testNetPortTextField.setText(String.valueOf(ShareData.testNetRpcPort));
+            ipTextField.setValidators(new IPFieldValidator());
+            portTextField.setValidators(new PortFieldValidator());
 
-        JFXTextField mainNetIpTextField = new JFXTextField();
-        JFXTextField mainNetPortTextField = new JFXTextField();
-        mainNetIpTextField.setText(ShareData.mainNetRpcIp);
-        mainNetPortTextField.setText(String.valueOf(ShareData.mainNetRpcPort));
+            ipTextField.textProperty().addListener((o, oldVal, newVal) -> {
+                if(ipTextField.validate())
+                    ShareData.saved_network.get(label).url = newVal.trim();
 
-        gridPane.add(localTitle, 0, 0);
-        gridPane.add(localIpTextField, 1, 0);
-        gridPane.add(localPortTextField, 2, 0);
+            });
+            portTextField.textProperty().addListener((o, oldVal, newVal) -> {
+                if (portTextField.validate())
+                    ShareData.saved_network.get(label).port = Integer.parseInt(newVal.trim());
 
-        gridPane.add(testNetTitle, 0, 1);
-        gridPane.add(testNetIpTextField, 1, 1);
-        gridPane.add(testNetPortTextField, 2, 1);
+            });
+            textfields.add(ipTextField);
+            textfields.add(portTextField);
+            ++rownIdx;
 
-        gridPane.add(mainNetTitle, 0, 2);
-        gridPane.add(mainNetIpTextField, 1, 2);
-        gridPane.add(mainNetPortTextField, 2, 2);
 
-        testNetIpTextField.setValidators(new IPFieldValidator());
-        testNetPortTextField.setValidators(new PortFieldValidator());
-
-        mainNetIpTextField.setValidators(new IPFieldValidator());
-        mainNetPortTextField.setValidators(new PortFieldValidator());
-        testNetIpTextField.textProperty().addListener((o, oldVal, newVal) -> {
-            testNetIpTextField.validate();
-        });
-        testNetPortTextField.textProperty().addListener((o, oldVal, newVal) -> {
-            testNetPortTextField.validate();
-        });
-        mainNetIpTextField.textProperty().addListener((o, oldVal, newVal) -> {
-            mainNetIpTextField.validate();
-        });
-        mainNetPortTextField.textProperty().addListener((o, oldVal, newVal) -> {
-            mainNetPortTextField.validate();
-        });
+        }
 
         layout.setBody(gridPane);
         dialog.setContent(layout);
@@ -105,37 +89,14 @@ public class TopController {
         closeButton.getStyleClass().add("dialog-accept");
         closeButton.setOnAction(event -> {
             try {
-                if (!testNetIpTextField.validate()) {
-                    return;
-                }
-                if (!testNetPortTextField.validate()) {
-                    return;
-                }
-                if (!mainNetIpTextField.validate()) {
-                    return;
-                }
-                if (!mainNetPortTextField.validate()) {
-                    return;
-                }
-                ShareData.testNetRpcIp = testNetIpTextField.getText();
-                ShareData.testNetRpcPort = Integer.parseInt(testNetPortTextField.getText());
-                ShareData.mainNetRpcIp = mainNetIpTextField.getText();
-                ShareData.mainNetRpcPort = Integer.parseInt(mainNetPortTextField.getText());
 
-                // just change the above 4 variable is not enough, the current using ip and port
-                // will not be reset
-                // reset current using ip and port
-                switch (ShareData.currentEnvironment){
-                    case 1:
-                        ShareData.currentRpcIp = ShareData.testNetRpcIp;
-                        ShareData.currentRpcPort = ShareData.testNetRpcPort;
-                        break;
-                    case 2:
-                        ShareData.currentRpcIp = ShareData.mainNetRpcIp;
-                        ShareData.currentRpcPort = ShareData.mainNetRpcPort;
-                        break;
 
+                for (int i=0; i < textfields.size(); ++i){
+                    if (!textfields.get(i).validate()) return;
                 }
+
+                ShareData.currentRpcIp = ShareData.saved_network.get(ShareData.currentEnvironment).url;
+                ShareData.currentRpcPort = ShareData.saved_network.get(ShareData.currentEnvironment).port;
 
 
 
@@ -145,7 +106,7 @@ public class TopController {
             }
             dialog.close();
         });
-        testNetIpTextField.requestFocus();
+//        testNetIpTextField.requestFocus();
         closeButton.setDefaultButton(true);
         layout.setActions(closeButton);
         dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
@@ -182,6 +143,90 @@ public class TopController {
         closeButton.setDefaultButton(true);
         layout.setActions(closeButton);
         dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
+    }
+
+    public void onAddSettings(MouseEvent mouseEvent){
+        JFXDialog dialog = new JFXDialog();
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setPrefWidth(800);
+        layout.setHeading(new Label("Add New Setting"));
+
+        List<JFXTextField> fields = new ArrayList<>();
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(20);
+        ColumnConstraints columnConstraints0 = new ColumnConstraints();
+        columnConstraints0.setHgrow(Priority.NEVER);
+        ColumnConstraints columnConstraints1 = new ColumnConstraints();
+        columnConstraints1.setHgrow(Priority.ALWAYS);
+        gridPane.getColumnConstraints().add(columnConstraints0);
+        gridPane.getColumnConstraints().add(columnConstraints1);
+
+        Label title = new Label("Network Name");
+        gridPane.add(title, 0, 0);
+        JFXTextField nameField = new JFXTextField();
+        gridPane.add(nameField, 1, 0);
+        nameField.setValidators(new NetworkNameValidator());
+        nameField.textProperty().addListener((o, oldVal, newVal) -> {
+            nameField.validate();
+        });
+        fields.add(nameField);
+
+        Label ip = new Label("Network URL");
+        gridPane.add(ip, 0, 1);
+        JFXTextField ipField = new JFXTextField();
+        gridPane.add(ipField, 1, 1);
+        ipField.setValidators(new IPFieldValidator());
+        ipField.textProperty().addListener((o, oldVal, newVal) -> {
+            ipField.validate();
+        });
+        fields.add(ipField);
+
+        Label port = new Label("Network Port");
+        gridPane.add(port, 0, 2);
+        JFXTextField portField = new JFXTextField();
+        gridPane.add(portField, 1, 2);
+        portField.setValidators(new PortFieldValidator());
+        portField.textProperty().addListener((o, oldVal, newVal) -> {
+            portField.validate();
+        });
+        fields.add(portField);
+
+        layout.setBody(gridPane);
+        dialog.setContent(layout);
+
+        JFXButton closeButton = new JFXButton("Add");
+        closeButton.getStyleClass().add("dialog-accept");
+        closeButton.setOnAction(event -> {
+            try {
+
+
+                for (int i=0; i < fields.size(); ++i){
+                    if (!fields.get(i).validate()) return;
+                }
+
+                ShareData.saved_network.put(nameField.getText().trim(), new ShareData.NetWorkEnvironment(ipField.getText().trim(),
+                        Integer.parseInt(portField.getText().trim())));
+
+                String output = String.format("%s:%s:%s", nameField.getText().trim(), ipField.getText().trim(), portField.getText().trim());
+                ShareData.newNetwork.set(output);
+
+
+
+            } catch (Exception e) {
+                logger.error("Failed: {}", e);
+                return;
+            }
+
+            dialog.close();
+        });
+        closeButton.setDefaultButton(true);
+        layout.setActions(closeButton);
+        dialog.show((StackPane) MainApplication.instance.primaryStage.getScene().getRoot());
+
+
+
     }
 
     public void onClickBlockChain(MouseEvent mouseEvent) {

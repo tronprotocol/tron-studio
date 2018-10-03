@@ -35,14 +35,23 @@ import org.tron.core.services.http.FullNodeHttpApiService;
 import javafx.stage.Popup;
 import javafx.geometry.Insets;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import javafx.event.ActionEvent;
-
 import org.fxmisc.flowless.VirtualizedScrollPane;
+
+import java.io.File;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.nio.file.Paths;
 
 @Slf4j
 public class MainApplication extends Application {
@@ -60,11 +69,61 @@ public class MainApplication extends Application {
     cfgArgs.setDebug(false);
     launch(args);
   }
+    private static void writeIntoXML(){
+        try {
+
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            // root elements
+            Document doc = docBuilder.newDocument();
+            Element rootElement = doc.createElement("Environment");
+            doc.appendChild(rootElement);
+
+            for(String i : ShareData.saved_network.keySet()){
+                Element network = doc.createElement("network");
+                rootElement.appendChild(network);
+                Attr attr = doc.createAttribute("id");
+                attr.setValue(i.trim());
+                network.setAttributeNode(attr);
+                Element ip = doc.createElement("ip");
+                ip.appendChild(doc.createTextNode(ShareData.saved_network.get(i).url));
+                network.appendChild(ip);
+
+                Element port = doc.createElement("port");
+                port.appendChild(doc.createTextNode(Integer.toString(ShareData.saved_network.get(i).port)));
+                network.appendChild(port);
+
+
+            }
+
+            // write the content into xml file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            File fXmlFile = new File(Paths.get(System.getProperty("user.home"), "TronStudio", "record", "network.xml").toString());
+            StreamResult result = new StreamResult(fXmlFile);
+
+            // Output to console for testing
+            // StreamResult result = new StreamResult(System.out);
+
+            transformer.transform(source, result);
+
+            System.out.println("File saved!");
+
+        } catch (ParserConfigurationException pce) {
+            pce.printStackTrace();
+        } catch (TransformerException tfe) {
+            tfe.printStackTrace();
+        }
+    }
 
   @Override
   public void stop() throws Exception {
-    stopFullNode();
-    super.stop();
+      writeIntoXML();
+      stopFullNode();
+      super.stop();
+
   }
 
   @Override
@@ -135,16 +194,19 @@ public class MainApplication extends Application {
     rpcApiService.blockUntilShutdown();
   }
 
+
   private static void stopFullNode() {
-    appT.shutdownServices();
-    appT.shutdown();
+      appT.shutdownServices();
+      appT.shutdown();
+
     System.exit(0);
   }
 
 
   public static void shutdown(final org.tron.common.application.Application app) {
-    logger.info("********register application shutdown hook********");
+    System.out.println("********register application shutdown hook********");
     Runtime.getRuntime().addShutdownHook(new Thread(app::shutdown));
+      logger.info("stopped");
   }
 
 }

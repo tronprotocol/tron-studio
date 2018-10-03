@@ -3,10 +3,8 @@ package org.tron.studio.ui;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -16,6 +14,8 @@ import javafx.scene.control.Label;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -70,30 +70,28 @@ public class RightTabRunController implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
         isDeploying = false;
-        this.current_ip_port.setDisable(true);
-        environmentComboBox.setItems(FXCollections.observableArrayList(
-                "Local TVM",
-                "Test Net",
-                "Main Net"
-        ));
-        environmentComboBox.getSelectionModel().selectFirst();
-        environmentComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (StringUtils.equals(newValue, "Local TVM")) {
-                ShareData.currentRpcIp = ShareData.localRpcIp;
-                ShareData.currentRpcPort = ShareData.localRpcPort;
-                ShareData.currentEnvironment = 0;
-            } else if (StringUtils.equals(newValue, "Test Net")) {
-                ShareData.currentRpcIp = ShareData.testNetRpcIp;
-                ShareData.currentRpcPort = ShareData.testNetRpcPort;
-                ShareData.currentEnvironment = 1;
-            } else if (StringUtils.equals(newValue, "Main Net")) {
-                ShareData.currentRpcIp = ShareData.mainNetRpcIp;
-                ShareData.currentRpcPort = ShareData.mainNetRpcPort;
-                ShareData.currentEnvironment = 2;
-            }
 
-            this.current_ip_port.setText(ShareData.currentRpcIp + ":" + String.valueOf(ShareData.currentRpcPort));
-            this.current_ip_port.setDisable(true);
+        environmentComboBox.setItems(FXCollections.observableArrayList(
+            ShareData.saved_network.keySet()
+        ));
+        environmentComboBox.setValue(ShareData.currentEnvironment);
+        this.current_ip_port.setText(ShareData.currentRpcIp + ":" + String.valueOf(ShareData.currentRpcPort));
+        this.current_ip_port.setDisable(true);
+
+        ShareData.newNetwork.addListener((observable, oldValue, newValue) -> {
+            environmentComboBox.getItems().clear();
+            environmentComboBox.setItems(FXCollections.observableArrayList(ShareData.saved_network.keySet()));
+            environmentComboBox.setValue(ShareData.currentEnvironment);
+        });
+        ShareData.newNetwork.set(ShareData.currentEnvironment);
+        environmentComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (StringUtils.isNotEmpty(newValue)) {
+                ShareData.currentEnvironment = newValue.trim();
+                ShareData.currentRpcIp = ShareData.saved_network.get(newValue).url.trim();
+                ShareData.currentRpcPort = ShareData.saved_network.get(newValue).port;
+                this.current_ip_port.setText(ShareData.currentRpcIp + ":" + String.valueOf(ShareData.currentRpcPort));
+                this.current_ip_port.setDisable(true);
+            }
 
         });
 
@@ -329,7 +327,25 @@ public class RightTabRunController implements Initializable {
         HBox title = new HBox();
         String contractAddressString = Wallet.encode58Check(contractAddress);
         Label transactionLabel = new Label(String.format("%s %s", contractName, contractAddressString));
+
+        MaterialDesignIconView copyIcon = new MaterialDesignIconView();
+        copyIcon.setGlyphName("CONTENT_COPY");
+        copyIcon.setStyleClass("icon");
+        JFXRippler jfxRippler = new JFXRippler();
+        jfxRippler.getStyleClass().add("icons-rippler1");
+        jfxRippler.setPosition(JFXRippler.RipplerPos.BACK);
+        jfxRippler.getChildren().add(copyIcon);
+        jfxRippler.setOnMouseClicked(event -> {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent clipboardContent = new ClipboardContent();
+            clipboardContent.putString(contractAddressString);
+            clipboard.setContent(clipboardContent);
+            Notifications note = Notifications.create().title("Copy Contract Address").text(contractAddressString);
+            note.show();
+        });
+
         title.getChildren().add(transactionLabel);
+        title.getChildren().add(jfxRippler);
         listView.setGroupnode(title);
 
         List<String> abiJson = JSONArray.parseArray(abi, String.class);
@@ -520,6 +536,7 @@ public class RightTabRunController implements Initializable {
                 processTriggerContractResult();
             } catch (Exception e) {
                 Notifications note = Notifications.create().title("Trigger Contract Failed").text(e.getMessage());
+//                addTransactionHistoryItem("Error", new TransactionHistoryItem())
                 note.show();
             }
         }
