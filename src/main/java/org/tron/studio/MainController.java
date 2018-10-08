@@ -99,8 +99,10 @@ public class MainController {
             boolean alreadyOpen = false;
             for (Tab tab : codeAreaTabPane.getTabs()) {
                 if (StringUtils.equals(tab.getText(), currentContractName)) {
+                    System.out.println(tab.getText());
                     codeAreaTabPane.getSelectionModel().select(tab);
                     alreadyOpen = true;
+                    break;
                 }
             }
             if (!alreadyOpen) {
@@ -115,11 +117,11 @@ public class MainController {
         ShareData.openContractFileName.addListener((observable, oldValue, newValue) ->{
             String filePath = ShareData.openContractFileName.get();
             File newFile = new File(filePath);
-
+            System.out.println(filePath);
             Tab newTab = setTab(newFile);
             newTab.setClosable(true);
-            ShareData.currentContractName.set(newFile.getName());
-            ShareData.allContractFileName.add(newFile.getName());
+//            ShareData.currentContractName.set(filePath);
+//            ShareData.allContractFileName.add(filePath);
             codeAreaTabPane.getSelectionModel().select(newTab);
         });
 
@@ -152,7 +154,7 @@ public class MainController {
         AutoCompletion autoCompletion = new AutoCompletion(codeArea);
         autoCompletion.autoComplete(codeArea);
 
-        codeTab.setText(file.getName());
+        codeTab.setText(file.getPath());
         //Just not allow to close the default tab
         codeTab.setClosable(true);
 
@@ -171,8 +173,8 @@ public class MainController {
 
         new FormatCode(codeArea);
 
-        ShareData.allContractFileName.add(file.getName());
-        ShareData.currentContractName.set(file.getName());
+        ShareData.allContractFileName.add(file.getPath());
+        ShareData.currentContractName.set(file.getPath());
         ShareData.currentContractTab = codeTab;
 
         return codeTab;

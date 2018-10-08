@@ -215,7 +215,7 @@ public class LeftCodeListController {
 
     private void openFile(File file) {
         try {
-            ShareData.newContractFileName.set(file.getPath());
+            ShareData.openContractFileName.set(file.getPath());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -230,7 +230,7 @@ public class LeftCodeListController {
 //            fileName = SolidityFileUtil.formatFileName(fileName);
 //            SolidityFileUtil.createNewFile(fileName);
 //            ShareData.newContractFileName.set(fileName);
-            ShareData.allContractFileName.get().add(file.getPath());
+//            ShareData.allContractFileName.get().add(file.getPath());
 //            ShareData.currentContractName.set(file.getPath());
         }
     }
