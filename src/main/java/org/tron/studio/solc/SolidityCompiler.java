@@ -32,6 +32,7 @@ public class SolidityCompiler {
     }
 
     public static Result compile(File sourceDirectory, boolean combinedJson, Option... options) throws IOException {
+        System.out.println(sourceDirectory.getPath());
         return getInstance().compileSrc(sourceDirectory, ShareData.enableOptimize, combinedJson, options);
     }
 
@@ -201,9 +202,10 @@ public class SolidityCompiler {
     }
 
     public Result compileSrc(File source, boolean optimize, boolean combinedJson, Option... options) throws IOException {
+        System.out.println(source.getPath());
         List<String> commandParts = prepareCommandOptions(optimize, combinedJson, options);
 
-        commandParts.add(source.getName());
+        commandParts.add(source.getPath());
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandParts)
                 .directory(new File(SolidityFileUtil.getSourcePath()));

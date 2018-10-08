@@ -24,6 +24,7 @@ import org.tron.studio.filesystem.SolidityFileUtil;
 import org.tron.studio.solc.CompilationErrorResult;
 import org.tron.studio.solc.CompilationResult;
 import org.tron.studio.solc.SolidityCompiler;
+import java.io.File;
 
 import java.io.IOException;
 import java.net.URL;
@@ -62,14 +63,19 @@ public class RightTabCompileController implements Initializable {
         }
         isCompiling = true;
         contractFileName = ShareData.currentContractFileName.getValue();
+        System.out.println(contractFileName);
         ShareData.currentSolidityCompilerResult.set(null);
         new Thread(() -> {
             boolean compileSuccess = true;
             try {
+                File target = new File(contractFileName);
+                if (!target.exists()) {
+                    System.out.println("using default directory");
+                    target = SolidityFileUtil.getExistFile(contractFileName);
+                }
                 SolidityCompiler.Result solidityCompilerResult = SolidityCompiler.compile(
-                        SolidityFileUtil.getExistFile(contractFileName), true, ABI, BIN, HASHES, INTERFACE,
+                        target, true, ABI, BIN, HASHES, INTERFACE,
                         METADATA);
-
                 Platform.runLater(() -> ShareData.setSolidityCompilerResult(contractFileName, solidityCompilerResult));
                 CompilationErrorResult.parse(solidityCompilerResult.errors);
 

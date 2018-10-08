@@ -71,6 +71,8 @@ public class SolidityFileUtil {
 
     public static String getSourceCode(String fileName) {
         File existFile = getExistFile(fileName);
+        if (!existFile.exists())
+            existFile = new File(fileName.trim());
         StringBuilder builder = new StringBuilder();
         try {
             Files.lines(Paths.get(existFile.toURI())).forEach(line -> {
