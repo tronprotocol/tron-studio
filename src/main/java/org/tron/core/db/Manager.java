@@ -1,68 +1,37 @@
 package org.tron.core.db;
 
-import static org.tron.core.config.Parameter.ChainConstant.SOLIDIFIED_THRESHOLD;
-import static org.tron.core.config.Parameter.NodeConstant.MAX_TRANSACTION_PENDING;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javafx.util.Pair;
-import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.tron.abi.EventEncoder;
 import org.tron.abi.FunctionReturnDecoder;
 import org.tron.abi.TypeReference;
 import org.tron.abi.datatypes.BytesType;
 import org.tron.abi.datatypes.Event;
 import org.tron.abi.datatypes.Type;
 import org.tron.abi.datatypes.generated.AbiTypes;
-import org.tron.abi.datatypes.generated.Bytes32;
 import org.tron.common.overlay.discover.node.Node;
 import org.tron.common.runtime.Runtime;
 import org.tron.common.runtime.vm.program.invoke.ProgramInvokeFactoryImpl;
 import org.tron.common.storage.DepositImpl;
-import org.tron.common.utils.ByteArray;
-import org.tron.common.utils.ForkController;
-import org.tron.common.utils.SessionOptional;
-import org.tron.common.utils.Sha256Hash;
-import org.tron.common.utils.StringUtil;
+import org.tron.common.utils.*;
 import org.tron.core.Constant;
 import org.tron.core.Wallet;
-import org.tron.core.capsule.AccountCapsule;
-import org.tron.core.capsule.BlockCapsule;
+import org.tron.core.capsule.*;
 import org.tron.core.capsule.BlockCapsule.BlockId;
-import org.tron.core.capsule.BytesCapsule;
-import org.tron.core.capsule.ReceiptCapsule;
-import org.tron.core.capsule.TransactionCapsule;
-import org.tron.core.capsule.TransactionInfoCapsule;
-import org.tron.core.capsule.WitnessCapsule;
 import org.tron.core.capsule.utils.BlockUtil;
 import org.tron.core.config.Parameter.ChainConstant;
 import org.tron.core.config.args.Args;
@@ -70,32 +39,20 @@ import org.tron.core.config.args.GenesisBlock;
 import org.tron.core.db.KhaosDatabase.KhaosBlock;
 import org.tron.core.db2.core.ISession;
 import org.tron.core.db2.core.ITronChainBase;
-import org.tron.core.exception.AccountResourceInsufficientException;
-import org.tron.core.exception.BadBlockException;
-import org.tron.core.exception.BadItemException;
-import org.tron.core.exception.BadNumberBlockException;
-import org.tron.core.exception.BalanceInsufficientException;
-import org.tron.core.exception.ContractExeException;
-import org.tron.core.exception.ContractSizeNotEqualToOneException;
-import org.tron.core.exception.ContractValidateException;
-import org.tron.core.exception.DupTransactionException;
-import org.tron.core.exception.HeaderNotFound;
-import org.tron.core.exception.ItemNotFoundException;
-import org.tron.core.exception.NonCommonBlockException;
-import org.tron.core.exception.ReceiptCheckErrException;
-import org.tron.core.exception.TaposException;
-import org.tron.core.exception.TooBigTransactionException;
-import org.tron.core.exception.TooBigTransactionResultException;
-import org.tron.core.exception.TransactionExpirationException;
-import org.tron.core.exception.UnLinkedBlockException;
-import org.tron.core.exception.VMIllegalException;
-import org.tron.core.exception.ValidateScheduleException;
-import org.tron.core.exception.ValidateSignatureException;
+import org.tron.core.exception.*;
 import org.tron.core.witness.ProposalController;
 import org.tron.core.witness.WitnessController;
 import org.tron.protos.Protocol;
 import org.tron.protos.Protocol.AccountType;
 import org.tron.protos.Protocol.Block;
+
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+
+import static org.tron.core.config.Parameter.ChainConstant.SOLIDIFIED_THRESHOLD;
+import static org.tron.core.config.Parameter.NodeConstant.MAX_TRANSACTION_PENDING;
 
 
 @Slf4j (topic = "Manager")
@@ -1047,9 +1004,13 @@ public class Manager {
           List<TypeReference<?>> typeList = new ArrayList<>();
           List<String> nameList = new ArrayList<>();
           abiEntry.getInputsList().forEach(input -> {
-            nameList.add(input.getName());
-            TypeReference<?> tr = AbiTypes.getTypeReference(input.getType(), input.getIndexed());
-            typeList.add(tr);
+            try {
+              TypeReference<?> tr = AbiTypes.getTypeReference(input.getType(), input.getIndexed());
+              nameList.add(input.getName());
+              typeList.add(tr);
+            } catch (UnsupportedOperationException e) {
+              logger.debug("Unable parse abi entry. {}", e.getMessage());
+            }
           });
           JSONObject resultJsonObject = new JSONObject();
           JSONObject rawJsonObject = new JSONObject();
@@ -1059,6 +1020,9 @@ public class Manager {
           rawTopicsJsonArray.add(eventHexString);
 
           Event event = new Event(entryName, typeList);
+          if (!StringUtils.equalsIgnoreCase(EventEncoder.encode(event), eventHexString)) {
+            return;
+          }
           String rawLogData = ByteArray.toHexString(log.getData().toByteArray());
           List<Type> nonIndexedValues = FunctionReturnDecoder.decode(rawLogData, event.getNonIndexedParameters());
           List<Type> indexedValues = new ArrayList<>();
