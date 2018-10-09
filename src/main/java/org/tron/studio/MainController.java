@@ -109,7 +109,9 @@ public class MainController {
         });
 
         ShareData.newContractFileName.addListener((observable, oldValue, newValue) -> {
-            createTabForFileSystemFile(newValue);
+            if(newValue != null) {
+                createTabForFileSystemFile(newValue);
+            }
         });
 
         ShareData.openContractFileName.addListener((observable, oldValue, newValue) ->{

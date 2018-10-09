@@ -7,11 +7,14 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
@@ -20,6 +23,7 @@ import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.FileCopyUtils;
 import org.tron.studio.MainApplication;
 import org.tron.studio.ShareData;
 import org.tron.studio.filesystem.SolidityFileUtil;
@@ -65,15 +69,18 @@ public class LeftCodeListController {
         fileNameTable.setRoot(new RecursiveTreeItem<>(fileNameData, RecursiveTreeObject::getChildren));
         fileNameTable.setShowRoot(false);
 
-        fileNameTable.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSelection, newSelection) -> {
-                    if (newSelection != null) {
-                        File fileName = SolidityFileUtil.getExistFile(newSelection.getValue().fileName.getValue());
-                        ShareData.currentContractFileName.set(fileName.getName());
-                        ShareData.allContractFileName.add(fileName.getName());
-                    }
-                });
-
+        fileNameTable.setOnMouseClicked(event -> {
+            if(event.getButton() == MouseButton.PRIMARY) {
+                TreeItem<FileName> newSelection = fileNameTable
+                    .getSelectionModel().getSelectedItem();
+                if (newSelection != null) {
+                    File fileName = SolidityFileUtil
+                        .getExistFile(newSelection.getValue().fileName.getValue());
+                    ShareData.currentContractFileName.set(fileName.getName());
+                    ShareData.allContractFileName.add(fileName.getName());
+                }
+            }
+        });
         ContextMenu contextMenu = new ContextMenu();
         MenuItem delMenu = new MenuItem("Delete");
         contextMenu.getItems().add(delMenu);
@@ -221,14 +228,27 @@ public class LeftCodeListController {
         }
     }
 
+    private File copyFile(File file) {
+        File newFile = new File(SolidityFileUtil.getSourcePath(), file.getName());
+        try {
+            newFile.createNewFile();
+            FileCopyUtils.copy(file, newFile);
+            return newFile;
+        } catch (Exception e) {
+            logger.error("Failed to copy file, {}", e);
+        }
+        return newFile;
+    }
+
     public void openContract(MouseEvent mouseEvent) {
+        ShareData.newContractFileName.set(null);
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            openFile(file);
-
-            String fileName = file.getName();
+            File newFile = copyFile(file);
+            openFile(newFile);
+            String fileName = newFile.getName();
             fileName = SolidityFileUtil.formatFileName(fileName);
-            SolidityFileUtil.createNewFile(fileName);
+//            SolidityFileUtil.createNewFile(fileName);
             ShareData.newContractFileName.set(fileName);
             ShareData.allContractFileName.get().add(fileName);
             ShareData.currentContractName.set(fileName);
