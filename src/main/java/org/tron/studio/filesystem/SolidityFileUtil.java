@@ -66,7 +66,10 @@ public class SolidityFileUtil {
     }
 
     public static File getExistFile(String fileName) {
-        return new File(Config.SOLIDITY_SOURCE_PATH, fileName.trim());
+        File file = new File(fileName.trim());
+        if (!file.exists())
+            return new File(Config.SOLIDITY_SOURCE_PATH, fileName.trim());
+        return file;
     }
 
     public static String getSourceCode(String fileName) {

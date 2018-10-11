@@ -62,6 +62,7 @@ public class RightTabCompileController implements Initializable {
         }
         isCompiling = true;
         contractFileName = ShareData.currentContractFileName.getValue();
+        System.out.println(contractFileName);
         ShareData.currentSolidityCompilerResult.set(null);
         new Thread(() -> {
             boolean compileSuccess = true;
@@ -70,7 +71,7 @@ public class RightTabCompileController implements Initializable {
                         SolidityFileUtil.getExistFile(contractFileName), true, ABI, BIN, HASHES, INTERFACE,
                         METADATA);
 
-                Platform.runLater(() -> ShareData.setSolidityCompilerResult(contractFileName, solidityCompilerResult));
+                Platform.runLater(() -> ShareData.setSolidityCompilerResult(contractFileName.trim(), solidityCompilerResult));
                 CompilationErrorResult.parse(solidityCompilerResult.errors);
 
                 //There are errors

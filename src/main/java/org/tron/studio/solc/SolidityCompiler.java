@@ -203,7 +203,7 @@ public class SolidityCompiler {
     public Result compileSrc(File source, boolean optimize, boolean combinedJson, Option... options) throws IOException {
         List<String> commandParts = prepareCommandOptions(optimize, combinedJson, options);
 
-        commandParts.add(source.getName());
+        commandParts.add(source.getPath());
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandParts)
                 .directory(new File(SolidityFileUtil.getSourcePath()));

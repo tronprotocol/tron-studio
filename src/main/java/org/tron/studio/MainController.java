@@ -96,14 +96,17 @@ public class MainController {
         });
 
         ShareData.currentContractFileName.addListener((observable, oldValue, currentContractName) -> {
+            if(currentContractName == null || currentContractName.length() == 0)    return;
             boolean alreadyOpen = false;
             for (Tab tab : codeAreaTabPane.getTabs()) {
                 if (StringUtils.equals(tab.getText(), currentContractName)) {
                     codeAreaTabPane.getSelectionModel().select(tab);
                     alreadyOpen = true;
+                    break;
                 }
             }
             if (!alreadyOpen) {
+                System.out.println(currentContractName);
                 createTabForFileSystemFile(currentContractName);
             }
         });
@@ -115,14 +118,18 @@ public class MainController {
         });
 
         ShareData.openContractFileName.addListener((observable, oldValue, newValue) ->{
-            String filePath = ShareData.openContractFileName.get();
-            File newFile = new File(filePath);
+            if (newValue != null && newValue.length() > 0) {
+                String filePath = ShareData.openContractFileName.get();
+                System.out.println(filePath);
+//                File newFile = new File(filePath);
 
-            Tab newTab = setTab(newFile);
-            newTab.setClosable(true);
-            ShareData.currentContractName.set(newFile.getName());
-            ShareData.allContractFileName.add(newFile.getName());
-            codeAreaTabPane.getSelectionModel().select(newTab);
+//                Tab newTab = setTab(newFile);
+//                newTab.setClosable(true);
+                ShareData.currentContractFileName.set(null);
+                ShareData.currentContractFileName.set(filePath);
+                ShareData.allContractFileName.add(filePath);
+//                codeAreaTabPane.getSelectionModel().select(newTab);
+            }
         });
 
         ShareData.debugTransactionAction.addListener((observable, oldValue, newValue) -> {
@@ -154,7 +161,7 @@ public class MainController {
         AutoCompletion autoCompletion = new AutoCompletion(codeArea);
         autoCompletion.autoComplete(codeArea);
 
-        codeTab.setText(file.getName());
+        codeTab.setText(file.getPath());
         //Just not allow to close the default tab
         codeTab.setClosable(true);
 
