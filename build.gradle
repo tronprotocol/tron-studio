@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        maven { url 'http://mvnrepository.com' }
         mavenCentral()
         jcenter()
     }
@@ -46,8 +45,11 @@ task sourceJar(type: Jar, dependsOn: classes) {
 }
 
 repositories {
+<<<<<<< HEAD
     maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
     maven { url 'http://mvnrepository.com' }
+=======
+>>>>>>> java-tron/develop
     mavenLocal()
     mavenCentral()
     maven { url 'http://repo.spring.io/plugins-release' }
@@ -281,6 +283,9 @@ task stest(type: Test) {
 
     useTestNG {
         suites(file('src/test/resources/testng.xml'))
+        parallel 'tests'
+        threadCount 4
+
     }
 
     testLogging {
@@ -297,7 +302,7 @@ task stest(type: Test) {
 
 jacocoTestReport {
     reports {
-        xml.enabled false
+        xml.enabled true
         csv.enabled false
         html.destination file("${buildDir}/jacocoHtml")
     }

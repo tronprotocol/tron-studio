@@ -35,17 +35,12 @@ import stest.tron.wallet.common.client.utils.TransactionUtils;
 @Slf4j
 public class WalletTestAssetIssue010 {
 
-  //testng001、testng002、testng003、testng004
-  private final String testKey002 =
-      "FC8BF0238748587B9617EB6D15D47A66C0E07C1A1959033CF249C6532DC29FE6";
-
-
-
-  /*  //testng001、testng002、testng003、testng004
-  private static final byte[] fromAddress = Base58
-      .decodeFromBase58Check("THph9K2M2nLvkianrMGswRhz5hjSA9fuH7");*/
-
+  private final String testKey002 = Configuration.getByPath("testng.conf")
+      .getString("foundationAccount.key1");
+  private final String testKey003 = Configuration.getByPath("testng.conf")
+      .getString("foundationAccount.key2");
   private final byte[] fromAddress = PublicMethed.getFinalAddress(testKey002);
+  private final byte[] toAddress = PublicMethed.getFinalAddress(testKey003);
 
 
 
@@ -87,7 +82,7 @@ public class WalletTestAssetIssue010 {
     Wallet.setAddressPreFixByte(CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
   }
 
-  @BeforeClass(enabled = false)
+  @BeforeClass(enabled = true)
   public void beforeClass() {
     logger.info(testKeyForAssetIssue010);
     channelFull = ManagedChannelBuilder.forTarget(fullnode)
@@ -126,7 +121,7 @@ public class WalletTestAssetIssue010 {
 
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void testUpdateAssetIssue() {
     //Query the description and url,freeAssetNetLimit and publicFreeAssetNetLimit
     ByteString assetNameBs = ByteString.copyFrom(name.getBytes());
@@ -159,7 +154,7 @@ public class WalletTestAssetIssue010 {
         .assertTrue(assetIssueByName.getPublicFreeAssetNetLimit() == updatePublicFreeAssetNetLimit);
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void testUpdateAssetIssueExcption() {
     //Test update asset issue for wrong parameter
     //publicFreeAssetNetLimit is -1
@@ -200,7 +195,7 @@ public class WalletTestAssetIssue010 {
             publicFreeAssetNetLimit, testKeyForAssetIssue010, blockingStubFull));
   }
 
-  @AfterClass(enabled = false)
+  @AfterClass(enabled = true)
   public void shutdown() throws InterruptedException {
     //Assert.assertTrue(PublicMethed.updateAsset(ASSET010ADDRESS,Description.getBytes(),
     // Url.getBytes(),freeAssetNetLimit,

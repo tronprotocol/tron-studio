@@ -24,14 +24,29 @@ import org.tron.abi.datatypes.Event;
 import org.tron.abi.datatypes.Type;
 import org.tron.abi.datatypes.generated.AbiTypes;
 import org.tron.common.overlay.discover.node.Node;
+<<<<<<< HEAD
 import org.tron.common.runtime.Runtime;
 import org.tron.common.runtime.vm.program.invoke.ProgramInvokeFactoryImpl;
 import org.tron.common.storage.DepositImpl;
 import org.tron.common.utils.*;
+=======
+import org.tron.common.utils.ByteArray;
+import org.tron.common.utils.ForkController;
+import org.tron.common.utils.SessionOptional;
+import org.tron.common.utils.Sha256Hash;
+import org.tron.common.utils.StringUtil;
+>>>>>>> java-tron/develop
 import org.tron.core.Constant;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.*;
 import org.tron.core.capsule.BlockCapsule.BlockId;
+<<<<<<< HEAD
+=======
+import org.tron.core.capsule.BytesCapsule;
+import org.tron.core.capsule.TransactionCapsule;
+import org.tron.core.capsule.TransactionInfoCapsule;
+import org.tron.core.capsule.WitnessCapsule;
+>>>>>>> java-tron/develop
 import org.tron.core.capsule.utils.BlockUtil;
 import org.tron.core.config.Parameter.ChainConstant;
 import org.tron.core.config.args.Args;
@@ -272,7 +287,7 @@ public class Manager {
               this.rePush(tx);
             }
           } catch (InterruptedException ex) {
-            logger.error(ex.getMessage());
+            logger.info(ex.getMessage());
             Thread.currentThread().interrupt();
           } catch (Exception ex) {
             logger.error("unknown exception happened in repush loop", ex);
@@ -563,7 +578,7 @@ public class Manager {
           getDynamicPropertiesStore().getLatestBlockHeaderHash());
       logger.info("begin to erase block:" + oldHeadBlock);
       khaosDb.pop();
-      revokingStore.pop();
+      revokingStore.fastPop();
       logger.info("end to erase block:" + oldHeadBlock);
       popedTransactions.addAll(oldHeadBlock.getTransactions());
 
@@ -576,9 +591,10 @@ public class Manager {
       ContractExeException, ValidateSignatureException, AccountResourceInsufficientException,
       TransactionExpirationException, TooBigTransactionException, DupTransactionException,
       TaposException, ValidateScheduleException, ReceiptCheckErrException,
-      VMIllegalException, TooBigTransactionResultException {
+      VMIllegalException, TooBigTransactionResultException, UnLinkedBlockException,
+      NonCommonBlockException, BadNumberBlockException, BadBlockException {
     block.generatedByMyself = true;
-    applyBlock(block);
+    pushBlock(block);
   }
 
   private void applyBlock(BlockCapsule block) throws ContractValidateException,
@@ -932,25 +948,20 @@ public class Manager {
 
     consumeBandwidth(trxCap, trace);
 
-    DepositImpl deposit = DepositImpl.createRoot(this);
-    Runtime runtime = new Runtime(trace, blockCap, deposit, new ProgramInvokeFactoryImpl());
-    if (runtime.isCallConstant()) {
-      throw new VMIllegalException("cannot call constant method ");
-    }
-    trace.init();
-    trace.exec(runtime);
+    trace.init(blockCap);
+    trace.checkIsConstant();
+    trace.exec();
 
     if (Objects.nonNull(blockCap)) {
-      trace.setResult(runtime);
+      trace.setResult();
       if (!blockCap.getInstance().getBlockHeader().getWitnessSignature().isEmpty()) {
         if (trace.checkNeedRetry()) {
           String txId = Hex.toHexString(trxCap.getTransactionId().getBytes());
           logger.info("Retry for tx id: {}", txId);
-          deposit = DepositImpl.createRoot(this);
-          runtime = new Runtime(trace, blockCap, deposit, new ProgramInvokeFactoryImpl());
-          trace.init();
-          trace.exec(runtime);
-          trace.setResult(runtime);
+          trace.init(blockCap);
+          trace.checkIsConstant();
+          trace.exec();
+          trace.setResult();
           logger.info("Retry result for tx id: {}, tx resultCode in receipt: {}",
               txId, trace.getReceipt().getResult());
         }
@@ -958,18 +969,16 @@ public class Manager {
       }
     }
 
-    trace.finalization(runtime);
+    trace.finalization();
     if (Objects.nonNull(blockCap)) {
       if (getDynamicPropertiesStore().supportVM()) {
-        trxCap.setResult(runtime);
+        trxCap.setResultCode(trace.getReceipt().getResult());
       }
     }
     transactionStore.put(trxCap.getTransactionId().getBytes(), trxCap);
 
-    ReceiptCapsule traceReceipt = trace.getReceipt();
-
     TransactionInfoCapsule transactionInfo = TransactionInfoCapsule
-        .buildInstance(trxCap, blockCap, runtime, traceReceipt);
+        .buildInstance(trxCap, blockCap, trace);
 
     transactionHistoryStore.put(trxCap.getTransactionId().getBytes(), transactionInfo);
 
@@ -1093,13 +1102,17 @@ public class Manager {
       UnLinkedBlockException, ValidateScheduleException, AccountResourceInsufficientException {
 
     //check that the first block after the maintenance period has just been processed
-    if (lastHeadBlockIsMaintenanceBefore != lastHeadBlockIsMaintenance()) {
-      if (!witnessController.validateWitnessSchedule(witnessCapsule.getAddress(), when)) {
-        logger.info("It's not my turn, "
-            + "and the first block after the maintenance period has just been processed");
-        return null;
-      }
+    // if (lastHeadBlockIsMaintenanceBefore != lastHeadBlockIsMaintenance()) {
+    if (!witnessController.validateWitnessSchedule(witnessCapsule.getAddress(), when)) {
+      logger.info("It's not my turn, "
+          + "and the first block after the maintenance period has just been processed");
+
+      logger.info("when:{},lastHeadBlockIsMaintenanceBefore:{},lastHeadBlockIsMaintenanceAfter:{}",
+          when, lastHeadBlockIsMaintenanceBefore, lastHeadBlockIsMaintenance());
+
+      return null;
     }
+    // }
 
     final long timestamp = this.dynamicPropertiesStore.getLatestBlockHeaderTimestamp();
     final long number = this.dynamicPropertiesStore.getLatestBlockHeaderNumber();

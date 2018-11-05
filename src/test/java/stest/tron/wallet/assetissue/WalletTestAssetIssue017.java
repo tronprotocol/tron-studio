@@ -36,15 +36,12 @@ import stest.tron.wallet.common.client.utils.TransactionUtils;
 
 @Slf4j
 public class WalletTestAssetIssue017 {
-
-  //testng001、testng002、testng003、testng004
-  private final String testKey002 =
-      "FC8BF0238748587B9617EB6D15D47A66C0E07C1A1959033CF249C6532DC29FE6";
-  private final String testKey003 =
-      "6815B367FDDE637E53E9ADC8E69424E07724333C9A2B973CFA469975E20753FC";
-
+  private final String testKey002 = Configuration.getByPath("testng.conf")
+      .getString("foundationAccount.key1");
+  private final String testKey003 = Configuration.getByPath("testng.conf")
+      .getString("foundationAccount.key2");
   private final byte[] fromAddress = PublicMethed.getFinalAddress(testKey002);
-  private final byte[] toAddress   = PublicMethed.getFinalAddress(testKey003);
+  private final byte[] toAddress = PublicMethed.getFinalAddress(testKey003);
 
 
   private static long start;
@@ -84,7 +81,7 @@ public class WalletTestAssetIssue017 {
     Wallet.setAddressPreFixByte(CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
   }
 
-  @BeforeClass(enabled = false)
+  @BeforeClass(enabled = true)
   public void beforeClass() {
     logger.info(testKeyForAssetIssue017);
     channelFull = ManagedChannelBuilder.forTarget(fullnode)
@@ -123,7 +120,7 @@ public class WalletTestAssetIssue017 {
     }
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void atestGetPaginatedAssetIssueList() {
 
     Integer offset = 0;
@@ -143,7 +140,7 @@ public class WalletTestAssetIssue017 {
     }
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void btestGetPaginatedAssetIssueListException() {
     //offset is 0, limit is 0.
     Integer offset = 0;
@@ -194,7 +191,7 @@ public class WalletTestAssetIssue017 {
     Assert.assertTrue(assetIssueListPaginated.get().getAssetIssueCount() >= 1);
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void ctestGetPaginatedAssetIssueListOnSolidityNode() {
 
     Integer offset = 0;
@@ -216,7 +213,7 @@ public class WalletTestAssetIssue017 {
     }
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void dtestGetPaginatedAssetIssueListExceptionOnSolidityNode() {
     //offset is 0, limit is 0.
     Integer offset = 0;
@@ -281,7 +278,7 @@ public class WalletTestAssetIssue017 {
   }
 
 
-  @AfterClass(enabled = false)
+  @AfterClass(enabled = true)
   public void shutdown() throws InterruptedException {
     if (channelFull != null) {
       channelFull.shutdown().awaitTermination(5, TimeUnit.SECONDS);
