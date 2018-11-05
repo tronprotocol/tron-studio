@@ -153,7 +153,6 @@ public class Channel {
   public void initNode(byte[] nodeId, int remotePort) {
     node = new Node(nodeId, inetSocketAddress.getHostString(), remotePort);
     nodeStatistics = nodeManager.getNodeStatistics(node);
-    nodeManager.getNodeHandler(node).setNode(node);
   }
 
   public void disconnect(ReasonCode reason) {

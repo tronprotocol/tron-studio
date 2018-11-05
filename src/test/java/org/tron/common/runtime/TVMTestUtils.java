@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.common.crypto.Hash;
+import org.tron.common.runtime.vm.program.invoke.ProgramInvokeFactoryImpl;
 import org.tron.common.storage.DepositImpl;
 import org.tron.core.Wallet;
 import org.tron.core.capsule.BlockCapsule;
@@ -92,16 +93,18 @@ public class TVMTestUtils {
       DepositImpl deposit, BlockCapsule block)
       throws ContractExeException, ContractValidateException, ReceiptCheckErrException, VMIllegalException {
     TransactionCapsule trxCap = new TransactionCapsule(trx);
-    deposit.commit();
     TransactionTrace trace = new TransactionTrace(trxCap, deposit.getDbManager());
+    Runtime runtime = new Runtime(trace, block, deposit,
+        new ProgramInvokeFactoryImpl());
+
     // init
-    trace.init(block);
+    trace.init();
     //exec
-    trace.exec();
+    trace.exec(runtime);
 
-    trace.finalization();
+    trace.finalization(runtime);
 
-    return trace.getRuntime();
+    return runtime;
   }
 
 
@@ -135,15 +138,18 @@ public class TVMTestUtils {
       throws ContractExeException, ContractValidateException, ReceiptCheckErrException, VMIllegalException {
     TransactionCapsule trxCap = new TransactionCapsule(trx);
     TransactionTrace trace = new TransactionTrace(trxCap, dbManager);
+    DepositImpl deposit = DepositImpl.createRoot(dbManager);
+    Runtime runtime = new Runtime(trace, blockCap, deposit,
+        new ProgramInvokeFactoryImpl());
 
     // init
-    trace.init(blockCap);
+    trace.init();
     //exec
-    trace.exec();
+    trace.exec(runtime);
 
-    trace.finalization();
+    trace.finalization(runtime);
 
-    return new TVMTestResult(trace.getRuntime(), trace.getReceipt(), null);
+    return new TVMTestResult(runtime, trace.getReceipt(), null);
   }
 
 

@@ -44,25 +44,30 @@ import org.tron.protos.Protocol.ReasonCode;
 @Scope("prototype")
 public class HandshakeHandler extends ByteToMessageDecoder {
 
-  protected static final Logger logger = LoggerFactory.getLogger("HandshakeHandler");
+  private static final Logger logger = LoggerFactory.getLogger("HandshakeHandler");
 
   private byte[] remoteId;
 
-  protected Channel channel;
+  private Channel channel;
 
-  @Autowired
-  protected NodeManager nodeManager;
+  private final NodeManager nodeManager;
 
-  @Autowired
-  protected ChannelManager channelManager;
+  private final ChannelManager channelManager;
 
-  @Autowired
-  protected Manager manager;
+  private Manager manager;
 
   private P2pMessageFactory messageFactory = new P2pMessageFactory();
 
   @Autowired
   private SyncPool syncPool;
+
+  @Autowired
+  public HandshakeHandler(final NodeManager nodeManager, final ChannelManager channelManager,
+      final Manager manager) {
+    this.nodeManager = nodeManager;
+    this.channelManager = channelManager;
+    this.manager = manager;
+  }
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -110,7 +115,7 @@ public class HandshakeHandler extends ByteToMessageDecoder {
     this.remoteId = Hex.decode(remoteId);
   }
 
-  protected void sendHelloMsg(ChannelHandlerContext ctx, long time) {
+  private void sendHelloMsg(ChannelHandlerContext ctx, long time) {
 
     HelloMessage message = new HelloMessage(nodeManager.getPublicHomeNode(), time,
         manager.getGenesisBlockId(), manager.getSolidBlockId(), manager.getHeadBlockId());
@@ -120,10 +125,8 @@ public class HandshakeHandler extends ByteToMessageDecoder {
   }
 
   private void handleHelloMsg(ChannelHandlerContext ctx, HelloMessage msg) {
-
-    channel.initNode(msg.getFrom().getId(), msg.getFrom().getPort());
-
     if (remoteId.length != 64) {
+      channel.initNode(msg.getFrom().getId(), msg.getFrom().getPort());
       InetAddress address = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
       if (!channelManager.getTrustPeers().keySet().contains(address) && !syncPool.isCanConnect()) {
         channel.disconnect(ReasonCode.TOO_MANY_PEERS);

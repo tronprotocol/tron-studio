@@ -12,7 +12,6 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.tron.api.GrpcAPI.AccountResourceMessage;
 import org.tron.api.GrpcAPI.ExchangeList;
-import org.tron.api.GrpcAPI.PaginatedMessage;
 import org.tron.api.WalletGrpc;
 import org.tron.common.crypto.ECKey;
 import org.tron.common.utils.ByteArray;
@@ -77,19 +76,18 @@ public class WalletExchange001 {
         .usePlaintext(true)
         .build();
     blockingStubFull = WalletGrpc.newBlockingStub(channelFull);
-  }
-
-  @Test(enabled = true)
-  public void test1CreateUsedAsset() {
     Assert.assertTrue(PublicMethed.sendcoin(exchange001Address,10240000000L,fromAddress,
         testKey002,blockingStubFull));
     Assert.assertTrue(PublicMethed.sendcoin(secondExchange001Address,10240000000L,fromAddress,
         testKey002,blockingStubFull));
+  }
 
-    //Assert.assertTrue(PublicMethed.freezeBalance(exchange001Address, 1000000L,
-    //    3,exchange001Key,blockingStubFull));
-    //Assert.assertTrue(PublicMethed.freezeBalance(secondExchange001Address, 1000000L,
-    //    3,secondExchange001Key,blockingStubFull));
+  @Test(enabled = true)
+  public void test1CreateUsedAsset() {
+    Assert.assertTrue(PublicMethed.freezeBalance(exchange001Address, 1000000L,
+        3,exchange001Key,blockingStubFull));
+    Assert.assertTrue(PublicMethed.freezeBalance(secondExchange001Address, 1000000L,
+        3,secondExchange001Key,blockingStubFull));
     Long start = System.currentTimeMillis() + 5000L;
     Long end = System.currentTimeMillis() + 5000000L;
     Assert.assertTrue(PublicMethed.createAssetIssue(exchange001Address, name1, totalSupply, 1,
@@ -292,16 +290,6 @@ public class WalletExchange001 {
         == beforeToken1Balance - afterToken1Balance);
     Assert.assertTrue(afterExchangeToken2Balance - beforeExchangeToken2Balance
         == beforeToken2Balance - afterToken2Balance);
-  }
-
-  @Test(enabled = true)
-  public void test7GetExchangeListPaginated() {
-    PaginatedMessage.Builder pageMessageBuilder = PaginatedMessage.newBuilder();
-    pageMessageBuilder.setOffset(0);
-    pageMessageBuilder.setLimit(100);
-    ExchangeList exchangeList = blockingStubFull
-        .getPaginatedExchangeList(pageMessageBuilder.build());
-    Assert.assertTrue(exchangeList.getExchangesCount() >= 1);
   }
 
   @AfterClass

@@ -23,9 +23,6 @@ import org.tron.core.config.args.Args;
 import org.tron.core.db.ByteArrayWrapper;
 import org.tron.core.db.Manager;
 import org.tron.core.exception.StoreException;
-import org.tron.core.net.node.override.HandshakeHandlerTest;
-import org.tron.core.net.node.override.PeerClientTest;
-import org.tron.core.net.node.override.TronChannelInitializerTest;
 import org.tron.core.net.peer.PeerConnection;
 import org.tron.core.services.RpcApiService;
 import org.tron.core.services.WitnessService;
@@ -42,14 +39,12 @@ import java.util.stream.IntStream;
 public class GetLostBlockIdsTest {
     private static TronApplicationContext context;
     private static NodeImpl node;
-    private RpcApiService rpcApiService;
-    private static PeerClientTest peerClient;
-    private ChannelManager channelManager;
-    private SyncPool pool;
+    RpcApiService rpcApiService;
+    private static PeerClient peerClient;
+    ChannelManager channelManager;
+    SyncPool pool;
     private static Application appT;
-    private Manager dbManager;
-    private Node nodeEntity;
-    private static HandshakeHandlerTest handshakeHandlerTest;
+    Manager dbManager;
 
     private static final String dbPath = "output-GetLostBlockIdsTest";
     private static final String dbDirectory = "db_GetLostBlockIds_test";
@@ -147,7 +142,7 @@ public class GetLostBlockIdsTest {
         logger.info("finish2");
     }
 
-    private boolean go = false;
+    private static boolean go = false;
     private Map<ByteString, String> addTestWitnessAndAccount() {
         dbManager.getWitnesses().clear();
         return IntStream.range(0, 2)
@@ -188,9 +183,6 @@ public class GetLostBlockIdsTest {
 
     @Before
     public void init() {
-        nodeEntity = new Node(
-            "enode://e437a4836b77ad9d9ffe73ee782ef2614e6d8370fcf62191a6e488276e23717147073a7ce0b444d485fff5a0c34c4577251a7a990cf80d8542e21b95aa8c5e6c@127.0.0.1:17892");
-
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -226,12 +218,10 @@ public class GetLostBlockIdsTest {
 //        appT.startServices();
 //        appT.startup();
                 node = context.getBean(NodeImpl.class);
-                peerClient = context.getBean(PeerClientTest.class);
+                peerClient = context.getBean(PeerClient.class);
                 channelManager = context.getBean(ChannelManager.class);
                 pool = context.getBean(SyncPool.class);
                 dbManager = context.getBean(Manager.class);
-                handshakeHandlerTest = context.getBean(HandshakeHandlerTest.class);
-                handshakeHandlerTest.setNode(nodeEntity);
                 NodeDelegate nodeDelegate = new NodeDelegateImpl(dbManager);
                 node.setNodeDelegate(nodeDelegate);
                 pool.init(node);
@@ -265,21 +255,15 @@ public class GetLostBlockIdsTest {
             ExecutorService advertiseLoopThread = ReflectUtils.getFieldValue(node, "broadPool");
             advertiseLoopThread.shutdownNow();
 
-            peerClient.prepare(nodeEntity.getHexId());
-
             ReflectUtils.setFieldValue(node, "isAdvertiseActive", false);
             ReflectUtils.setFieldValue(node, "isFetchActive", false);
 
-            TronChannelInitializerTest tronChannelInitializer = ReflectUtils
-                .getFieldValue(peerClient, "tronChannelInitializer");
-            tronChannelInitializer.prepare();
-            org.tron.common.overlay.server.Channel channel = ReflectUtils.getFieldValue(tronChannelInitializer, "channel");
-            ReflectUtils.setFieldValue(channel, "handshakeHandler", handshakeHandlerTest);
-
+            Node node = new Node(
+                    "enode://e437a4836b77ad9d9ffe73ee782ef2614e6d8370fcf62191a6e488276e23717147073a7ce0b444d485fff5a0c34c4577251a7a990cf80d8542e21b95aa8c5e6c@127.0.0.1:17892");
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    peerClient.connect(nodeEntity.getHost(), nodeEntity.getPort(), nodeEntity.getHexId());
+                    peerClient.connect(node.getHost(), node.getPort(), node.getHexId());
                 }
             }).start();
             Thread.sleep(1000);
@@ -303,7 +287,6 @@ public class GetLostBlockIdsTest {
             peer.close();
         }
         peerClient.close();
-        handshakeHandlerTest.close();
         appT.shutdownServices();
         appT.shutdown();
         context.destroy();

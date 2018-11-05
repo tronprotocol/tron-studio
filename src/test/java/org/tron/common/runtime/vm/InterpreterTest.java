@@ -24,7 +24,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import java.io.*;
-import org.tron.common.runtime.vm.program.InternalTransaction.TrxType;
 import org.tron.core.config.args.Args;
 import org.tron.protos.Protocol.Transaction;
 import org.tron.common.runtime.vm.program.InternalTransaction;
@@ -52,7 +51,7 @@ public class InterpreterTest {
     // 0x60 0x00 - PUSH 0x00
     // 0x56      - JUMP to 0
     Transaction trx = Transaction.getDefaultInstance();
-    InternalTransaction interTrx = new InternalTransaction(trx, TrxType.TRX_UNKNOWN_TYPE);
+    InternalTransaction interTrx = new InternalTransaction(trx);
     program = new Program(op, invoke, interTrx);
 
     boolean result = false;
@@ -75,7 +74,7 @@ public class InterpreterTest {
     byte[] op = { 0x56 };
     // 0x56      - JUMP
     Transaction trx = Transaction.getDefaultInstance();
-    InternalTransaction interTrx = new InternalTransaction(trx, TrxType.TRX_UNKNOWN_TYPE);
+    InternalTransaction interTrx = new InternalTransaction(trx);
     program = new Program(op, invoke, interTrx);
 
     boolean result = false;
@@ -101,7 +100,7 @@ public class InterpreterTest {
     // 0x20      - 20
     // 0x56      - JUMP
     Transaction trx = Transaction.getDefaultInstance();
-    InternalTransaction interTrx = new InternalTransaction(trx, TrxType.TRX_UNKNOWN_TYPE);
+    InternalTransaction interTrx = new InternalTransaction(trx);
     program = new Program(op, invoke, interTrx);
 
     boolean result = false;
@@ -128,7 +127,7 @@ public class InterpreterTest {
     // 0x7F7F7F7F7F      - 547599908735
     // 0x56              - JUMP
     Transaction trx = Transaction.getDefaultInstance();
-    InternalTransaction interTrx = new InternalTransaction(trx, TrxType.TRX_UNKNOWN_TYPE);
+    InternalTransaction interTrx = new InternalTransaction(trx);
     program = new Program(op, invoke, interTrx);
 
     boolean result = false;

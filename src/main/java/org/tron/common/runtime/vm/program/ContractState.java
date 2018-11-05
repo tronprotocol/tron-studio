@@ -43,7 +43,7 @@ public class ContractState implements Deposit, ProgramListenerAware {
   private ProgramListener programListener;
 
   public ContractState(ProgramInvoke programInvoke) {
-    this.address = programInvoke.getContractAddress(); // contract address
+    this.address = programInvoke.getOwnerAddress(); // contract address
     this.deposit = programInvoke.getDeposit();
   }
 

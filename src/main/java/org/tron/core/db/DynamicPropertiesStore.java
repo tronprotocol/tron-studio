@@ -303,9 +303,9 @@ public class DynamicPropertiesStore extends TronStoreWithRevoking<BytesCapsule> 
     }
 
     try {
-      this.getMaxCpuTimeOfOneTx();
+      this.getMaxCpuTimeOfOneTX();
     } catch (IllegalArgumentException e) {
-      this.saveMaxCpuTimeOfOneTx(50L);
+      this.saveMaxCpuTimeOfOneTX(50L);
     }
 
     try {
@@ -736,12 +736,12 @@ public class DynamicPropertiesStore extends TronStoreWithRevoking<BytesCapsule> 
             () -> new IllegalArgumentException("not found ENERGY_FEE"));
   }
 
-  public void saveMaxCpuTimeOfOneTx(long time) {
+  public void saveMaxCpuTimeOfOneTX(long time) {
     this.put(MAX_CPU_TIME_OF_ONE_TX,
         new BytesCapsule(ByteArray.fromLong(time)));
   }
 
-  public long getMaxCpuTimeOfOneTx() {
+  public long getMaxCpuTimeOfOneTX() {
     return Optional.ofNullable(getUnchecked(MAX_CPU_TIME_OF_ONE_TX))
         .map(BytesCapsule::getData)
         .map(ByteArray::toLong)

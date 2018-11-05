@@ -23,10 +23,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.tron.common.application.ApplicationFactory;
 import org.tron.common.application.TronApplicationContext;
 import org.tron.common.runtime.Runtime;
-import org.tron.common.runtime.RuntimeImpl;
 import org.tron.common.runtime.TVMTestUtils;
 import org.tron.common.runtime.vm.program.invoke.ProgramInvokeFactoryImpl;
 import org.tron.common.storage.DepositImpl;
@@ -65,12 +63,12 @@ import org.tron.protos.Protocol.Transaction.raw;
  * function setCoin(uint receiver) public { for(uint i=0;i<receiver;i++){ balances = balances++; } }
  * }
  */
-public class BandWidthRuntimeTest {
+public class BandWithRuntimeTest {
 
   public static final long totalBalance = 1000_0000_000_000L;
-  private static String dbPath = "output_BandWidthRuntimeTest_test";
-  private static String dbDirectory = "db_BandWidthRuntimeTest_test";
-  private static String indexDirectory = "index_BandWidthRuntimeTest_test";
+  private static String dbPath = "output_BandWithRuntimeTest_test";
+  private static String dbDirectory = "db_BandWithRuntimeTest_test";
+  private static String indexDirectory = "index_BandWithRuntimeTest_test";
   private static AnnotationConfigApplicationContext context;
   private static Manager dbManager;
 
@@ -152,11 +150,10 @@ public class BandWidthRuntimeTest {
       dbManager.consumeBandwidth(trxCap, trace);
       BlockCapsule blockCapsule = null;
       DepositImpl deposit = DepositImpl.createRoot(dbManager);
-      Runtime runtime = new RuntimeImpl(trace, blockCapsule, deposit,
-          new ProgramInvokeFactoryImpl());
-      trace.init(blockCapsule);
-      trace.exec();
-      trace.finalization();
+      Runtime runtime = new Runtime(trace, blockCapsule, deposit, new ProgramInvokeFactoryImpl());
+      trace.init();
+      trace.exec(runtime);
+      trace.finalization(runtime);
 
       triggerOwner = dbManager.getAccountStore()
           .get(Wallet.decodeFromBase58Check(TriggerOwnerAddress));
@@ -171,7 +168,7 @@ public class BandWidthRuntimeTest {
   }
 
   @Test
-  public void testSuccessNoBandd() {
+  public void testSuccessNoBandWith() {
     try {
       byte[] contractAddress = createContract();
       TriggerSmartContract triggerContract = TVMTestUtils.createTriggerContract(contractAddress,
@@ -183,21 +180,20 @@ public class BandWidthRuntimeTest {
       TransactionCapsule trxCap = new TransactionCapsule(transaction);
       TransactionTrace trace = new TransactionTrace(trxCap, dbManager);
       dbManager.consumeBandwidth(trxCap, trace);
-      long bandWidth = trxCap.getSerializedSize() + Constant.MAX_RESULT_SIZE_IN_TX;
+      long bandWith = trxCap.getSerializedSize() + Constant.MAX_RESULT_SIZE_IN_TX;
       BlockCapsule blockCapsule = null;
       DepositImpl deposit = DepositImpl.createRoot(dbManager);
-      Runtime runtime = new RuntimeImpl(trace, blockCapsule, deposit,
-          new ProgramInvokeFactoryImpl());
-      trace.init(blockCapsule);
-      trace.exec();
-      trace.finalization();
+      Runtime runtime = new Runtime(trace, blockCapsule, deposit, new ProgramInvokeFactoryImpl());
+      trace.init();
+      trace.exec(runtime);
+      trace.finalization(runtime);
 
       AccountCapsule triggerOwnerTwo = dbManager.getAccountStore()
           .get(Wallet.decodeFromBase58Check(TriggerOwnerTwoAddress));
       long balance = triggerOwnerTwo.getBalance();
       ReceiptCapsule receipt = trace.getReceipt();
 
-      Assert.assertEquals(bandWidth, receipt.getNetUsage());
+      Assert.assertEquals(bandWith, receipt.getNetUsage());
       Assert.assertEquals(522850, receipt.getEnergyUsageTotal());
       Assert.assertEquals(50000, receipt.getEnergyUsage());
       Assert.assertEquals(47285000, receipt.getEnergyFee());
@@ -228,10 +224,10 @@ public class BandWidthRuntimeTest {
     dbManager.consumeBandwidth(trxCap, trace);
     BlockCapsule blockCapsule = null;
     DepositImpl deposit = DepositImpl.createRoot(dbManager);
-    Runtime runtime = new RuntimeImpl(trace, blockCapsule, deposit, new ProgramInvokeFactoryImpl());
-    trace.init(blockCapsule);
-    trace.exec();
-    trace.finalization();
+    Runtime runtime = new Runtime(trace, blockCapsule, deposit, new ProgramInvokeFactoryImpl());
+    trace.init();
+    trace.exec(runtime);
+    trace.finalization(runtime);
     owner = dbManager.getAccountStore()
         .get(Wallet.decodeFromBase58Check(OwnerAddress));
     energy = owner.getEnergyUsage() - energy;
@@ -252,7 +248,6 @@ public class BandWidthRuntimeTest {
   @AfterClass
   public static void destroy() {
     Args.clearParam();
-    ApplicationFactory.create(context).shutdown();
     context.destroy();
     FileUtil.deleteDir(new File(dbPath));
   }

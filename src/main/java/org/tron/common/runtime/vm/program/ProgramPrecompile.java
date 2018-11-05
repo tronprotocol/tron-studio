@@ -42,7 +42,7 @@ public class ProgramPrecompile {
       }
 
       if (op.equals(OpCode.JUMPDEST)) {
-        logger.debug("JUMPDEST:" + i);
+        logger.info("JUMPDEST:" + i);
         ret.jumpdest.add(i);
       }
 
@@ -62,7 +62,7 @@ public class ProgramPrecompile {
       }
 
       if (op.equals(OpCode.RETURN)) {
-        logger.debug("return");
+        logger.info("return");
       }
 
       if (op.equals(OpCode.RETURN) && i + 1 < ops.length && OpCode.code(ops[i + 1]) != null

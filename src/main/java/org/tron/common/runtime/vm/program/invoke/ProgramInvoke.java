@@ -19,7 +19,6 @@ package org.tron.common.runtime.vm.program.invoke;
 
 import org.tron.common.runtime.vm.DataWord;
 import org.tron.common.storage.Deposit;
-import org.tron.core.capsule.BlockCapsule;
 import org.tron.core.db.BlockStore;
 
 /**
@@ -28,7 +27,7 @@ import org.tron.core.db.BlockStore;
  */
 public interface ProgramInvoke {
 
-  DataWord getContractAddress();
+  DataWord getOwnerAddress();
 
   DataWord getBalance();
 
@@ -73,6 +72,4 @@ public interface ProgramInvoke {
   long getEnergyLimit();
 
   void setStaticCall();
-
-  BlockCapsule getBlockByNum(int index);
 }

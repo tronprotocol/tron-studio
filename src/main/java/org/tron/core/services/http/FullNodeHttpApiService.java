@@ -78,10 +78,6 @@ public class FullNodeHttpApiService implements Service {
   @Autowired
   private GetPaginatedAssetIssueListServlet getPaginatedAssetIssueListServlet;
   @Autowired
-  private GetPaginatedProposalListServlet getPaginatedProposalListServlet;
-  @Autowired
-  private GetPaginatedExchangeListServlet getPaginatedExchangeListServlet;
-  @Autowired
   private TotalTransactionServlet totalTransactionServlet;
   @Autowired
   private GetNextMaintenanceTimeServlet getNextMaintenanceTimeServlet;
@@ -177,10 +173,6 @@ public class FullNodeHttpApiService implements Service {
       context.addServlet(new ServletHolder(getAssetIssueListServlet), "/getassetissuelist");
       context.addServlet(new ServletHolder(getPaginatedAssetIssueListServlet),
           "/getpaginatedassetissuelist");
-      context.addServlet(new ServletHolder(getPaginatedProposalListServlet),
-          "/getpaginatedproposalist");
-      context.addServlet(new ServletHolder(getPaginatedExchangeListServlet),
-          "/getpaginatedexchangelist");
       context.addServlet(new ServletHolder(totalTransactionServlet), "/totaltransaction");
       context
           .addServlet(new ServletHolder(getNextMaintenanceTimeServlet), "/getnextmaintenancetime");

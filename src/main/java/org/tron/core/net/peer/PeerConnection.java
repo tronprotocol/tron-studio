@@ -46,10 +46,6 @@ public class PeerConnection extends Channel {
   @Getter
   private long remainNum;
 
-  @Setter
-  @Getter
-  private long lastBlockUpdateTime = System.currentTimeMillis();
-
   private volatile boolean syncFlag = true;
 
   private HelloMessage helloMessage;

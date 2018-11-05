@@ -33,12 +33,9 @@ import stest.tron.wallet.common.client.utils.TransactionUtils;
 @Slf4j
 public class WalletTestAssetIssue004 {
 
-  private final String testKey002 = Configuration.getByPath("testng.conf")
-      .getString("foundationAccount.key1");
-  private final String testKey003 = Configuration.getByPath("testng.conf")
-      .getString("foundationAccount.key2");
-  private final byte[] fromAddress = PublicMethed.getFinalAddress(testKey002);
-  private final byte[] toAddress = PublicMethed.getFinalAddress(testKey003);
+  //testng001、testng002、testng003、testng004
+  private final String testKey002 =
+      "FC8BF0238748587B9617EB6D15D47A66C0E07C1A1959033CF249C6532DC29FE6";
 
 
   //testng001、testng002、testng003、testng004
@@ -48,6 +45,8 @@ public class WalletTestAssetIssue004 {
       .decodeFromBase58Check("27XeWZUtufGk8jdjF3m1tuPnnRqqKgzS3pT");
   private static final byte[] INVALID_ADDRESS = Base58
       .decodeFromBase58Check("27cu1ozb4mX3m2afY68FSAqn3HmMp815d48");
+
+  private final byte[] fromAddress = PublicMethed.getFinalAddress(testKey002);
 
   private static final long now = System.currentTimeMillis();
   private static final String name = "testAssetIssue004_" + Long.toString(now);
@@ -66,7 +65,7 @@ public class WalletTestAssetIssue004 {
     Wallet.setAddressPreFixByte(CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
   }
 
-  @BeforeClass(enabled = true)
+  @BeforeClass(enabled = false)
   public void beforeClass() {
     channelFull = ManagedChannelBuilder.forTarget(fullnode)
         .usePlaintext(true)
@@ -91,7 +90,7 @@ public class WalletTestAssetIssue004 {
 
   }
 
-  @Test(enabled = true)
+  @Test(enabled = false)
   public void testGetAssetIssueByAccount() {
     ByteString addressBs = ByteString.copyFrom(fromAddress);
     Account request = Account.newBuilder().setAddress(addressBs).build();
@@ -131,7 +130,7 @@ public class WalletTestAssetIssue004 {
 
   }
 
-  @AfterClass(enabled = true)
+  @AfterClass(enabled = false)
   public void shutdown() throws InterruptedException {
     if (channelFull != null) {
       channelFull.shutdown().awaitTermination(5, TimeUnit.SECONDS);

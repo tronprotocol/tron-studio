@@ -26,12 +26,23 @@ import stest.tron.wallet.common.client.utils.PublicMethed;
 
 @Slf4j
 public class WalletTestAssetIssue012 {
-  private final String testKey002 = Configuration.getByPath("testng.conf")
-      .getString("foundationAccount.key1");
-  private final String testKey003 = Configuration.getByPath("testng.conf")
-      .getString("foundationAccount.key2");
+
+  //testng001、testng002、testng003、testng004
+  private final String testKey002 =
+      "FC8BF0238748587B9617EB6D15D47A66C0E07C1A1959033CF249C6532DC29FE6";
+  private final String testKey003 =
+      "6815B367FDDE637E53E9ADC8E69424E07724333C9A2B973CFA469975E20753FC";
+
+
+
+  /*  //testng001、testng002、testng003、testng004
+  private static final byte[] fromAddress = Base58
+      .decodeFromBase58Check("THph9K2M2nLvkianrMGswRhz5hjSA9fuH7");
+  private static final byte[] toAddress = Base58
+      .decodeFromBase58Check("TV75jZpdmP2juMe1dRwGrwpV6AMU6mr1EU");*/
+
   private final byte[] fromAddress = PublicMethed.getFinalAddress(testKey002);
-  private final byte[] toAddress = PublicMethed.getFinalAddress(testKey003);
+  private final byte[] toAddress   = PublicMethed.getFinalAddress(testKey003);
 
 
   private static final long now = System.currentTimeMillis();
@@ -67,7 +78,7 @@ public class WalletTestAssetIssue012 {
     Wallet.setAddressPreFixByte(CommonConstant.ADD_PRE_FIX_BYTE_MAINNET);
   }
 
-  @BeforeClass(enabled = true)
+  @BeforeClass(enabled = false)
   public void beforeClass() {
     logger.info(testKeyForAssetIssue012);
     logger.info(transferAssetCreateKey);
@@ -85,7 +96,7 @@ public class WalletTestAssetIssue012 {
     Optional<GrpcAPI.AssetIssueList> queryAssetByAccount = Optional.ofNullable(assetIssueList1);
     if (queryAssetByAccount.get().getAssetIssueCount() == 0) {
       //Assert.assertTrue(PublicMethed.freezeBalance(fromAddress, 10000000, 3, testKey002,
-      //   blockingStubFull));
+       //   blockingStubFull));
       Assert.assertTrue(PublicMethed
           .sendcoin(asset012Address, sendAmount, fromAddress, testKey002, blockingStubFull));
       Assert.assertTrue(PublicMethed
@@ -104,7 +115,7 @@ public class WalletTestAssetIssue012 {
     }
   }
 
-  @Test(enabled = true)
+  @Test(enabled = false)
   public void testTransferAssetUseCreatorNet() {
     //Transfer asset to an account.
     Assert.assertTrue(PublicMethed
@@ -140,7 +151,7 @@ public class WalletTestAssetIssue012 {
   }
 
 
-  @AfterClass(enabled = true)
+  @AfterClass(enabled = false)
   public void shutdown() throws InterruptedException {
     if (channelFull != null) {
       channelFull.shutdown().awaitTermination(5, TimeUnit.SECONDS);

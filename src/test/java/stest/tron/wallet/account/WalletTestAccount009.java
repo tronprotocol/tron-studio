@@ -22,12 +22,10 @@ import stest.tron.wallet.common.client.utils.PublicMethed;
 
 @Slf4j
 public class WalletTestAccount009 {
-  private final String testKey002 = Configuration.getByPath("testng.conf")
-      .getString("foundationAccount.key1");
+  private final String testKey002 =
+      "FC8BF0238748587B9617EB6D15D47A66C0E07C1A1959033CF249C6532DC29FE6";
+
   private final byte[] fromAddress = PublicMethed.getFinalAddress(testKey002);
-  private final String testKey003 = Configuration.getByPath("testng.conf")
-      .getString("foundationAccount.key2");
-  private final byte[] toAddress = PublicMethed.getFinalAddress(testKey003);
 
   private static final long now = System.currentTimeMillis();
   private static String name = "AssetIssue012_" + Long.toString(now);
@@ -70,10 +68,6 @@ public class WalletTestAccount009 {
         .build();
     blockingStubFull = WalletGrpc.newBlockingStub(channelFull);
 
-  }
-
-  @Test(enabled = true)
-  public void testGetEnergy() {
     Assert.assertTrue(PublicMethed.sendcoin(account009Address,10000000,
         fromAddress,testKey002,blockingStubFull));
     Assert.assertTrue(PublicMethed.sendcoin(account009SecondAddress,10000000,
@@ -81,7 +75,10 @@ public class WalletTestAccount009 {
     Assert.assertTrue(PublicMethed.sendcoin(account009InvalidAddress,10000000,
         fromAddress,testKey002,blockingStubFull));
 
+  }
 
+  @Test(enabled = true)
+  public void testGetEnergy() {
     Account account009Info = PublicMethed.queryAccount(account009Key,blockingStubFull);
     Assert.assertTrue(account009Info.getAccountResource().getEnergyUsage() == 0);
     Assert.assertTrue(account009Info.getAccountResource().getFrozenBalanceForEnergy()
