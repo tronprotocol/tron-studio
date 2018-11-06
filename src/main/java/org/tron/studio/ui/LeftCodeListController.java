@@ -200,17 +200,33 @@ public class LeftCodeListController {
                 return;
             }
 
-            for (File file : SolidityFileUtil.getFileNameList()) {
-                if (StringUtils.equals(file.getName(), filename)) {
-                    try {
-                        BufferedWriter out = new BufferedWriter(new FileWriter(file));
-                        out.write(content);
-                        out.close();
-                        logger.info(String.format("%s", file));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            System.out.println(filename);
+            boolean isImported = filename.indexOf("/") != -1 || filename.indexOf("\\") != -1? true: false;
+
+            if (isImported){
+                try {
+                    File file = new File(filename);
+                    BufferedWriter out = new BufferedWriter(new FileWriter(file));
+                    out.write(content);
+                    out.close();
+                    logger.info(String.format("%s", file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                for (File file : SolidityFileUtil.getFileNameList()) {
+                    if (StringUtils.equals(file.getName(), filename)) {
+                        try {
+                            BufferedWriter out = new BufferedWriter(new FileWriter(file));
+                            out.write(content);
+                            out.close();
+                            logger.info(String.format("%s", file));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
                     }
-                    break;
                 }
             }
             lastFileName = filename;
