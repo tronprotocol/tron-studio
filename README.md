@@ -23,3 +23,5 @@ Oracle JDK 1.8
 cd  build/libs
 java -jar TronStudio.jar
 ```
+## Compile contract Nullpointer quick fix:
+ https://github.com/tronprotocol/tron-studio/issues/8 
