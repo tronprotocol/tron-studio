@@ -5,6 +5,9 @@
 ## Tron Studio
 TronStudio is an IDE to develop/deploy/debug smart contract based on TVM.
 
+## Disable auto complete:
+change studio.autocomplete to false in src/main/resources/studio.properties
+and re-build amd run
 
 ## Screenshot
 ![](image/screenshot.png)
