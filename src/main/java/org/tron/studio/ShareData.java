@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.spongycastle.util.encoders.Hex;
 import org.tron.studio.solc.SolidityCompiler;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.tron.studio.utils.FormatCode;
 import org.tron.studio.walletserver.WalletClient;
 import javafx.scene.Scene;
@@ -28,8 +28,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.TreeSet;
+import org.springframework.context.annotation.PropertySource;
 
-
+@PropertySource("classpath:studio.properties")
 public class ShareData {
 
     private static final String[] testAccountAddress = {
@@ -96,6 +97,9 @@ public class ShareData {
 
     public static Boolean enableOptimize = true;
     public static long TRX_SUN_UNIT = 1_000_000;
+
+    @Value("${studio.autocomplete}")
+    public static boolean enableAutoComplete;
 
     public static SimpleStringProperty newAccount = new SimpleStringProperty();
     public static SimpleStringProperty newNetwork = new SimpleStringProperty();
