@@ -12,7 +12,8 @@ import org.tron.common.application.ApplicationFactory;
 import org.tron.common.application.TronApplicationContext;
 import org.tron.common.runtime.TVMTestResult;
 import org.tron.common.runtime.TVMTestUtils;
-import org.tron.common.runtime.vm.program.Program.OutOfResourceException;
+import org.tron.common.runtime.vm.program.Program.OutOfEnergyException;
+import org.tron.common.runtime.vm.program.Program.OutOfTimeException;
 import org.tron.common.storage.DepositImpl;
 import org.tron.common.utils.FileUtil;
 import org.tron.core.Constant;
@@ -89,6 +90,13 @@ public class EnergyWhenTimeoutStyleTest {
     TVMTestResult result = deployEndlessLoopContract(value, feeLimit,
         consumeUserResourcePercent);
 
+    if (null != result.getRuntime().getResult().getException()) {
+      long expectEnergyUsageTotal = feeLimit / 100;
+      Assert.assertEquals(result.getReceipt().getEnergyUsageTotal(), expectEnergyUsageTotal);
+      Assert.assertEquals(dbManager.getAccountStore().get(address).getBalance(),
+          totalBalance - expectEnergyUsageTotal * 100);
+      return;
+    }
     long expectEnergyUsageTotal = 55107;
     Assert.assertEquals(result.getReceipt().getEnergyUsageTotal(), expectEnergyUsageTotal);
     Assert.assertEquals(dbManager.getAccountStore().get(address).getBalance(),
@@ -107,7 +115,8 @@ public class EnergyWhenTimeoutStyleTest {
     long expectEnergyUsageTotal2 = feeLimit / 100;
     Assert.assertEquals(result.getReceipt().getEnergyUsageTotal(), expectEnergyUsageTotal2);
     Exception exception = result.getRuntime().getResult().getException();
-    Assert.assertTrue(exception instanceof OutOfResourceException);
+    Assert.assertTrue((exception instanceof OutOfTimeException)
+        || (exception instanceof OutOfEnergyException));
     Assert.assertEquals(dbManager.getAccountStore().get(address).getBalance(),
         totalBalance - (expectEnergyUsageTotal + expectEnergyUsageTotal2) * 100);
   }

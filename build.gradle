@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        maven { url 'http://mvnrepository.com' }
         mavenCentral()
         jcenter()
     }
@@ -23,6 +22,9 @@ apply plugin: 'checkstyle'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "jacoco"
 apply plugin: 'maven-publish'
+
+jar.enabled = false
+shadowJar.enabled = false
 
 sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -178,8 +180,9 @@ dependencies {
     compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.14'
 
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
-    // https://mvnrepository.com/artifact/org.antlr/antlr4-runtime
-    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7'
+
+    compile "io.vavr:vavr:0.9.2"
+
 }
 
 check.dependsOn 'lint'
@@ -281,6 +284,9 @@ task stest(type: Test) {
 
     useTestNG {
         suites(file('src/test/resources/testng.xml'))
+        parallel 'tests'
+        threadCount 4
+
     }
 
     testLogging {
@@ -297,7 +303,7 @@ task stest(type: Test) {
 
 jacocoTestReport {
     reports {
-        xml.enabled false
+        xml.enabled true
         csv.enabled false
         html.destination file("${buildDir}/jacocoHtml")
     }
