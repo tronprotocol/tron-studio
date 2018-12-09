@@ -1063,6 +1063,7 @@ public class WalletClient {
     builder.setOriginAddress(ByteString.copyFrom(address));
     builder.setAbi(abi);
     builder.setConsumeUserResourcePercent(consumeUserResourcePercent);
+    builder.setOriginEnergyLimit(1000 * 10000);
 
     if (value != 0) {
 

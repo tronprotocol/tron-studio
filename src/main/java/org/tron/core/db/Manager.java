@@ -884,7 +884,7 @@ public class Manager {
       }
       logger.debug("save block: " + newBlock);
     }
-    logger.info("pushBlock block number:{}, cost/txs:{}/{}",
+    logger.debug("pushBlock block number:{}, cost/txs:{}/{}",
         block.getNum(),
         System.currentTimeMillis() - start,
         block.getTransactions().size());
