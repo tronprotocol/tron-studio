@@ -331,5 +331,5 @@ def binaryRelease(taskName, jarName, mainClass) {
 }
 
 artifacts {
-//    archives(binaryRelease('buildTronStudio', 'TronStudio', 'org.tron.studio.TronStudio'))
+    archives(binaryRelease('buildTronStudio', 'TronStudio', 'org.tron.studio.MainApplication'))
 }
