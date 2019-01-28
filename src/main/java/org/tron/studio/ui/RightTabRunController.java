@@ -269,8 +269,6 @@ public class RightTabRunController implements Initializable {
 
             long finalFeeLimit = feeLimit;
             long finalCallValue = callValue;
-            long finalTokenId = tokenId;
-            long finalTokenValue = tokenValue;
             String byteCode = bin.toString();
 
             try {
@@ -280,7 +278,7 @@ public class RightTabRunController implements Initializable {
                 deployContractResult[0] = ShareData.wallet
                         .deployContract(currentContractName, currentContractFileMetadata.abi, byteCode,
                                 finalFeeLimit, finalCallValue,
-                                Long.parseLong(userPayRatio.getText()),finalTokenId, finalTokenValue, null);
+                                Long.parseLong(userPayRatio.getText()), tokenId, tokenValue, null);
 
             } catch (Exception e) {
                 String uuid = UUID.randomUUID().toString();
