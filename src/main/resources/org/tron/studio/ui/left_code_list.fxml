@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTreeTableView?>
+<?import com.jfoenix.controls.JFXTreeTableColumn?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.JFXRippler?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+
+<VBox spacing="10" prefWidth="200" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.tron.studio.ui.LeftCodeListController">
+    <padding>
+        <Insets left="10" right="10"/>
+    </padding>
+    <HBox>
+        <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#createContract">
+            <StackPane style="-fx-padding: 10;">
+                <MaterialDesignIconView glyphSize="20" glyphName="NOTE_PLUS_OUTLINE" styleClass="icon"/>
+            </StackPane>
+        </JFXRippler>
+        <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#saveContract">
+            <StackPane style="-fx-padding: 10;">
+                <MaterialDesignIconView glyphSize="20" glyphName="CONTENT_SAVE" styleClass="icon"/>
+            </StackPane>
+        </JFXRippler>
+        <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#openContract">
+            <StackPane style="-fx-padding: 10;">
+                <MaterialDesignIconView glyphSize="20" glyphName="FILE_IMPORT" styleClass="icon"/>
+            </StackPane>
+        </JFXRippler>
+    </HBox>
+    <JFXTreeTableView fx:id="fileNameTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <JFXTreeTableColumn fx:id="fileNameColumn" text="FileName" />
+        </columns>
+        <columnResizePolicy>
+            <JFXTreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </JFXTreeTableView>
+</VBox>

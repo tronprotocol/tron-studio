@@ -1,0 +1,85 @@
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXRippler?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<VBox spacing="10" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.tron.studio.ui.RightTabRunController">
+    <padding>
+        <Insets top="10" right="10" left="10"/>
+    </padding>
+    <GridPane hgap="5" vgap="5" styleClass="jfx-drawer-overlay-pane">
+        <columnConstraints>
+            <ColumnConstraints hgrow="NEVER" prefWidth="120.0"/>
+            <ColumnConstraints hgrow="ALWAYS" prefWidth="80.0"/>
+        </columnConstraints>
+        <Label text="Environment"      GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label text="Account"          GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Label text="Fee Limit"        GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Label text="Call Value"       GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Label text="Token(ID, Value)" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <Label text="User Pay Ratio"   GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+
+        <JFXComboBox  fx:id="environmentComboBox" HBox.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXTextField fx:id="current_ip_port"     HBox.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+        <JFXRippler   position="BACK" styleClass="icons-rippler1"  onMouseClicked="#onClickRefresh" GridPane.rowIndex="1" GridPane.columnIndex="2" >
+            <StackPane style="-fx-padding: 2;">
+                <MaterialDesignIconView glyphName="REFRESH" styleClass="icon"/>
+            </StackPane>
+        </JFXRippler>
+        <JFXComboBox  fx:id="accountComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="feeLimitTextField"   HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXComboBox  fx:id="feeUnitComboBox"     HBox.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="valueTextField"      HBox.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXComboBox  fx:id="valueUnitComboBox"   HBox.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="tokenIdTextField"    HBox.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="tokenValueTextField" HBox.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.columnIndex="2" GridPane.columnSpan="1"/>
+        <JFXTextField fx:id="userPayRatio"        HBox.hgrow="ALWAYS" GridPane.rowIndex="7" GridPane.columnIndex="1" GridPane.columnSpan="1"/>
+
+        <HBox GridPane.rowIndex="2" GridPane.columnIndex="2" GridPane.columnSpan="1" alignment="CENTER_RIGHT">
+            <JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickCopyAddress">
+                <StackPane style="-fx-padding: 2;">
+                    <MaterialDesignIconView glyphName="CONTENT_COPY" styleClass="icon"/>
+                </StackPane>
+            </JFXRippler>
+            <!--<JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickAddAddress">-->
+                <!--<StackPane style="-fx-padding: 2;">-->
+                    <!--<MaterialDesignIconView glyphName="PLUS_BOX" styleClass="icon"/>-->
+                <!--</StackPane>-->
+            <!--</JFXRippler>-->
+        </HBox>
+    </GridPane>
+    <GridPane hgap="5" vgap="5" styleClass="jfx-drawer-overlay-pane">
+        <columnConstraints>
+            <ColumnConstraints hgrow="ALWAYS" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+        </columnConstraints>
+        <JFXComboBox  fx:id="contractComboBox" GridPane.columnSpan="2" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <JFXTextField fx:id="constructorParaTextField" promptText="constructor parameters"    GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <!--<JFXTextField promptText="Load contract from address" GridPane.rowIndex="2" GridPane.columnIndex="0" />-->
+        <JFXButton    styleClass="custom-jfx-button-raised" text="Deploy" onAction="#onClickDeploy" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        <!--<JFXButton    styleClass="custom-jfx-button-raised" text="Load" onAction="#onClickLoad"     GridPane.rowIndex="2" GridPane.columnIndex="1" />-->
+    </GridPane>
+    <VBox spacing="10" styleClass="jfx-drawer-overlay-pane" VBox.vgrow="ALWAYS">
+        <HBox spacing="10">
+            <Label text="Deployed Contracts" />
+            <Region HBox.hgrow="ALWAYS"/>
+            <JFXRippler position="BACK" styleClass="icons-rippler1" onMouseClicked="#onClickClear">
+                <StackPane style="-fx-padding: 2;">
+                    <MaterialDesignIconView glyphName="DELETE" styleClass="icon"/>
+                </StackPane>
+            </JFXRippler>
+        </HBox>
+        <JFXListView VBox.vgrow="ALWAYS" fx:id="deployedContractList" styleClass="jfx-list-view" />
+    </VBox>
+
+</VBox>

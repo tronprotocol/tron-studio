@@ -1,0 +1,50 @@
+<?import com.jfoenix.controls.*?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<HBox spacing="10" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.tron.studio.ui.RightTabDebugController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <VBox spacing="10" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+        <HBox spacing="10" HBox.hgrow="ALWAYS">
+            <!--<JFXTextField promptText="Block number" fx:id="blockNumber"/>-->
+            <JFXTextField HBox.hgrow="ALWAYS" promptText="Transaction Id" fx:id="transactionIdTextField" editable="false"/>
+        </HBox>
+        <HBox spacing="10">
+            <Region HBox.hgrow="ALWAYS" />
+            <JFXRippler position="BACK" styleClass="icons-rippler1">
+                <StackPane style="-fx-padding: 2;">
+                    <MaterialDesignIconView glyphName="PLAY" size="2em" styleClass="icon" onMouseClicked="#onClickPlay"/>
+                </StackPane>
+            </JFXRippler>
+            <JFXRippler position="BACK" styleClass="icons-rippler1">
+                <StackPane style="-fx-padding: 2;">
+                    <MaterialDesignIconView  glyphName="STOP" size="2em" styleClass="icon" onMouseClicked="#onClickStop"/>
+                </StackPane>
+            </JFXRippler>
+            <JFXRippler position="BACK" styleClass="icons-rippler1">
+                <StackPane style="-fx-padding: 2;">
+                    <MaterialDesignIconView glyphName="STEP_BACKWARD" size="2em" styleClass="icon" onMouseClicked="#onClickBackward"/>
+                </StackPane>
+            </JFXRippler>
+            <JFXRippler position="BACK" styleClass="icons-rippler1">
+                <StackPane style="-fx-padding: 2;">
+                    <MaterialDesignIconView glyphName="STEP_FORWARD" size="2em" styleClass="icon" onMouseClicked="#onClickForward"/>
+                </StackPane>
+            </JFXRippler>
+            <Region HBox.hgrow="ALWAYS" />
+        </HBox>
+
+        <Label text="Energy Limit Left" fx:id="energyLimitLeftLabel"/>
+        <Label text="Instructions"/>
+        <JFXListView prefHeight="150" fx:id="debugInstructionsList" styleClass="sublist_debug"/>
+        <Label text="Stack"/>
+        <JFXListView prefHeight="150" fx:id="debugStackList" styleClass="sublist_debug"/>
+        <Label text="Memory"/>
+        <JFXListView prefHeight="150" fx:id="debugMemoryList" styleClass="sublist_debug"/>
+        <Region VBox.vgrow="ALWAYS"/>
+    </VBox>
+</HBox>

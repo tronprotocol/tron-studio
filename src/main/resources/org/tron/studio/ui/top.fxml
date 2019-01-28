@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXToolbar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.JFXRippler?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:id="titlePane" fx:controller="org.tron.studio.ui.TopController">
+   <JFXToolbar AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+               AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" >
+       <leftItems>
+           <Label text="Tron Studio"/>
+           <JFXButton styleClass="custom-jfx-button-raised"  text="Dump Layout info" onAction="#dumpLayoutInfo" visible="false"/>
+       </leftItems>
+       <rightItems>
+           <HBox spacing="10">
+               <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickBlockChain" visible="false">
+                   <StackPane style="-fx-padding: 10;">
+                       <MaterialDesignIconView glyphSize="20" glyphName="LINK" styleClass="icon-top2"/>
+                   </StackPane>
+               </JFXRippler>
+               <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickAccount">
+                   <StackPane style="-fx-padding: 10;">
+                       <MaterialDesignIconView glyphSize="20" glyphName="ACCOUNT_MULTIPLE" styleClass="icon-top2"/>
+                   </StackPane>
+               </JFXRippler>
+               <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onClickSettings">
+                   <StackPane style="-fx-padding: 10;">
+                       <MaterialDesignIconView glyphSize="20" glyphName="SETTINGS" styleClass="icon-top2"/>
+                   </StackPane>
+               </JFXRippler>
+               <JFXRippler position="FRONT" styleClass="icons-rippler" onMouseClicked="#onAddSettings">
+                   <StackPane style="-fx-padding: 10;">
+                       <MaterialDesignIconView glyphSize="20" glyphName="PLUS" styleClass="icon-top2"/>
+                   </StackPane>
+               </JFXRippler>
+           </HBox>
+       </rightItems>
+
+   </JFXToolbar>
+
+</AnchorPane>

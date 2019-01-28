@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXListView?>
+<?import java.net.URL?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.fxmisc.richtext.CodeArea?>
+<?import com.jfoenix.controls.JFXTabPane?>
+<?import com.jfoenix.controls.JFXRippler?>
+<?import com.jfoenix.controls.JFXHamburger?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="Infinity" maxWidth="Infinity" prefHeight="450"
+           prefWidth="800" xmlns="http://javafx.com/javafx/8.0.121"
+           fx:controller="org.tron.studio.MainController">
+    <AnchorPane>
+        <children>
+            <fx:include source="ui/top.fxml"
+                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
+                        AnchorPane.topAnchor="0"/>
+            <SplitPane dividerPositions="0.15, 0.65"
+                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
+                  AnchorPane.topAnchor="64" AnchorPane.bottomAnchor="50">
+                    <fx:include source="ui/left_code_list.fxml"/>
+                    <SplitPane prefWidth="400" AnchorPane.bottomAnchor="0" orientation="VERTICAL">
+                        <JFXTabPane fx:id="codeAreaTabPane" tabClosingPolicy="SELECTED_TAB" styleClass="custom-tab-pane"
+                                    VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                            <tabs>
+                                <Tab fx:id="defaultCodeAreaTab" text="VoteContract" >
+                                    <content>
+                                        <fx:include source="ui/code_area.fxml"/>
+                                    </content>
+                                </Tab>
+                            </tabs>
+                        </JFXTabPane>
+                        <fx:include VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" source="ui/transaction_history.fxml"/>
+                    </SplitPane>
+                    <JFXTabPane fx:id="rightContentTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="custom-tab-pane">
+                        <tabs>
+                            <Tab text="Compile">
+                                <content>
+                                    <fx:include source="ui/right_tab_compile.fxml"/>
+                                </content>
+                            </Tab>
+                            <Tab text="Run">
+                                <content>
+                                    <fx:include source="ui/right_tab_run.fxml"/>
+                                </content>
+                            </Tab>
+                            <Tab text="Debug">
+                                <content>
+                                    <fx:include source="ui/right_tab_debug.fxml"/>
+                                </content>
+                            </Tab>
+                        </tabs>
+                    </JFXTabPane>
+            </SplitPane>
+            <fx:include source="ui/bottom.fxml"
+                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0"
+                        AnchorPane.bottomAnchor="0"/>
+        </children>
+    </AnchorPane>
+</StackPane>

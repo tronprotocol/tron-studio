@@ -1,0 +1,11 @@
+
+.styled-text-area {
+    -fx-background-color: #ffffff;
+    -fx-font-family: "Courier";
+}
+
+.styled-text-area .text {
+    -fx-fill: #000000;
+}  
+
+
