@@ -738,6 +738,9 @@ public final class AbiTypes {
             case "bytes32":
                 return new TypeReference<Bytes32>(indexed) {
                 };
+            case "trctoken":
+                return new TypeReference<Uint256>(indexed) {
+                };
             default:
                 throw new UnsupportedOperationException("Unsupported type encountered: "
                         + type);

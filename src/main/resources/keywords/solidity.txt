@@ -161,3 +161,4 @@ bytes32
 fixed
 ufixed
 let
+trcToken

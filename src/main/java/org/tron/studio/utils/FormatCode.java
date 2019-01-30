@@ -60,7 +60,7 @@ public class FormatCode {
             }
         });
 
-        correctIndent();
+//        correctIndent();
     }
 
     public void correctIndent() {
