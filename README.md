@@ -1,5 +1,5 @@
 ## DEPRECATION NOTICE
-TronStudio project is now DEPRECATED and does not support the new [TRC10 token smart contract functions](https://developers.tron.network/docs/trc10-transfer-in-smart-contracts). Please use [TronBox](https://github.com/tronprotocol/tron-box) for smart contract deployment. Or community-developed online IDEs [Tronsmartcontract.space](https://tronsmartcontract.space) and [Arjia](http://arjia.city). 
+TronStudio project is now DEPRECATED and does not support the new [TRC10 token smart contract functions](https://developers.tron.network/docs/trc10-transfer-in-smart-contracts). Please use [TronBox](https://github.com/tronprotocol/tron-box) for smart contract deployment. 
 
 ## Documentation
 
